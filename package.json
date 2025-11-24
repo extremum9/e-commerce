@@ -13,6 +13,39 @@
     "format": "prettier --write \"{src,e2e}/**/*.+(ts|js|json|html|scss)\""
   },
   "private": true,
+  "lint-staged": {
+    "*.{ts,js}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{html,scss,json}": [
+      "prettier --write"
+    ]
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      },
+      {
+        "files": "index.html",
+        "options": {
+          "parser": "html"
+        }
+      }
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
+  },
   "dependencies": {
     "@angular/common": "20.3.0",
     "@angular/compiler": "20.3.0",
@@ -46,32 +79,9 @@
     "karma-coverage": "2.2.0",
     "karma-jasmine": "5.1.0",
     "karma-jasmine-html-reporter": "2.1.0",
+    "lint-staged": "16.2.7",
     "prettier": "3.6.2",
     "typescript": "5.9.2",
     "typescript-eslint": "8.40.0"
-  },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "trailingComma": "none",
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      },
-      {
-        "files": "index.html",
-        "options": {
-          "parser": "html"
-        }
-      }
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "git-cz"
-    }
   }
 }
