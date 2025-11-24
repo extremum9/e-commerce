@@ -9,6 +9,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "lint": "ng lint",
     "format": "prettier --write \"{src,e2e}/**/*.+(ts|js|json|html|scss)\""
   },
   "private": true,
@@ -23,12 +24,20 @@
     "tslib": "2.3.0"
   },
   "devDependencies": {
+    "@angular-eslint/builder": "20.3.0",
     "@angular/build": "20.3.0",
     "@angular/cli": "20.3.0",
     "@angular/compiler-cli": "20.3.0",
     "@commitlint/cli": "20.1.0",
     "@commitlint/config-conventional": "20.0.0",
+    "@eslint/js": "9.35.0",
     "@types/jasmine": "5.1.0",
+    "angular-eslint": "20.3.0",
+    "eslint": "9.35.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-import-x": "4.16.1",
+    "eslint-plugin-prettier": "5.5.4",
     "git-cz": "4.9.0",
     "husky": "9.1.7",
     "jasmine-core": "5.9.0",
@@ -38,7 +47,8 @@
     "karma-jasmine": "5.1.0",
     "karma-jasmine-html-reporter": "2.1.0",
     "prettier": "3.6.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "typescript-eslint": "8.40.0"
   },
   "prettier": {
     "printWidth": 100,
