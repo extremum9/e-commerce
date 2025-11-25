@@ -161,7 +161,9 @@ export default [
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['eslint.config.mjs', 'playwright.config.ts']
+        },
         tsconfigRootDir: import.meta.dirname
       }
     },
