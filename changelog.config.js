@@ -2,63 +2,63 @@ const types = {
   a11y: {
     description: 'An accessibility improvement or fix',
     emoji: '♿',
-    value: 'a11y',
+    value: 'a11y'
   },
   feat: {
     description: 'A new feature',
     emoji: '🎸',
-    value: 'feat',
+    value: 'feat'
   },
   fix: {
     description: 'A bug fix',
     emoji: '🐛',
-    value: 'fix',
+    value: 'fix'
   },
   test: {
     description: 'Adding missing or correcting existing tests',
     emoji: '💍',
-    value: 'test',
+    value: 'test'
   },
   build: {
     description: 'Changes that affect the build system',
     emoji: '📦',
-    value: 'build',
+    value: 'build'
   },
   chore: {
     description: 'Other changes that do not modify src or test files',
     emoji: '🤖',
-    value: 'chore',
+    value: 'chore'
   },
   perf: {
     description: 'A code change that improves performance',
     emoji: '🚀',
-    value: 'perf',
+    value: 'perf'
   },
   docs: {
     description: 'Documentation only changes',
     emoji: '✏️',
-    value: 'docs',
+    value: 'docs'
   },
   refactor: {
     description: 'A code change that neither fixes a bug or adds a feature',
     emoji: '💡',
-    value: 'refactor',
+    value: 'refactor'
   },
   style: {
     description: 'Markup, white-space, formatting, missing semi-colons...',
     emoji: '💄',
-    value: 'style',
+    value: 'style'
   },
   ci: {
     description: 'CI related changes',
     emoji: '🎡',
-    value: 'ci',
+    value: 'ci'
   },
   revert: {
     description: 'Revert a previous commit',
     emoji: '🗑️',
-    value: 'revert',
-  },
+    value: 'revert'
+  }
 };
 
 module.exports = {
@@ -69,5 +69,5 @@ module.exports = {
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues'],
   scopes: [],
-  types,
+  types
 };
