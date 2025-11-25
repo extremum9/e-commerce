@@ -15,6 +15,8 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 // Allows us to bring in the recommended rules for import/export syntax from eslint-plugin-import-x
 import * as eslintPluginImportX from 'eslint-plugin-import-x';
 
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+
 // Export our config array, which is composed together thanks to the typed utility function from typescript-eslint
 export default [
   ...tseslint.config(
@@ -168,12 +170,12 @@ export default [
       }
     },
     settings: {
-      'import/resolver': {
-        typescript: {
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
           alwaysTryTypes: true,
           project: 'tsconfig.json'
-        }
-      }
+        })
+      ]
     }
   }
 ];
