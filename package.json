@@ -11,7 +11,10 @@
     "test": "ng test",
     "e2e": "ng e2e",
     "lint": "ng lint",
-    "format": "prettier --write \"{src,e2e}/**/*.+(ts|js|json|html|scss)\""
+    "format": "prettier --write \"{src,e2e}/**/*.+(ts|js|json|html|scss)\"",
+    "format:check": "prettier --check \"{src,e2e}/**/*.+(ts|js|json|html|scss)\"",
+    "test:ci": "ng test --no-watch --browsers ChromeHeadless",
+    "e2e:ci": "ng e2e --configuration production"
   },
   "private": true,
   "lint-staged": {
