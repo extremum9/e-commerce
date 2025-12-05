@@ -3,6 +3,8 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-navbar',
@@ -13,20 +15,49 @@ import { MatIcon } from '@angular/material/icon';
           <img src="/logo.png" width="36" height="36" alt="Logo" />
           <span class="hidden font-medium md:inline-block">E-Commerce</span>
         </a>
-
         <div class="flex items-center gap-2">
-          <button class="hidden! md:flex!" matIconButton aria-label="Wishlist">
+          <button class="hidden! sm:flex!" matIconButton aria-label="Wishlist">
             <mat-icon>favorite</mat-icon>
           </button>
           <button matIconButton aria-label="Shopping cart">
             <mat-icon>shopping_cart</mat-icon>
           </button>
-          <button matButton="filled">Sign In</button>
+          <button class="hidden! sm:flex!" matButton="filled">Sign In</button>
+          <button
+            class="sm:hidden!"
+            matIconButton
+            [matMenuTriggerFor]="mobileMenu"
+            aria-label="Toggle mobile menu"
+          >
+            <mat-icon>menu</mat-icon>
+          </button>
         </div>
       </div>
     </mat-toolbar>
+
+    <mat-menu #mobileMenu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>favorite</mat-icon>
+        <span>Wishlist</span>
+      </button>
+      <mat-divider />
+      <button mat-menu-item>
+        <mat-icon>login</mat-icon>
+        <span>Sign In</span>
+      </button>
+    </mat-menu>
   `,
-  imports: [RouterLink, MatToolbar, MatIconButton, MatIcon, MatButton],
+  imports: [
+    RouterLink,
+    MatToolbar,
+    MatIconButton,
+    MatIcon,
+    MatButton,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatDivider
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Navbar {}
