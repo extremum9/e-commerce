@@ -8,17 +8,20 @@ import { MatIcon } from '@angular/material/icon';
   selector: 'app-navbar',
   template: `
     <mat-toolbar class="shadow-md">
-      <div class="container flex items-center justify-between mx-auto">
-        <a class="font-medium" routerLink="/">E-Commerce</a>
+      <div class="flex items-center justify-between gap-2 w-full max-w-[80rem] mx-auto">
+        <a class="flex items-center gap-1" routerLink="/">
+          <img src="/logo.png" width="36" height="36" alt="Logo" />
+          <span class="hidden font-medium md:inline-block">E-Commerce</span>
+        </a>
+
         <div class="flex items-center gap-2">
-          <button matIconButton aria-label="Wishlist">
+          <button class="hidden! md:flex!" matIconButton aria-label="Wishlist">
             <mat-icon>favorite</mat-icon>
           </button>
           <button matIconButton aria-label="Shopping cart">
             <mat-icon>shopping_cart</mat-icon>
           </button>
-          <button matButton>Sign In</button>
-          <button matButton="filled">Sign Up</button>
+          <button matButton="filled">Sign In</button>
         </div>
       </div>
     </mat-toolbar>
