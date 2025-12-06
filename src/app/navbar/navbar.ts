@@ -10,7 +10,7 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-navbar',
   template: `
     <mat-toolbar class="shadow-md">
-      <div class="flex items-center justify-between gap-2 w-full max-w-[80rem] mx-auto">
+      <div class="container flex items-center justify-between gap-2">
         <a class="flex items-center gap-1" routerLink="/">
           <img src="/logo.png" width="36" height="36" alt="Logo" />
           <span class="hidden font-medium md:inline-block">E-Commerce</span>
