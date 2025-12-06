@@ -1,26 +1,25 @@
-import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 
 import { App } from './app';
+import { Navbar } from './navbar/navbar';
 
-describe('App', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [App],
-      providers: [provideZonelessChangeDetection()]
-    }).compileComponents();
-  });
-
-  it('should create the app', () => {
+describe(App.name, () => {
+  const setup = () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection(), provideRouter([])]
+    });
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(App);
+    const debugElement = fixture.debugElement;
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Welcome to e-commerce!');
+
+    return { fixture, debugElement };
+  };
+
+  it('should have a navbar', () => {
+    const { debugElement } = setup();
+    expect(debugElement.query(By.directive(Navbar))).toBeTruthy();
   });
 });
