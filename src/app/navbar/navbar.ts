@@ -11,20 +11,31 @@ import { MatDivider } from '@angular/material/divider';
   template: `
     <mat-toolbar class="shadow-md">
       <div class="container flex items-center justify-between gap-2">
-        <a class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/">MiniStore</a>
+        <a data-testid="navbar-brand" class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/"
+          >MiniStore</a
+        >
         <div class="flex items-center gap-2">
-          <a class="hidden! sm:flex!" routerLink="/wishlist" matIconButton aria-label="Wishlist">
+          <a
+            data-testid="navbar-wishlist-link"
+            class="hidden! sm:flex!"
+            routerLink="/wishlist"
+            matIconButton
+            aria-label="Wishlist"
+          >
             <mat-icon>favorite</mat-icon>
           </a>
-          <a routerLink="/cart" matIconButton aria-label="Shopping cart">
+          <a data-testid="navbar-cart-link" routerLink="/cart" matIconButton aria-label="Cart">
             <mat-icon>shopping_cart</mat-icon>
           </a>
-          <button class="hidden! sm:flex!" matButton="filled">Sign In</button>
+          <button data-testid="navbar-login-button" class="hidden! sm:flex!" matButton="filled">
+            Sign In
+          </button>
           <button
+            data-testid="menu-button"
             class="sm:hidden!"
             matIconButton
-            [matMenuTriggerFor]="mobileMenu"
-            aria-label="Toggle mobile menu"
+            [matMenuTriggerFor]="menu"
+            aria-label="Toggle menu"
           >
             <mat-icon>menu</mat-icon>
           </button>
@@ -32,7 +43,7 @@ import { MatDivider } from '@angular/material/divider';
       </div>
     </mat-toolbar>
 
-    <mat-menu #mobileMenu="matMenu">
+    <mat-menu #menu="matMenu">
       <a routerLink="/wishlist" mat-menu-item>
         <mat-icon>favorite</mat-icon>
         <span>Wishlist</span>
