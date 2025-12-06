@@ -11,10 +11,7 @@ import { MatDivider } from '@angular/material/divider';
   template: `
     <mat-toolbar class="shadow-md">
       <div class="container flex items-center justify-between gap-2">
-        <a class="flex items-center shrink-0 gap-1" routerLink="/">
-          <img src="/logo.png" width="36" height="36" alt="Logo" />
-          <span class="hidden font-medium md:inline-block">E-Commerce</span>
-        </a>
+        <a class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/">MiniStore</a>
         <div class="flex items-center gap-2">
           <a class="hidden! sm:flex!" routerLink="/wishlist" matIconButton aria-label="Wishlist">
             <mat-icon>favorite</mat-icon>
