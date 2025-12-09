@@ -5,7 +5,7 @@ test.describe('Home page', () => {
     await page.goto('/');
   });
 
-  test('should display a title', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Welcome to e-commerce!');
+  test('should display a brand', async ({ page }) => {
+    await expect(page.getByTestId('navbar-brand')).toContainText('MiniStore');
   });
 });
