@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouterOutlet } from '@angular/router';
 import { By } from '@angular/platform-browser';
 
 import { App } from './app';
@@ -21,5 +21,10 @@ describe(App.name, () => {
   it('should have a navbar', () => {
     const { debugElement } = setup();
     expect(debugElement.query(By.directive(Navbar))).toBeTruthy();
+  });
+
+  it('should have a router outlet', () => {
+    const { debugElement } = setup();
+    expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
   });
 });
