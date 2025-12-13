@@ -49,3 +49,9 @@ body {
   max-width: 80rem;
   margin-inline: auto;
 }
+
+.fluid-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  gap: 1rem;
+}

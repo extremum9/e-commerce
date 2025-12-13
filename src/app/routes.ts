@@ -4,10 +4,10 @@ export const APP_ROUTES: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'products'
+    redirectTo: 'products/all'
   },
   {
-    path: 'products',
+    path: 'products/:category',
     loadComponent: () => import('./products-list/products-list')
   }
 ];
