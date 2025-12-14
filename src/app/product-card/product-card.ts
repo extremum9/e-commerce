@@ -32,7 +32,7 @@ import { Product } from '../models/product';
         >
         <div class="flex items-center justify-between gap-2">
           <span class="text-2xl font-bold break-all text-gray-900">\${{ product().price }}</span>
-          <button mat-flat-button class="shrink-0">
+          <button matButton="filled" class="shrink-0">
             <mat-icon>shopping_cart</mat-icon>
             Add to Cart
           </button>
