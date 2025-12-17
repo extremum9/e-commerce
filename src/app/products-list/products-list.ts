@@ -14,6 +14,7 @@ import { ProductCard } from '../product-card/product-card';
         @for (cat of categories(); track cat) {
           <li>
             <a
+              data-testid="category-link"
               [routerLink]="['/products', cat]"
               [matButton]="cat === category() ? 'filled' : 'outlined'"
             >

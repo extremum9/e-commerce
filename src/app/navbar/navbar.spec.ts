@@ -97,7 +97,6 @@ describe(Navbar.name, () => {
     const menuHarness = await loader.getHarness(
       MatMenuHarness.with({ selector: menuButtonSelector })
     );
-
     await menuHarness.open();
 
     expect(await menuHarness.isOpen())
