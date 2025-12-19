@@ -31,7 +31,7 @@ import { MatDivider } from '@angular/material/divider';
             Sign In
           </button>
           <button
-            data-testid="menu-button"
+            data-testid="navbar-menu-button"
             class="sm:hidden!"
             matIconButton
             [matMenuTriggerFor]="menu"
@@ -44,12 +44,12 @@ import { MatDivider } from '@angular/material/divider';
     </mat-toolbar>
 
     <mat-menu #menu="matMenu">
-      <a routerLink="/wishlist" mat-menu-item>
+      <a data-testid="menu-wishlist-link" routerLink="/wishlist" mat-menu-item>
         <mat-icon>favorite</mat-icon>
         <span>Wishlist</span>
       </a>
       <mat-divider />
-      <button mat-menu-item>
+      <button data-testid="menu-login-button" mat-menu-item>
         <mat-icon>login</mat-icon>
         <span>Sign In</span>
       </button>
