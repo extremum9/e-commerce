@@ -79,7 +79,7 @@ describe(Navbar.name, () => {
 
   it('should toggle the menu', async () => {
     const { loader } = setup();
-    const menuButtonSelector = '[data-testid=menu-button]';
+    const menuButtonSelector = '[data-testid=navbar-menu-button]';
 
     const menuButtonHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: menuButtonSelector })
