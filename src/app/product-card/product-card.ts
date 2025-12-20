@@ -8,6 +8,7 @@ import { Product } from '../models/product';
   selector: 'app-product-card',
   template: `
     <article
+      data-testid="product-card"
       class="flex flex-col h-full overflow-hidden rounded-xl bg-white shadow-lg transition-[translate,box-shadow] duration-200 ease-in-out hover:-translate-y-1 hover:shadow-xl"
     >
       <img
