@@ -45,3 +45,8 @@ Thumbs.db
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Firebase
+.firebase
+*-debug.log
+.runtimeconfig.json
