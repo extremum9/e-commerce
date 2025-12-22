@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs';
 
-import { PRODUCTS } from '../../data/products';
 import { ProductCard } from '../product-card/product-card';
+import { ProductApiClient } from '../product-api-client';
 
 export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'home'] as const;
 
@@ -25,28 +27,34 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
         }
       </ul>
 
-      <ul class="fluid-grid">
-        @for (product of products(); track product.id) {
-          <li>
-            <app-product-card [product]="product" />
-          </li>
-        }
-      </ul>
+      @if (products(); as products) {
+        <ul class="fluid-grid">
+          @for (product of products; track product.id) {
+            <li>
+              <app-product-card [product]="product" />
+            </li>
+          }
+        </ul>
+      }
     </div>
   `,
   imports: [ProductCard, MatButton, TitleCasePipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductList {
+  private readonly productApiClient = inject(ProductApiClient);
+
   protected readonly categories = signal(CATEGORIES);
 
   protected readonly category = input<string>();
 
-  protected readonly products = computed(() => {
-    const category = this.category()?.toLowerCase();
-
-    return category === 'all'
-      ? PRODUCTS
-      : PRODUCTS.filter((product) => product.category === category);
-  });
+  protected readonly products = toSignal(
+    toObservable(this.category).pipe(
+      switchMap((category) =>
+        !category || category === 'all'
+          ? this.productApiClient.list()
+          : this.productApiClient.listByCategory(category)
+      )
+    )
+  );
 }
