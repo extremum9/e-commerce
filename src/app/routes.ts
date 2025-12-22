@@ -8,6 +8,6 @@ export const APP_ROUTES: Routes = [
   },
   {
     path: 'products/:category',
-    loadComponent: () => import('./products-list/products-list')
+    loadComponent: () => import('./product-list/product-list')
   }
 ];

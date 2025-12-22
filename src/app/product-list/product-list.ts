@@ -9,7 +9,6 @@ import { ProductCard } from '../product-card/product-card';
 export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'home'] as const;
 
 @Component({
-  selector: 'app-products-list',
   template: `
     <div class="p-5 md:p-8">
       <ul class="flex flex-wrap justify-center gap-3 mb-6">
@@ -38,7 +37,7 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
   imports: [ProductCard, MatButton, TitleCasePipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class ProductsList {
+export default class ProductList {
   protected readonly categories = signal(CATEGORIES);
 
   protected readonly category = input<string>();
