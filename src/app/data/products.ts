@@ -29,7 +29,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: '3',
-    name: 'Pro Gaming Laptop 15"',
+    name: 'Pro Gaming Laptop 15',
     description: 'High-performance gaming laptop with latest GPU and 144Hz refresh rate display.',
     category: 'electronics',
     price: 1299.0,
