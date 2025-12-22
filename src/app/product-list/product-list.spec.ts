@@ -9,7 +9,7 @@ import { By } from '@angular/platform-browser';
 import { Product } from '../models/product';
 import { ProductCard } from '../product-card/product-card';
 
-import ProductsList from './products-list';
+import ProductList from './product-list';
 
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
@@ -20,9 +20,9 @@ class ProductCardStub {
   public readonly product = input.required<Product>();
 }
 
-describe(ProductsList.name, () => {
+describe(ProductList.name, () => {
   const setup = async () => {
-    TestBed.overrideComponent(ProductsList, {
+    TestBed.overrideComponent(ProductList, {
       remove: {
         imports: [ProductCard]
       },
@@ -34,7 +34,7 @@ describe(ProductsList.name, () => {
       providers: [
         provideZonelessChangeDetection(),
         provideRouter(
-          [{ path: 'products/:category', component: ProductsList }],
+          [{ path: 'products/:category', component: ProductList }],
           withComponentInputBinding()
         )
       ]
