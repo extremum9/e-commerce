@@ -6,6 +6,8 @@ import { MatButton } from '@angular/material/button';
 import { PRODUCTS } from '../data/products';
 import { ProductCard } from '../product-card/product-card';
 
+export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'home'] as const;
+
 @Component({
   selector: 'app-products-list',
   template: `
@@ -37,7 +39,7 @@ import { ProductCard } from '../product-card/product-card';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductsList {
-  protected readonly categories = signal(['all', 'electronics', 'clothing', 'accessories', 'home']);
+  protected readonly categories = signal(CATEGORIES);
 
   protected readonly category = input<string>();
 
