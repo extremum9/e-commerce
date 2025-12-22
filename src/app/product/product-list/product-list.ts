@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 
-import { PRODUCTS } from '../data/products';
+import { PRODUCTS } from '../../data/products';
 import { ProductCard } from '../product-card/product-card';
 
 export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'home'] as const;

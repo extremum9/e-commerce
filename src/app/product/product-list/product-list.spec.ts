@@ -6,7 +6,7 @@ import { Component, input, provideZonelessChangeDetection } from '@angular/core'
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { By } from '@angular/platform-browser';
 
-import { Product } from '../models/product';
+import { Product } from '../../models/product';
 import { ProductCard } from '../product-card/product-card';
 
 import ProductList from './product-list';
