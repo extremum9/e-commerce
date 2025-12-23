@@ -21,6 +21,7 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
               data-testid="category-link"
               [routerLink]="['/products', cat]"
               [matButton]="cat === category() ? 'filled' : 'outlined'"
+              [attr.aria-current]="cat === category() ? 'page' : null"
             >
               {{ cat | titlecase }}
             </a>
