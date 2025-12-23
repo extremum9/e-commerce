@@ -29,14 +29,11 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
       </ul>
 
       @if (products(); as products) {
+        <p class="mb-6 text-base text-gray-600">{{ products.length }} products found</p>
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
               <app-product-card [product]="product" />
-            </li>
-          } @empty {
-            <li>
-              <p class="text-gray-500">No products found.</p>
             </li>
           }
         </ul>
