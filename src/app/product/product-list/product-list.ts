@@ -55,12 +55,12 @@ export default class ProductList {
 
   protected readonly categories = signal(CATEGORIES);
 
-  protected readonly category = input<string>();
+  protected readonly category = input.required<string>();
 
   protected readonly products = toSignal(
     toObservable(this.category).pipe(
       switchMap((category) =>
-        !category || category === 'all'
+        category === 'all'
           ? this.productApiClient.list()
           : this.productApiClient.listByCategory(category)
       )
