@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { switchMap } from 'rxjs';
 
 import { ProductCard } from '../product-card/product-card';
@@ -33,12 +34,20 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
             <li>
               <app-product-card [product]="product" />
             </li>
+          } @empty {
+            <li>
+              <p class="text-gray-500">No products found.</p>
+            </li>
           }
         </ul>
+      } @else {
+        <div class="flex justify-center py-6">
+          <mat-spinner [diameter]="50" />
+        </div>
       }
     </div>
   `,
-  imports: [ProductCard, MatButton, TitleCasePipe, RouterLink],
+  imports: [ProductCard, MatButton, TitleCasePipe, RouterLink, MatProgressSpinner],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductList {
