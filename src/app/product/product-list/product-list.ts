@@ -19,7 +19,7 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
           <li>
             <a
               data-testid="category-link"
-              [routerLink]="['/products', cat]"
+              [routerLink]="cat === 'all' ? ['/products'] : ['/products', cat]"
               [matButton]="cat === category() ? 'filled' : 'outlined'"
               [attr.aria-current]="cat === category() ? 'page' : null"
             >
@@ -53,7 +53,9 @@ export default class ProductList {
 
   protected readonly categories = signal(CATEGORIES);
 
-  protected readonly category = input.required<string>();
+  protected readonly category = input.required({
+    transform: (value?: string) => value?.toLowerCase().trim() || 'all'
+  });
 
   protected readonly products = toSignal(
     toObservable(this.category).pipe(

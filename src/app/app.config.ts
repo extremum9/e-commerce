@@ -11,7 +11,7 @@ import { connectFirestoreEmulator, getFirestore, provideFirestore } from '@angul
 
 import { environment } from '../environments/environment';
 
-import { APP_ROUTES } from './routes';
+import { APP_ROUTES } from './app-routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
