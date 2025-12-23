@@ -13,9 +13,9 @@ import { Product } from '../../models/product';
     >
       <img
         data-testid="product-image"
-        class="w-full object-cover rounded-t-xl"
+        class="w-full object-cover aspect-square rounded-t-xl"
         [src]="product().imageUrl"
-        width="600"
+        width="400"
         height="400"
         [alt]="product().name"
       />
