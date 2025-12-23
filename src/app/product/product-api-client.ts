@@ -13,9 +13,8 @@ export class ProductApiClient {
   }
 
   public listByCategory(category: string): Observable<Product[]> {
-    return collectionData(
-      query(this.productsCollection, where('category', '==', category.toLowerCase())),
-      { idField: 'id' }
-    ) as Observable<Product[]>;
+    return collectionData(query(this.productsCollection, where('category', '==', category)), {
+      idField: 'id'
+    }) as Observable<Product[]>;
   }
 }
