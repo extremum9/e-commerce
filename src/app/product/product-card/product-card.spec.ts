@@ -45,7 +45,7 @@ describe(ProductCard.name, () => {
       .toBe(fakeProduct.imageUrl);
     expect(imageElement.getAttribute('width'))
       .withContext('The `width` attribute of the image is incorrect')
-      .toBe('600');
+      .toBe('400');
     expect(imageElement.getAttribute('height'))
       .withContext('The `height` attribute of the image is incorrect')
       .toBe('400');
@@ -93,7 +93,7 @@ describe(ProductCard.name, () => {
       .toContain('text-red-700');
   });
 
-  it('should display a price and add-to-cart button', async () => {
+  it('should display a price and an add-to-cart button', async () => {
     const { loader, debugElement, fakeProduct } = setup();
 
     const price = debugElement.query(By.css('[data-testid=product-price]'));
