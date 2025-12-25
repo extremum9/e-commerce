@@ -133,7 +133,7 @@ describe(ProductList.name, () => {
     const { debugElement, mockProducts } = await setup();
 
     const productCount = debugElement.query(By.css('[data-testid=product-count]'));
-    expect(productCount).withContext('No product count').toBeTruthy();
+    expect(productCount).withContext('The product count is missing').toBeTruthy();
     expect(productCount.nativeElement.textContent)
       .withContext('The product count is incorrect')
       .toContain(`${mockProducts.length} products found`);

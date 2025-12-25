@@ -28,7 +28,7 @@ describe(ProductCard.name, () => {
   it('should display an image', () => {
     const { debugElement, mockProduct } = setup();
     const image = debugElement.query(By.css('[data-testid=product-image]'));
-    expect(image).withContext('No image for the product').toBeTruthy();
+    expect(image).withContext('The image is missing').toBeTruthy();
     const imageElement: HTMLImageElement = image.nativeElement;
     expect(imageElement.getAttribute('src'))
       .withContext('The `src` attribute of the image is incorrect')
@@ -48,38 +48,38 @@ describe(ProductCard.name, () => {
     const { debugElement, mockProduct } = setup();
 
     const name = debugElement.query(By.css('[data-testid=product-name]'));
-    expect(name).withContext('No name for the product').toBeTruthy();
+    expect(name).withContext('The name is missing').toBeTruthy();
     expect(name.nativeElement.textContent)
-      .withContext('The name of the product is incorrect')
+      .withContext('The name is incorrect')
       .toContain(mockProduct.name);
 
     const description = debugElement.query(By.css('[data-testid=product-description]'));
-    expect(description).withContext('No description for the product').toBeTruthy();
+    expect(description).withContext('The description is missing').toBeTruthy();
     expect(description.nativeElement.textContent)
-      .withContext('The description of the product is incorrect')
+      .withContext('The description is incorrect')
       .toContain(mockProduct.description);
   });
 
   it('should display availability status', () => {
     const { fixture, debugElement, mockProduct } = setup();
     const availability = debugElement.query(By.css('[data-testid=product-availability]'));
-    expect(availability).withContext('No availability status for the product').toBeTruthy();
+    expect(availability).withContext('The availability status is missing').toBeTruthy();
     const availabilityElement: HTMLElement = availability.nativeElement;
     expect(availabilityElement.textContent)
-      .withContext('The text of the availability status is incorrect when in stock')
+      .withContext('The availability status is incorrect when the product is in stock')
       .toContain('In Stock');
     expect(availabilityElement.classList)
-      .withContext('The availability status should appear green when in stock')
+      .withContext('The availability status should be green when the product is in stock')
       .toContain('text-green-600');
 
     fixture.componentRef.setInput('product', { ...mockProduct, inStock: false });
     fixture.detectChanges();
 
     expect(availability.nativeElement.textContent)
-      .withContext('The text of the availability status is incorrect when out of stock')
+      .withContext('The availability status is incorrect when the product out of stock')
       .toContain('Out of Stock');
     expect(availability.nativeElement.classList)
-      .withContext('The availability status should appear red when out of stock')
+      .withContext('The availability status should be red when the product is out of stock')
       .toContain('text-red-700');
   });
 
@@ -87,16 +87,16 @@ describe(ProductCard.name, () => {
     const { loader, debugElement, mockProduct } = setup();
 
     const price = debugElement.query(By.css('[data-testid=product-price]'));
-    expect(price).withContext('No price for the product').toBeTruthy();
+    expect(price).withContext('The price is missing').toBeTruthy();
     expect(price.nativeElement.textContent)
-      .withContext('The price of the product is incorrect')
+      .withContext('The price is incorrect')
       .toContain(`$${mockProduct.price}`);
 
     const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=product-add-to-cart-button]' })
     );
     expect(await buttonHarness.getText())
-      .withContext('The text of the add-to-cart button is incorrect')
+      .withContext('The add-to-cart button should have a text')
       .toContain('Add to Cart');
 
     const iconHarness = await buttonHarness.getHarness(MatIconHarness);

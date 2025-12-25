@@ -25,7 +25,7 @@ describe(Navbar.name, () => {
   it('should display the brand', () => {
     const { debugElement } = setup();
     const brandLink = debugElement.query(By.css('[data-testid=navbar-brand]'));
-    expect(brandLink).withContext('No `a` element for the brand link').toBeTruthy();
+    expect(brandLink).withContext('The brand link is missing').toBeTruthy();
     expect(brandLink.nativeElement.getAttribute('href'))
       .withContext('The `href` attribute of the brand link is incorrect')
       .toBe('/');
