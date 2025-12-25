@@ -3,8 +3,8 @@ import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { switchMap } from 'rxjs';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ProductCard } from '../product-card/product-card';
 import { ProductApiClient } from '../product-api-client';
@@ -30,7 +30,9 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
       </ul>
 
       @if (products(); as products) {
-        <p class="mb-6 text-base text-gray-600">{{ products.length }} products found</p>
+        <p data-testid="product-count" class="mb-6 text-base text-gray-600">
+          {{ products.length }} products found
+        </p>
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
