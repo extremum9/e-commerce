@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures/fixtures';
+import { expect, test } from '../fixtures';
 
 test.describe('Home page', () => {
   test('should display a navbar with the brand and actions', async ({ homePage, navbar }) => {
