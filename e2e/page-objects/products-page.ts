@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-import { ProductCard } from '../shared/components';
+import { ProductCard } from '../components';
 
 export class ProductsPage {
   public readonly page: Page;
