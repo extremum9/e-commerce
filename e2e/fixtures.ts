@@ -24,13 +24,15 @@ export const test = base.extend<Fixtures>({
   productsPage: async ({ page }, use) => {
     await use(new ProductsPage(page));
   },
-  db: async (_, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  db: async ({}, use) => {
     await use({
       seedProducts
     });
   },
   dbClean: [
-    async (_, use) => {
+    // eslint-disable-next-line no-empty-pattern
+    async ({}, use) => {
       await clearFirestore();
       await use();
     },
