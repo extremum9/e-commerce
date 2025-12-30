@@ -1,5 +1,6 @@
 import { firebaseConfig } from './firebase-config';
 
 export const environment = {
-  firebase: firebaseConfig
+  firebase: firebaseConfig,
+  useEmulators: false
 };
