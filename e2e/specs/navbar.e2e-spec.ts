@@ -1,8 +1,8 @@
 import { expect, test } from '../fixtures';
 
-test.describe('Home page', () => {
-  test('should display a navbar with the brand and actions', async ({ homePage, navbar }) => {
-    await homePage.goto();
+test.describe('Navbar', () => {
+  test('should display the brand and user links', async ({ page, navbar }) => {
+    await page.goto('/');
 
     await expect(navbar.brandLink).toBeVisible();
     await expect(navbar.brandLink).toHaveAttribute('href', '/');
@@ -20,8 +20,8 @@ test.describe('Home page', () => {
     await expect(navbar.menuButton).toBeHidden();
   });
 
-  test('should display a mobile menu on smaller screens', async ({ page, homePage, navbar }) => {
-    await homePage.goto();
+  test('should display a mobile menu on smaller screens', async ({ page, navbar }) => {
+    await page.goto('/');
     await page.setViewportSize({ width: 375, height: 667 });
 
     await expect(navbar.brandLink).toBeVisible();
