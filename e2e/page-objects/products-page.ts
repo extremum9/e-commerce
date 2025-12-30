@@ -1,15 +1,17 @@
 import { Locator, Page } from '@playwright/test';
 
-import { ProductCard } from '../components';
-
 export class ProductsPage {
   public readonly page: Page;
   public readonly categoryLinks: Locator;
+  public readonly loadingProductListSpinner: Locator;
+  public readonly productCount: Locator;
   public readonly productCards: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.categoryLinks = page.getByTestId('category-link');
+    this.loadingProductListSpinner = page.getByTestId('loading-product-list-spinner');
+    this.productCount = page.getByTestId('product-count');
     this.productCards = page.getByTestId('product-card');
   }
 
@@ -19,9 +21,5 @@ export class ProductsPage {
 
   public async selectCategory(category: string): Promise<void> {
     await this.categoryLinks.filter({ hasText: category }).click();
-  }
-
-  public getProductCard(index: number): ProductCard {
-    return new ProductCard(this.productCards.nth(index));
   }
 }

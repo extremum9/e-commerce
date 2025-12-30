@@ -42,7 +42,7 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
         </ul>
       } @else {
         <div class="flex justify-center py-6">
-          <mat-spinner [diameter]="50" />
+          <mat-spinner data-testid="loading-product-list-spinner" [diameter]="50" />
         </div>
       }
     </div>

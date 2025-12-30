@@ -1,32 +1,56 @@
 import { expect, test } from '../fixtures';
+import { ProductCard } from '../components';
 
 test.describe('Products page', () => {
-  test('should display a list of products', async ({ page, productsPage }) => {
+  test('should display categories and products', async ({ page, productsPage }) => {
     await productsPage.goto();
 
-    await expect(productsPage.productCards).toHaveCount(20);
-    const productCard = productsPage.getProductCard(0);
-    await expect(productCard.image).toBeVisible();
-    await expect(productCard.name).toContainText('Wireless Headphones');
-    await expect(productCard.description).toBeVisible();
-    await expect(productCard.availability).toContainClass('text-green-600');
-    await expect(productCard.availability).toContainText('In Stock');
-    await expect(productCard.price).toContainText('$249.99');
-    await expect(productCard.addToCartButton).toBeEnabled();
+    await expect(productsPage.loadingProductListSpinner).toBeVisible();
+    await expect(productsPage.loadingProductListSpinner).toHaveCount(0);
 
+    await expect(productsPage.categoryLinks).toHaveText([
+      'All',
+      'Electronics',
+      'Clothing',
+      'Accessories',
+      'Home'
+    ]);
+    await expect(productsPage.categoryLinks.first()).toHaveAttribute('href', '/products');
+    await expect(productsPage.categoryLinks.first()).toHaveAttribute('aria-current', 'page');
+    await expect(productsPage.categoryLinks.nth(1)).toHaveAttribute(
+      'href',
+      '/products/electronics'
+    );
+    await expect(productsPage.categoryLinks.nth(1)).not.toHaveAttribute('aria-current', 'page');
+
+    await expect(productsPage.productCount).toContainText('14 products found');
+    const productCard = new ProductCard(page);
+    await expect(productCard.image).toHaveCount(14);
+    await expect(productCard.name).toHaveCount(14);
+    await expect(productCard.name.first()).toContainText('High-Speed Blender');
+    await expect(productCard.description).toHaveCount(14);
+    await expect(productCard.availability).toHaveCount(14);
+    await expect(productCard.availability.first()).toContainText('Out of Stock');
+    await expect(productCard.availability.nth(1)).toContainText('In Stock');
+    await expect(productCard.price).toHaveCount(14);
+    await expect(productCard.addToCartButton).toHaveCount(14);
+  });
+
+  test('should filter products by category', async ({ page, productsPage }) => {
+    await productsPage.goto();
     await productsPage.selectCategory('Clothing');
 
     await expect(page).toHaveURL('products/clothing');
-    await expect(productsPage.productCards).toHaveCount(5);
-    await expect(productsPage.getProductCard(0).name).toContainText('Neck T-Shirt');
+    await expect(productsPage.productCount).toContainText('3 products found');
+    const productCard = new ProductCard(page);
+    await expect(productCard.name).toHaveCount(3);
+    await expect(productCard.name.first()).toContainText('Slim-Fit Denim Jeans');
 
     await productsPage.selectCategory('Accessories');
 
     await expect(page).toHaveURL('products/accessories');
-    await expect(productsPage.productCards).toHaveCount(5);
-    await expect(productsPage.getProductCard(0).name).toContainText('Aviator Sunglasses');
-
-    await productsPage.selectCategory('All');
-    await expect(page).toHaveURL('products/all');
+    await expect(productsPage.productCount).toContainText('2 products found');
+    await expect(productCard.name).toHaveCount(2);
+    await expect(productCard.name.first()).toContainText('Genuine Leather Wallet');
   });
 });
