@@ -1,7 +1,7 @@
-import { Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 export class ProductCard {
-  public readonly parent: Locator;
+  public readonly parent: Page | Locator;
   public readonly image: Locator;
   public readonly name: Locator;
   public readonly description: Locator;
@@ -9,7 +9,7 @@ export class ProductCard {
   public readonly price: Locator;
   public readonly addToCartButton: Locator;
 
-  constructor(parent: Locator) {
+  constructor(parent: Page | Locator) {
     this.parent = parent;
     this.image = parent.getByTestId('product-image');
     this.name = parent.getByTestId('product-name');
