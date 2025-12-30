@@ -1,6 +1,5 @@
 import {
   ApplicationConfig,
-  isDevMode,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection
 } from '@angular/core';
@@ -21,14 +20,14 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => {
       const firestore = getFirestore();
-      if (isDevMode()) {
+      if (environment.useEmulators) {
         connectFirestoreEmulator(firestore, 'localhost', 8080);
       }
       return firestore;
     }),
     provideAuth(() => {
       const auth = getAuth();
-      if (isDevMode()) {
+      if (environment.useEmulators) {
         connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       }
       return auth;
