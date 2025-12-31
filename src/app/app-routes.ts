@@ -11,5 +11,10 @@ export const APP_ROUTES: Routes = [
   {
     matcher: productCategoryMatcher,
     loadComponent: () => import('./product/product-list/product-list')
+  },
+  {
+    path: 'auth',
+    loadComponent: () => import('./auth/auth-dialog/auth-dialog'),
+    loadChildren: () => import('./auth/auth-routes')
   }
 ];
