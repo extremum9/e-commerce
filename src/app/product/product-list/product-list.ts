@@ -8,8 +8,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ProductCard } from '../product-card/product-card';
 import { ProductApiClient } from '../product-api-client';
-
-export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'home'] as const;
+import { CategoryApiClient } from '../category-api-client';
 
 @Component({
   template: `
@@ -51,9 +50,10 @@ export const CATEGORIES = ['all', 'electronics', 'clothing', 'accessories', 'hom
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductList {
+  private readonly categoryApiClient = inject(CategoryApiClient);
   private readonly productApiClient = inject(ProductApiClient);
 
-  protected readonly categories = signal(CATEGORIES);
+  protected readonly categories = signal(this.categoryApiClient.list());
 
   protected readonly category = input.required({
     transform: (value?: string) => value?.toLowerCase().trim() || 'all'
