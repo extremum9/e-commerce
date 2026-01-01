@@ -8,13 +8,13 @@ import { RegisterForm } from '../register-form/register-form';
 @Component({
   template: `
     <mat-dialog-content>
-      <mat-tab-group>
+      <mat-tab-group dynamicHeight>
         <mat-tab label="Sign In">
-          <app-login-form />
+          <app-login-form class="block pt-8" />
         </mat-tab>
 
         <mat-tab label="Sign Up">
-          <app-register-form />
+          <app-register-form class="block pt-8" />
         </mat-tab>
       </mat-tab-group>
     </mat-dialog-content>
