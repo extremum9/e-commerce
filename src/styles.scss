@@ -52,6 +52,15 @@ body {
   margin-inline: auto;
 }
 
+mat-form-field {
+  @include mat.theme(
+    (
+      density: -1
+    )
+  );
+  width: 100%;
+}
+
 .fluid-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
