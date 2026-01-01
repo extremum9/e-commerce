@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MatFormField, MatPrefix } from '@angular/material/form-field';
+import { MatError, MatFormField, MatPrefix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
@@ -10,7 +10,7 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-login-form',
   template: `
     <form (ngSubmit)="login()">
-      <mat-form-field appearance="outline">
+      <mat-form-field class="mb-2" appearance="outline">
         <input
           matInput
           type="email"
@@ -19,11 +19,19 @@ import { MatDivider } from '@angular/material/divider';
           [(ngModel)]="user.email"
           email
           required
+          #email="ngModel"
         />
         <mat-icon matPrefix>email</mat-icon>
+
+        @if (email.hasError('required')) {
+          <mat-error>Email is <span class="font-medium">required</span></mat-error>
+        }
+        @if (email.hasError('email')) {
+          <mat-error>Email is <span class="font-medium">invalid</span></mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field class="mb-2" appearance="outline">
         <input
           matInput
           type="password"
@@ -32,8 +40,20 @@ import { MatDivider } from '@angular/material/divider';
           [(ngModel)]="user.password"
           minlength="6"
           required
+          #password="ngModel"
         />
         <mat-icon matPrefix>lock</mat-icon>
+
+        @if (password.hasError('required')) {
+          <mat-error>Password is <span class="font-medium">required</span></mat-error>
+        }
+        @if (password.hasError('minlength')) {
+          <mat-error
+            >Password must be at least
+            <span class="font-medium">{{ password.getError('minlength').requiredLength }}</span>
+            characters long</mat-error
+          >
+        }
       </mat-form-field>
 
       <button class="w-full" matButton="filled" type="submit">Sign In</button>
@@ -50,7 +70,16 @@ import { MatDivider } from '@angular/material/divider';
       </button>
     </form>
   `,
-  imports: [FormsModule, MatFormField, MatInput, MatIcon, MatPrefix, MatButton, MatDivider],
+  imports: [
+    FormsModule,
+    MatFormField,
+    MatInput,
+    MatIcon,
+    MatPrefix,
+    MatButton,
+    MatDivider,
+    MatError
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginForm {
