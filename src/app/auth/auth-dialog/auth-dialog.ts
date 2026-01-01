@@ -1,12 +1,25 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { MatDialogContent } from '@angular/material/dialog';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+
+import { LoginForm } from '../login-form/login-form';
+import { RegisterForm } from '../register-form/register-form';
 
 @Component({
   template: `
-    <h1>AuthDialog works!</h1>
-    <router-outlet />
+    <mat-dialog-content>
+      <mat-tab-group>
+        <mat-tab label="Sign In">
+          <app-login-form />
+        </mat-tab>
+
+        <mat-tab label="Sign Up">
+          <app-register-form />
+        </mat-tab>
+      </mat-tab-group>
+    </mat-dialog-content>
   `,
-  imports: [RouterOutlet],
+  imports: [MatDialogContent, MatTabGroup, MatTab, LoginForm, RegisterForm],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class AuthDialog {}

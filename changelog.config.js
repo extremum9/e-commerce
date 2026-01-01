@@ -68,6 +68,6 @@ module.exports = {
   maxMessageLength: 64,
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues'],
-  scopes: ['', 'app', 'e2e', 'styles', 'navbar', 'products'],
+  scopes: ['', 'app', 'auth', 'e2e', 'styles', 'navbar', 'products'],
   types
 };

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-sign-in',
-  template: `<h1>SignIn works!</h1>`,
+  selector: 'app-login-form',
+  template: `<h1>LoginForm works!</h1>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SignIn {}
+export class LoginForm {}

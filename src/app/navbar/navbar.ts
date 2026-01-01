@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
+
+import AuthDialog from '../auth/auth-dialog/auth-dialog';
 
 @Component({
   selector: 'app-navbar',
@@ -27,7 +30,12 @@ import { MatDivider } from '@angular/material/divider';
           <a data-testid="navbar-cart-link" routerLink="/cart" matIconButton aria-label="Cart">
             <mat-icon>shopping_cart</mat-icon>
           </a>
-          <button data-testid="navbar-login-button" class="hidden! sm:flex!" matButton="filled">
+          <button
+            data-testid="navbar-login-button"
+            class="hidden! sm:flex!"
+            matButton="filled"
+            (click)="openAuthDialog()"
+          >
             Sign In
           </button>
           <button
@@ -68,4 +76,10 @@ import { MatDivider } from '@angular/material/divider';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Navbar {}
+export class Navbar {
+  private readonly dialog = inject(MatDialog);
+
+  protected openAuthDialog(): void {
+    this.dialog.open(AuthDialog, { width: '400px' });
+  }
+}
