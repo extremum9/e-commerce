@@ -4,19 +4,18 @@ import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-login-form',
   template: `
-    <form (ngSubmit)="login()">
+    <form (ngSubmit)="login()" #form="ngForm">
       <mat-form-field class="mb-2" appearance="outline">
         <input
           matInput
           type="email"
           name="email"
           placeholder="Enter your email"
-          [(ngModel)]="user.email"
+          [(ngModel)]="userForm.email"
           email
           required
           #email="ngModel"
@@ -37,7 +36,7 @@ import { MatDivider } from '@angular/material/divider';
           type="password"
           name="password"
           placeholder="Enter your password"
-          [(ngModel)]="user.password"
+          [(ngModel)]="userForm.password"
           minlength="6"
           required
           #password="ngModel"
@@ -57,33 +56,13 @@ import { MatDivider } from '@angular/material/divider';
       </mat-form-field>
 
       <button class="w-full" matButton="filled" type="submit">Sign In</button>
-
-      <div class="flex items-center my-4">
-        <mat-divider class="grow" />
-        <span class="px-2 text-gray-700">Or</span>
-        <mat-divider class="grow" />
-      </div>
-
-      <button class="w-full" matButton="outlined" type="button">
-        Sign In with Google
-        <mat-icon svgIcon="google" />
-      </button>
     </form>
   `,
-  imports: [
-    FormsModule,
-    MatFormField,
-    MatInput,
-    MatIcon,
-    MatPrefix,
-    MatButton,
-    MatDivider,
-    MatError
-  ],
+  imports: [FormsModule, MatFormField, MatInput, MatIcon, MatPrefix, MatButton, MatError],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginForm {
-  protected readonly user = {
+  protected readonly userForm = {
     email: signal(''),
     password: signal('')
   };
