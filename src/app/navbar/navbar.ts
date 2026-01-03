@@ -8,6 +8,7 @@ import { MatDivider } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 
 import AuthDialog from '../auth/auth-dialog/auth-dialog';
+import { AuthApiClient } from '../auth/auth-api-client';
 
 @Component({
   selector: 'app-navbar',
@@ -30,14 +31,32 @@ import AuthDialog from '../auth/auth-dialog/auth-dialog';
           <a data-testid="navbar-cart-link" routerLink="/cart" matIconButton aria-label="Cart">
             <mat-icon>shopping_cart</mat-icon>
           </a>
-          <button
-            data-testid="navbar-login-button"
-            class="hidden! sm:flex!"
-            matButton="filled"
-            (click)="openAuthDialog()"
-          >
-            Sign In
-          </button>
+          @if (user(); as user) {
+            <button matIconButton [matMenuTriggerFor]="userMenu" aria-label="Toggle user menu">
+              <img class="rounded-full" [src]="user.imageUrl || 'person.jpg'" alt="Profile image" />
+            </button>
+
+            <mat-menu #userMenu="matMenu" xPosition="before">
+              <div class="flex flex-col min-w-[180px] px-3">
+                <span class="text-sm font-medium">{{ user.name }}</span>
+                <span class="text-xs text-gray-500">{{ user.email }}</span>
+              </div>
+              <mat-divider />
+              <button class="!min-h-[32px]" mat-menu-item>
+                <mat-icon>logout</mat-icon>
+                Sign Out
+              </button>
+            </mat-menu>
+          } @else {
+            <button
+              data-testid="navbar-login-button"
+              class="hidden! sm:flex!"
+              matButton="filled"
+              (click)="openAuthDialog()"
+            >
+              Sign In
+            </button>
+          }
           <button
             data-testid="navbar-menu-button"
             class="sm:hidden!"
@@ -56,11 +75,13 @@ import AuthDialog from '../auth/auth-dialog/auth-dialog';
         <mat-icon>favorite</mat-icon>
         <span>Wishlist</span>
       </a>
-      <mat-divider />
-      <button data-testid="menu-login-button" mat-menu-item>
-        <mat-icon>login</mat-icon>
-        <span>Sign In</span>
-      </button>
+      @if (!user()) {
+        <mat-divider />
+        <button data-testid="menu-login-button" mat-menu-item>
+          <mat-icon>login</mat-icon>
+          <span>Sign In</span>
+        </button>
+      }
     </mat-menu>
   `,
   imports: [
@@ -77,7 +98,10 @@ import AuthDialog from '../auth/auth-dialog/auth-dialog';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Navbar {
+  private readonly authApiClient = inject(AuthApiClient);
   private readonly dialog = inject(MatDialog);
+
+  protected readonly user = this.authApiClient.currentUser;
 
   protected openAuthDialog(): void {
     this.dialog.open(AuthDialog, { width: '400px' });
