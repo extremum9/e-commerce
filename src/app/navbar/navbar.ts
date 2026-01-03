@@ -41,7 +41,7 @@ import { AuthApiClient } from '../auth/auth-api-client';
                 <span class="text-xs text-gray-500">{{ user.email }}</span>
               </div>
               <mat-divider />
-              <button class="!min-h-[32px]" mat-menu-item>
+              <button class="!min-h-[32px]" mat-menu-item (click)="logout()">
                 <mat-icon>logout</mat-icon>
                 Sign Out
               </button>
@@ -76,5 +76,9 @@ export class Navbar {
 
   protected openAuthDialog(): void {
     this.dialog.open(AuthDialog, { width: '400px' });
+  }
+
+  protected logout(): void {
+    this.authApiClient.logout();
   }
 }
