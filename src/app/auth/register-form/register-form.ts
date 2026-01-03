@@ -8,14 +8,14 @@ import { MatInput } from '@angular/material/input';
 @Component({
   selector: 'app-register-form',
   template: `
-    <form (ngSubmit)="register()" #form="ngForm">
+    <form (ngSubmit)="register()" #ngForm="ngForm">
       <mat-form-field class="mb-2" appearance="outline">
         <input
           matInput
           type="text"
           name="name"
           placeholder="Enter your name"
-          [(ngModel)]="userForm.name"
+          [(ngModel)]="form.name"
           required
           #name="ngModel"
         />
@@ -32,7 +32,7 @@ import { MatInput } from '@angular/material/input';
           type="email"
           name="email"
           placeholder="Enter your email"
-          [(ngModel)]="userForm.email"
+          [(ngModel)]="form.email"
           email
           required
           #email="ngModel"
@@ -53,7 +53,7 @@ import { MatInput } from '@angular/material/input';
           type="password"
           name="password"
           placeholder="Enter your password"
-          [(ngModel)]="userForm.password"
+          [(ngModel)]="form.password"
           minlength="6"
           required
           #password="ngModel"
@@ -79,7 +79,7 @@ import { MatInput } from '@angular/material/input';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterForm {
-  protected readonly userForm = {
+  protected readonly form = {
     name: signal(''),
     email: signal(''),
     password: signal('')
