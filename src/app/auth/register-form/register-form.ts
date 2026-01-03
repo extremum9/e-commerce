@@ -11,9 +11,9 @@ import { MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatPrefix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthApiClient } from '../auth-api-client';
+import { Snackbar } from '../../snackbar';
 
 @Component({
   selector: 'app-register-form',
@@ -91,7 +91,7 @@ import { AuthApiClient } from '../auth-api-client';
 })
 export class RegisterForm {
   private readonly authApiClient = inject(AuthApiClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(Snackbar);
 
   protected readonly form = {
     name: signal(''),
@@ -114,10 +114,7 @@ export class RegisterForm {
       next: () => this.dialogClosed.emit(),
       error: () => {
         this.submitted.set(false);
-        this.snackBar.open('Try again with another email', '', {
-          duration: 5000,
-          panelClass: 'snackbar-error'
-        });
+        this.snackBar.showError('Try again with another email');
       }
     });
   }

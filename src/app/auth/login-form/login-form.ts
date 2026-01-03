@@ -11,9 +11,9 @@ import { MatInput } from '@angular/material/input';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthApiClient } from '../auth-api-client';
+import { Snackbar } from '../../snackbar';
 
 @Component({
   selector: 'app-login-form',
@@ -75,7 +75,7 @@ import { AuthApiClient } from '../auth-api-client';
 })
 export class LoginForm {
   private readonly authApiClient = inject(AuthApiClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(Snackbar);
 
   protected readonly form = {
     email: signal(''),
@@ -97,10 +97,7 @@ export class LoginForm {
       next: () => this.dialogClosed.emit(),
       error: () => {
         this.submitted.set(false);
-        this.snackBar.open('The email or password is incorrect', '', {
-          duration: 5000,
-          panelClass: 'snackbar-error'
-        });
+        this.snackBar.showError('The email or password is incorrect');
       }
     });
   }
