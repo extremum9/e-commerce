@@ -21,7 +21,6 @@ import { AuthApiClient } from '../auth/auth-api-client';
         <div class="flex items-center gap-2">
           <a
             data-testid="navbar-wishlist-link"
-            class="hidden! sm:flex!"
             routerLink="/wishlist"
             matIconButton
             aria-label="Wishlist"
@@ -48,41 +47,13 @@ import { AuthApiClient } from '../auth/auth-api-client';
               </button>
             </mat-menu>
           } @else {
-            <button
-              data-testid="navbar-login-button"
-              class="hidden! sm:flex!"
-              matButton="filled"
-              (click)="openAuthDialog()"
-            >
+            <button data-testid="navbar-login-button" matButton="filled" (click)="openAuthDialog()">
               Sign In
             </button>
           }
-          <button
-            data-testid="navbar-menu-button"
-            class="sm:hidden!"
-            matIconButton
-            [matMenuTriggerFor]="menu"
-            aria-label="Toggle menu"
-          >
-            <mat-icon>menu</mat-icon>
-          </button>
         </div>
       </div>
     </mat-toolbar>
-
-    <mat-menu #menu="matMenu">
-      <a data-testid="menu-wishlist-link" routerLink="/wishlist" mat-menu-item>
-        <mat-icon>favorite</mat-icon>
-        <span>Wishlist</span>
-      </a>
-      @if (!user()) {
-        <mat-divider />
-        <button data-testid="menu-login-button" mat-menu-item>
-          <mat-icon>login</mat-icon>
-          <span>Sign In</span>
-        </button>
-      }
-    </mat-menu>
   `,
   imports: [
     RouterLink,
