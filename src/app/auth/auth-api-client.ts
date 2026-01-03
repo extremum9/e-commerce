@@ -3,7 +3,9 @@ import { from, map, Observable, tap } from 'rxjs';
 import {
   Auth,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
   updateProfile
 } from '@angular/fire/auth';
 
@@ -17,6 +19,10 @@ export class AuthApiClient {
 
   public login({ email, password }: LoginCredentials): Observable<void> {
     return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(map(() => undefined));
+  }
+
+  public loginWithGoogle(): Observable<void> {
+    return from(signInWithPopup(this.auth, new GoogleAuthProvider())).pipe(map(() => undefined));
   }
 
   public register({ name, email, password }: RegisterCredentials): Observable<void> {

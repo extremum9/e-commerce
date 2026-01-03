@@ -7,6 +7,7 @@ import { MatIcon } from '@angular/material/icon';
 
 import { LoginForm } from '../login-form/login-form';
 import { RegisterForm } from '../register-form/register-form';
+import { AuthApiClient } from '../auth-api-client';
 
 @Component({
   template: `
@@ -27,7 +28,7 @@ import { RegisterForm } from '../register-form/register-form';
         <mat-divider class="grow" />
       </div>
 
-      <button class="w-full" matButton="outlined" type="button">
+      <button class="w-full" matButton="outlined" type="button" (click)="loginWithGoogle()">
         Continue with Google
         <mat-icon svgIcon="google" />
       </button>
@@ -46,7 +47,12 @@ import { RegisterForm } from '../register-form/register-form';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class AuthDialog {
+  private readonly authApiClient = inject(AuthApiClient);
   private readonly dialogRef = inject(MatDialogRef);
+
+  protected loginWithGoogle(): void {
+    this.authApiClient.loginWithGoogle().subscribe(() => this.close());
+  }
 
   protected close(): void {
     this.dialogRef.close();
