@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MatDialogContent } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
@@ -13,7 +13,7 @@ import { RegisterForm } from '../register-form/register-form';
     <mat-dialog-content>
       <mat-tab-group dynamicHeight>
         <mat-tab label="Sign In">
-          <app-login-form class="block pt-8" />
+          <app-login-form class="block pt-8" (dialogClosed)="close()" />
         </mat-tab>
 
         <mat-tab label="Sign Up">
@@ -45,4 +45,10 @@ import { RegisterForm } from '../register-form/register-form';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class AuthDialog {}
+export default class AuthDialog {
+  private readonly dialogRef = inject(MatDialogRef);
+
+  protected close(): void {
+    this.dialogRef.close();
+  }
+}

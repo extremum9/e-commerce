@@ -1,21 +1,31 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  output,
+  signal,
+  viewChild
+} from '@angular/core';
 import { MatError, MatFormField, MatPrefix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { AuthApiClient } from '../auth-api-client';
 
 @Component({
   selector: 'app-login-form',
   template: `
-    <form (ngSubmit)="login()" #form="ngForm">
+    <form (ngSubmit)="login()" #ngForm="ngForm">
       <mat-form-field class="mb-2" appearance="outline">
         <input
           matInput
           type="email"
           name="email"
           placeholder="Enter your email"
-          [(ngModel)]="userForm.email"
+          [(ngModel)]="form.email"
           email
           required
           #email="ngModel"
@@ -36,7 +46,7 @@ import { MatButton } from '@angular/material/button';
           type="password"
           name="password"
           placeholder="Enter your password"
-          [(ngModel)]="userForm.password"
+          [(ngModel)]="form.password"
           minlength="6"
           required
           #password="ngModel"
@@ -55,19 +65,43 @@ import { MatButton } from '@angular/material/button';
         }
       </mat-form-field>
 
-      <button class="w-full" matButton="filled" type="submit">Sign In</button>
+      <button class="w-full" matButton="filled" type="submit" [disabled]="submitted()">
+        {{ submitted() ? 'Signing In...' : 'Sign In' }}
+      </button>
     </form>
   `,
   imports: [FormsModule, MatFormField, MatInput, MatIcon, MatPrefix, MatButton, MatError],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginForm {
-  protected readonly userForm = {
+  private readonly authApiClient = inject(AuthApiClient);
+  private readonly snackBar = inject(MatSnackBar);
+
+  protected readonly form = {
     email: signal(''),
     password: signal('')
   };
 
+  protected readonly submitted = signal(false);
+
+  protected readonly dialogClosed = output();
+  protected readonly ngForm = viewChild.required(NgForm);
+
   protected login(): void {
-    // add logic
+    if (this.ngForm().invalid) {
+      return;
+    }
+
+    this.submitted.set(true);
+    this.authApiClient.login(this.ngForm().value).subscribe({
+      next: () => this.dialogClosed.emit(),
+      error: () => {
+        this.submitted.set(false);
+        this.snackBar.open('The email or password is incorrect', '', {
+          duration: 5000,
+          panelClass: 'snackbar-error'
+        });
+      }
+    });
   }
 }
