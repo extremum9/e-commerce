@@ -91,8 +91,8 @@ export class LoginForm {
     if (this.ngForm().invalid) {
       return;
     }
-
     this.submitted.set(true);
+    this.snackBar.dismiss();
     this.authApiClient.login(this.ngForm().value).subscribe({
       next: () => this.dialogClosed.emit(),
       error: () => {

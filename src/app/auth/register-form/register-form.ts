@@ -1,9 +1,19 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  output,
+  signal,
+  viewChild
+} from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatPrefix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { AuthApiClient } from '../auth-api-client';
 
 @Component({
   selector: 'app-register-form',
@@ -54,7 +64,6 @@ import { MatInput } from '@angular/material/input';
           name="password"
           placeholder="Enter your password"
           [(ngModel)]="form.password"
-          minlength="6"
           required
           #password="ngModel"
         />
@@ -72,20 +81,44 @@ import { MatInput } from '@angular/material/input';
         }
       </mat-form-field>
 
-      <button class="w-full" matButton="filled" type="submit">Sign Up</button>
+      <button class="w-full" matButton="filled" type="submit" [disabled]="submitted()">
+        {{ submitted() ? 'Signing Up...' : 'Sign Up' }}
+      </button>
     </form>
   `,
   imports: [FormsModule, MatButton, MatError, MatFormField, MatIcon, MatInput, MatPrefix],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterForm {
+  private readonly authApiClient = inject(AuthApiClient);
+  private readonly snackBar = inject(MatSnackBar);
+
   protected readonly form = {
     name: signal(''),
     email: signal(''),
     password: signal('')
   };
 
+  protected readonly submitted = signal(false);
+
+  protected readonly dialogClosed = output();
+  protected readonly ngForm = viewChild.required(NgForm);
+
   protected register(): void {
-    // add logic
+    if (this.ngForm().invalid) {
+      return;
+    }
+    this.submitted.set(true);
+    this.snackBar.dismiss();
+    this.authApiClient.register(this.ngForm().value).subscribe({
+      next: () => this.dialogClosed.emit(),
+      error: () => {
+        this.submitted.set(false);
+        this.snackBar.open('Try again with another email', '', {
+          duration: 5000,
+          panelClass: 'snackbar-error'
+        });
+      }
+    });
   }
 }

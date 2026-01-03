@@ -17,7 +17,7 @@ import { RegisterForm } from '../register-form/register-form';
         </mat-tab>
 
         <mat-tab label="Sign Up">
-          <app-register-form class="block pt-8" />
+          <app-register-form class="block pt-8" (dialogClosed)="close()" />
         </mat-tab>
       </mat-tab-group>
 

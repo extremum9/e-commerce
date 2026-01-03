@@ -1,6 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { from, map, Observable } from 'rxjs';
-import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { from, map, Observable, tap } from 'rxjs';
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
+} from '@angular/fire/auth';
+
+import { LoginCredentials, RegisterCredentials } from '../models/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -8,9 +15,14 @@ import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
 export class AuthApiClient {
   private readonly auth = inject(Auth);
 
-  public login(credentials: { email: string; password: string }): Observable<void> {
-    return from(
-      signInWithEmailAndPassword(this.auth, credentials.email, credentials.password)
-    ).pipe(map(() => undefined));
+  public login({ email, password }: LoginCredentials): Observable<void> {
+    return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(map(() => undefined));
+  }
+
+  public register({ name, email, password }: RegisterCredentials): Observable<void> {
+    return from(createUserWithEmailAndPassword(this.auth, email, password)).pipe(
+      tap((response) => updateProfile(response.user, { displayName: name })),
+      map(() => undefined)
+    );
   }
 }
