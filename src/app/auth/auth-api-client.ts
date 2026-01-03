@@ -42,4 +42,8 @@ export class AuthApiClient {
       map(() => undefined)
     );
   }
+
+  public logout(): Observable<void> {
+    return from(this.auth.signOut());
+  }
 }
