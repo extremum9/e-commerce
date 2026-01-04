@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { from, map, Observable, tap } from 'rxjs';
+import { from, map, Observable, switchMap } from 'rxjs';
 import {
   Auth,
-  authState,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
-  updateProfile
+  updateProfile,
+  user
 } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -21,9 +21,11 @@ import { CurrentUser } from '../models/current-user';
 export class AuthApiClient {
   private readonly auth = inject(Auth);
 
-  private readonly user$ = authState(this.auth).pipe(
+  private readonly user$ = user(this.auth).pipe(
     map((user) =>
-      user ? { name: user.displayName!, email: user.email!, imageUrl: user.photoURL } : null
+      user
+        ? { name: user.displayName ?? '', email: user.email ?? '', imageUrl: user.photoURL }
+        : null
     )
   );
   public readonly currentUser = toSignal<CurrentUser | null>(this.user$, { initialValue: null });
@@ -38,7 +40,9 @@ export class AuthApiClient {
 
   public register({ name, email, password }: RegisterCredentials): Observable<void> {
     return from(createUserWithEmailAndPassword(this.auth, email, password)).pipe(
-      tap((response) => updateProfile(response.user, { displayName: name })),
+      switchMap(({ user }) =>
+        from(updateProfile(user, { displayName: name })).pipe(switchMap(() => from(user.reload())))
+      ),
       map(() => undefined)
     );
   }
