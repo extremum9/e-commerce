@@ -4,17 +4,22 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 
 import { Navbar } from './navbar/navbar';
+import { AuthApiClient } from './auth/auth-api-client';
 
 @Component({
   selector: 'app-root',
   template: `
-    <app-navbar />
-    <router-outlet />
+    @if (user() !== undefined) {
+      <app-navbar />
+      <router-outlet />
+    }
   `,
   imports: [Navbar, RouterOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App {
+  protected readonly user = inject(AuthApiClient).currentUser;
+
   constructor() {
     const iconRegistry = inject(MatIconRegistry);
     const sanitizer = inject(DomSanitizer);
