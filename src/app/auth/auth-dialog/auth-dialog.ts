@@ -28,7 +28,13 @@ import { AuthApiClient } from '../auth-api-client';
         <mat-divider class="grow" />
       </div>
 
-      <button class="w-full" matButton="outlined" type="button" (click)="loginWithGoogle()">
+      <button
+        data-testid="login-with-google-button"
+        class="w-full"
+        matButton="outlined"
+        type="button"
+        (click)="loginWithGoogle()"
+      >
         Continue with Google
         <mat-icon svgIcon="google" />
       </button>
