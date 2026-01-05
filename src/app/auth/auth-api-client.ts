@@ -21,14 +21,16 @@ import { CurrentUser } from '../models/current-user';
 export class AuthApiClient {
   private readonly auth = inject(Auth);
 
-  private readonly user$ = user(this.auth).pipe(
+  private readonly user$: Observable<CurrentUser | null> = user(this.auth).pipe(
     map((user) =>
       user
         ? { name: user.displayName ?? '', email: user.email ?? '', imageUrl: user.photoURL }
         : null
     )
   );
-  public readonly currentUser = toSignal<CurrentUser | null>(this.user$, { initialValue: null });
+  public readonly currentUser = toSignal<CurrentUser | null | undefined>(this.user$, {
+    initialValue: undefined
+  });
 
   public login({ email, password }: LoginCredentials): Observable<void> {
     return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(map(() => undefined));
