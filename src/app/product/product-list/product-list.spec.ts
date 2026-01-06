@@ -21,13 +21,12 @@ type SetupConfig = {
   listByCategoryReturn$?: Observable<Product[]>;
 };
 
-// eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   selector: 'app-product-card',
   template: `<h3>{{ product().name }}</h3>`
 })
 class ProductCardStub {
-  public readonly product = input.required<Product>();
+  product = input.required<Product>();
 }
 
 describe(ProductList.name, () => {

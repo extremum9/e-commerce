@@ -156,6 +156,17 @@ export default [
         '@angular-eslint/template/prefer-self-closing-tags': 'error',
         '@angular-eslint/template/interactive-supports-focus': 'off'
       }
+    },
+    {
+      // Everything in this config object overrides the base TypeScript rules for our spec files
+      files: ['**/*.spec.ts'],
+      rules: {
+        '@typescript-eslint/explicit-member-accessibility': 'off',
+        '@typescript-eslint/member-ordering': 'off',
+        '@angular-eslint/prefer-on-push-component-change-detection': 'off',
+        '@angular-eslint/prefer-signals': 'off',
+        'no-console': 'off'
+      }
     }
   ),
   eslintPluginPrettierRecommended,
