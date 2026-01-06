@@ -23,34 +23,31 @@ import { RegisterForm } from '../register-form/register-form';
 
 import AuthDialog from './auth-dialog';
 
-// eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   template: `<button data-testid="open-dialog-button" (click)="open()">Open dialog</button>`
 })
 class AuthDialogTestHost {
-  public dialog = inject(MatDialog);
+  dialog = inject(MatDialog);
 
-  public open() {
+  open() {
     this.dialog.open(AuthDialog);
   }
 }
 
-// eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   selector: 'app-login-form',
   template: ''
 })
 class LoginFormStub {
-  public dialogClosed = output();
+  dialogClosed = output();
 }
 
-// eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   selector: 'app-register-form',
   template: ''
 })
 class RegisterFormStub {
-  public dialogClosed = output();
+  dialogClosed = output();
 }
 
 describe(AuthDialog.name, () => {
