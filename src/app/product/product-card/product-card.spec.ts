@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 
-import { createMockProduct } from '../../mocks';
+import { createMockProduct } from '../../testing-utils';
 
 import { ProductCard } from './product-card';
 
