@@ -12,7 +12,7 @@ import { Product } from '../../models/product';
 import { ProductCard } from '../product-card/product-card';
 import { productCategoryMatcher } from '../../utils';
 import { ProductApiClient } from '../product-api-client';
-import { createMockProduct } from '../../mocks';
+import { createMockProduct } from '../../testing-utils';
 
 import ProductList from './product-list';
 
