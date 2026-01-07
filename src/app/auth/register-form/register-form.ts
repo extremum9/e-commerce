@@ -19,8 +19,9 @@ import { Snackbar } from '../../snackbar';
   selector: 'app-register-form',
   template: `
     <form (ngSubmit)="register()" #ngForm="ngForm">
-      <mat-form-field class="mb-2" appearance="outline">
+      <mat-form-field data-testid="register-form-name-field" class="mb-2" appearance="outline">
         <input
+          data-testid="register-form-name-input"
           matInput
           type="text"
           name="name"
@@ -36,8 +37,9 @@ import { Snackbar } from '../../snackbar';
         }
       </mat-form-field>
 
-      <mat-form-field class="mb-2" appearance="outline">
+      <mat-form-field data-testid="register-form-email-field" class="mb-2" appearance="outline">
         <input
+          data-testid="register-form-email-input"
           matInput
           type="email"
           name="email"
@@ -51,19 +53,20 @@ import { Snackbar } from '../../snackbar';
 
         @if (email.hasError('required')) {
           <mat-error>Email is <span class="font-medium">required</span></mat-error>
-        }
-        @if (email.hasError('email')) {
+        } @else if (email.hasError('email')) {
           <mat-error>Email is <span class="font-medium">invalid</span></mat-error>
         }
       </mat-form-field>
 
-      <mat-form-field class="mb-2" appearance="outline">
+      <mat-form-field data-testid="register-form-password-field" class="mb-2" appearance="outline">
         <input
+          data-testid="register-form-password-input"
           matInput
           type="password"
           name="password"
           placeholder="Enter your password"
           [(ngModel)]="form.password"
+          minlength="6"
           required
           #password="ngModel"
         />
@@ -71,17 +74,24 @@ import { Snackbar } from '../../snackbar';
 
         @if (password.hasError('required')) {
           <mat-error>Password is <span class="font-medium">required</span></mat-error>
-        }
-        @if (password.hasError('minlength')) {
+        } @else if (password.hasError('minlength')) {
           <mat-error
             >Password must be at least
-            <span class="font-medium">{{ password.getError('minlength').requiredLength }}</span>
-            characters long
+            <span class="font-medium"
+              >{{ password.getError('minlength').requiredLength }} characters</span
+            >
+            long
           </mat-error>
         }
       </mat-form-field>
 
-      <button class="w-full" matButton="filled" type="submit" [disabled]="submitted()">
+      <button
+        data-testid="register-form-submit-button"
+        class="w-full"
+        matButton="filled"
+        type="submit"
+        [disabled]="submitted()"
+      >
         {{ submitted() ? 'Signing Up...' : 'Sign Up' }}
       </button>
     </form>
@@ -101,7 +111,8 @@ export class RegisterForm {
 
   protected readonly submitted = signal(false);
 
-  protected readonly dialogClosed = output();
+  public readonly dialogClosed = output();
+
   protected readonly ngForm = viewChild.required(NgForm);
 
   protected register(): void {
