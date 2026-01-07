@@ -19,8 +19,9 @@ import { Snackbar } from '../../snackbar';
   selector: 'app-login-form',
   template: `
     <form (ngSubmit)="login()" #ngForm="ngForm">
-      <mat-form-field class="mb-2" appearance="outline">
+      <mat-form-field data-testid="login-form-email-field" class="mb-2" appearance="outline">
         <input
+          data-testid="login-form-email-input"
           matInput
           type="email"
           name="email"
@@ -34,14 +35,14 @@ import { Snackbar } from '../../snackbar';
 
         @if (email.hasError('required')) {
           <mat-error>Email is <span class="font-medium">required</span></mat-error>
-        }
-        @if (email.hasError('email')) {
+        } @else if (email.hasError('email')) {
           <mat-error>Email is <span class="font-medium">invalid</span></mat-error>
         }
       </mat-form-field>
 
-      <mat-form-field class="mb-2" appearance="outline">
+      <mat-form-field data-testid="login-form-password-field" class="mb-2" appearance="outline">
         <input
+          data-testid="login-form-password-input"
           matInput
           type="password"
           name="password"
@@ -55,17 +56,24 @@ import { Snackbar } from '../../snackbar';
 
         @if (password.hasError('required')) {
           <mat-error>Password is <span class="font-medium">required</span></mat-error>
-        }
-        @if (password.hasError('minlength')) {
+        } @else if (password.hasError('minlength')) {
           <mat-error
             >Password must be at least
-            <span class="font-medium">{{ password.getError('minlength').requiredLength }}</span>
-            characters long</mat-error
+            <span class="font-medium"
+              >{{ password.getError('minlength').requiredLength }} characters</span
+            >
+            long</mat-error
           >
         }
       </mat-form-field>
 
-      <button class="w-full" matButton="filled" type="submit" [disabled]="submitted()">
+      <button
+        data-testid="login-form-submit-button"
+        class="w-full"
+        matButton="filled"
+        type="submit"
+        [disabled]="submitted()"
+      >
         {{ submitted() ? 'Signing In...' : 'Sign In' }}
       </button>
     </form>
@@ -84,7 +92,8 @@ export class LoginForm {
 
   protected readonly submitted = signal(false);
 
-  protected readonly dialogClosed = output();
+  public readonly dialogClosed = output();
+
   protected readonly ngForm = viewChild.required(NgForm);
 
   protected login(): void {
