@@ -6,11 +6,11 @@ import {
   signal,
   viewChild
 } from '@angular/core';
-import { MatError, MatFormField, MatPrefix } from '@angular/material/form-field';
+import { MatError, MatFormField, MatPrefix, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 
 import { AuthApiClient } from '../auth-api-client';
 import { Snackbar } from '../../snackbar';
@@ -44,7 +44,7 @@ import { Snackbar } from '../../snackbar';
         <input
           data-testid="login-form-password-input"
           matInput
-          type="password"
+          [type]="passwordVisible() ? 'text' : 'password'"
           name="password"
           placeholder="Enter your password"
           [(ngModel)]="form.password"
@@ -53,6 +53,18 @@ import { Snackbar } from '../../snackbar';
           #password="ngModel"
         />
         <mat-icon matPrefix>lock</mat-icon>
+        <button
+          data-testid="password-visibility-toggle-button"
+          class="mr-2"
+          matIconButton
+          matSuffix
+          type="button"
+          aria-label="Toggle password visibility"
+          [attr.aria-pressed]="passwordVisible()"
+          (click)="passwordVisible.set(!passwordVisible())"
+        >
+          <mat-icon>{{ passwordVisible() ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
 
         @if (password.hasError('required')) {
           <mat-error>Password is <span class="font-medium">required</span></mat-error>
@@ -78,7 +90,17 @@ import { Snackbar } from '../../snackbar';
       </button>
     </form>
   `,
-  imports: [FormsModule, MatFormField, MatInput, MatIcon, MatPrefix, MatButton, MatError],
+  imports: [
+    FormsModule,
+    MatFormField,
+    MatInput,
+    MatIcon,
+    MatPrefix,
+    MatButton,
+    MatError,
+    MatSuffix,
+    MatIconButton
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginForm {
@@ -90,6 +112,7 @@ export class LoginForm {
     password: signal('')
   };
 
+  protected readonly passwordVisible = signal(false);
   protected readonly submitted = signal(false);
 
   public readonly dialogClosed = output();

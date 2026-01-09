@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
+import { MatIconHarness } from '@angular/material/icon/testing';
 
 import { Snackbar } from '../../snackbar';
 import { AuthApiClient } from '../auth-api-client';
@@ -155,6 +156,66 @@ describe(LoginForm.name, () => {
       .withContext('You should have an error message if the password field is too short')
       .toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password must be at least 6 characters long');
+  });
+
+  it('should toggle password visibility', async () => {
+    const { loader, getPasswordInputHarness } = setup();
+
+    const passwordInputHarness = await getPasswordInputHarness();
+
+    const buttonHarness = await loader.getHarness(
+      MatButtonHarness.with({ selector: '[data-testid=password-visibility-toggle-button]' })
+    );
+    const button = await buttonHarness.host();
+    expect(await button.getAttribute('aria-label'))
+      .withContext(
+        'The `aria-label` attribute of the password-visibility-toggle button is incorrect'
+      )
+      .toBe('Toggle password visibility');
+    expect(await button.getAttribute('aria-pressed'))
+      .withContext(
+        'The `aria-pressed` attribute of the password-visibility-toggle button should be `false` by default'
+      )
+      .toBe('false');
+
+    const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
+    expect(await buttonIconHarness.getName())
+      .withContext(
+        'The icon of the password-visibility-toggle button should be `visibility_off` by default'
+      )
+      .toBe('visibility_off');
+
+    await buttonHarness.click();
+
+    expect(await passwordInputHarness.getType())
+      .withContext('The type of the password input should be `text` when toggled once')
+      .toBe('text');
+    expect(await button.getAttribute('aria-pressed'))
+      .withContext(
+        'The `aria-pressed` attribute of the password-visibility-toggle button should be `true` when toggled once'
+      )
+      .toBe('true');
+    expect(await buttonIconHarness.getName())
+      .withContext(
+        'The icon of the password-visibility-toggle button should be `visibility` when toggled once'
+      )
+      .toBe('visibility');
+
+    await buttonHarness.click();
+
+    expect(await passwordInputHarness.getType())
+      .withContext('The type of the password input should be `password` when toggled twice')
+      .toBe('password');
+    expect(await button.getAttribute('aria-pressed'))
+      .withContext(
+        'The `aria-pressed` attribute of the password-visibility-toggle button should be `false` when toggled twice'
+      )
+      .toBe('false');
+    expect(await buttonIconHarness.getName())
+      .withContext(
+        'The icon of the password-visibility-toggle button should be `visibility_off` when toggled twice'
+      )
+      .toBe('visibility_off');
   });
 
   it('should NOT call the `AuthApiClient` service if the form is invalid', async () => {
