@@ -7,8 +7,8 @@ import {
   viewChild
 } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
-import { MatError, MatFormField, MatPrefix } from '@angular/material/form-field';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatError, MatFormField, MatPrefix, MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 
@@ -62,7 +62,7 @@ import { Snackbar } from '../../snackbar';
         <input
           data-testid="register-form-password-input"
           matInput
-          type="password"
+          [type]="passwordVisible() ? 'text' : 'password'"
           name="password"
           placeholder="Enter your password"
           [(ngModel)]="form.password"
@@ -71,6 +71,18 @@ import { Snackbar } from '../../snackbar';
           #password="ngModel"
         />
         <mat-icon matPrefix>lock</mat-icon>
+        <button
+          data-testid="password-visibility-toggle-button"
+          class="mr-2"
+          matIconButton
+          matSuffix
+          type="button"
+          aria-label="Toggle password visibility"
+          [attr.aria-pressed]="passwordVisible()"
+          (click)="passwordVisible.set(!passwordVisible())"
+        >
+          <mat-icon>{{ passwordVisible() ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
 
         @if (password.hasError('required')) {
           <mat-error>Password is <span class="font-medium">required</span></mat-error>
@@ -96,7 +108,17 @@ import { Snackbar } from '../../snackbar';
       </button>
     </form>
   `,
-  imports: [FormsModule, MatButton, MatError, MatFormField, MatIcon, MatInput, MatPrefix],
+  imports: [
+    FormsModule,
+    MatButton,
+    MatError,
+    MatFormField,
+    MatIcon,
+    MatInput,
+    MatPrefix,
+    MatSuffix,
+    MatIconButton
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterForm {
@@ -109,6 +131,7 @@ export class RegisterForm {
     password: signal('')
   };
 
+  protected readonly passwordVisible = signal(false);
   protected readonly submitted = signal(false);
 
   public readonly dialogClosed = output();
