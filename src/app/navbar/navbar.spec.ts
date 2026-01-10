@@ -1,25 +1,71 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatMenuHarness } from '@angular/material/menu/testing';
+import { MatDialog } from '@angular/material/dialog';
+
+import { createMockUser } from '../testing-utils';
+import { CurrentUser } from '../models/current-user';
+import { AuthApiClient } from '../auth/auth-api-client';
+import AuthDialog from '../auth/auth-dialog/auth-dialog';
 
 import { Navbar } from './navbar';
 
 describe(Navbar.name, () => {
   const setup = () => {
+    const mockUser = createMockUser();
+    const currentUser = signal<CurrentUser | null>(null);
+    const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', ['logout'], {
+      currentUser
+    });
+
+    const dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection(), provideRouter([])]
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        {
+          provide: AuthApiClient,
+          useValue: authApiClientSpy
+        },
+        {
+          provide: MatDialog,
+          useValue: dialogSpy
+        }
+      ]
     });
     const fixture = TestBed.createComponent(Navbar);
     const debugElement = fixture.debugElement;
     const loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
 
-    return { fixture, debugElement, loader };
+    const getLoginButtonHarness = () =>
+      loader.getHarness(
+        MatButtonHarness.with({
+          selector: '[data-testid=navbar-login-button]',
+          appearance: 'filled'
+        })
+      );
+
+    const getUserMenuHarness = () =>
+      loader.getHarness(MatMenuHarness.with({ selector: '[data-testid=user-menu-button]' }));
+
+    return {
+      fixture,
+      debugElement,
+      loader,
+      getLoginButtonHarness,
+      getUserMenuHarness,
+      mockUser,
+      currentUser,
+      authApiClientSpy,
+      dialogSpy
+    };
   };
 
   it('should display the brand', () => {
@@ -34,8 +80,8 @@ describe(Navbar.name, () => {
       .toContain('MiniStore');
   });
 
-  it('should display actions', async () => {
-    const { loader } = setup();
+  it('should display user links', async () => {
+    const { loader, getLoginButtonHarness } = setup();
 
     const wishlistLinkHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=navbar-wishlist-link]' })
@@ -69,43 +115,80 @@ describe(Navbar.name, () => {
       .withContext('The cart link should have an icon')
       .toBe('shopping_cart');
 
-    const loginButtonHarness = await loader.getHarness(
-      MatButtonHarness.with({ selector: '[data-testid=navbar-login-button]', appearance: 'filled' })
-    );
+    const loginButtonHarness = await getLoginButtonHarness();
     expect(await loginButtonHarness.getText())
       .withContext('The login button should have a text')
       .toContain('Sign In');
   });
 
-  it('should toggle the menu', async () => {
-    const { loader } = setup();
-    const menuButtonSelector = '[data-testid=navbar-menu-button]';
+  it('should display user profile if logged in', async () => {
+    const { fixture, debugElement, loader, getUserMenuHarness, mockUser, currentUser } = setup();
+    currentUser.set(mockUser);
+    fixture.detectChanges();
 
-    const menuButtonHarness = await loader.getHarness(
-      MatButtonHarness.with({ selector: menuButtonSelector })
+    expect(debugElement.query(By.css('[data-testid=navbar-login-button]')))
+      .withContext('You should NOT have a login button')
+      .toBeFalsy();
+
+    const userMenuButtonHarness = await loader.getHarness(
+      MatButtonHarness.with({ selector: '[data-testid=user-menu-button]' })
     );
-    const menuButton = await menuButtonHarness.host();
-    expect(await menuButton.getAttribute('aria-label'))
-      .withContext('The `aria-label` attribute of the menu button is incorrect')
-      .toContain('Toggle menu');
+    const userMenuButton = await userMenuButtonHarness.host();
+    expect(await userMenuButton.getAttribute('aria-label'))
+      .withContext('The `aria-label` attribute of the user menu button is incorrect')
+      .toBe('Toggle user menu');
 
-    const menuButtonIconHarness = await menuButtonHarness.getHarness(MatIconHarness);
-    expect(await menuButtonIconHarness.getName())
-      .withContext('The menu button should have an icon')
-      .toBe('menu');
+    const userProfileImage = debugElement.query(By.css('[data-testid=user-profile-image]'));
+    expect(userProfileImage).withContext('The user profile image is missing').toBeTruthy();
+    expect(userProfileImage.nativeElement.getAttribute('src'))
+      .withContext('The `src` attribute of the user profile image is incorrect')
+      .toBe(mockUser.imageUrl);
+    expect(userProfileImage.nativeElement.getAttribute('alt'))
+      .withContext('The `alt` attribute of the user profile image is incorrect')
+      .toBe('Profile image');
 
-    const menuHarness = await loader.getHarness(
-      MatMenuHarness.with({ selector: menuButtonSelector })
-    );
-    await menuHarness.open();
+    currentUser.set({ ...mockUser, imageUrl: null });
+    fixture.detectChanges();
 
-    expect(await menuHarness.isOpen())
-      .withContext('The menu should be opened after click')
-      .toBe(true);
+    expect(userProfileImage.nativeElement.getAttribute('src'))
+      .withContext('You should display a fallback image if the user does not have their own')
+      .toBe('person.jpg');
 
-    const menuItems = await menuHarness.getItems();
-    expect(menuItems.length)
-      .withContext('The menu should have two items: the wishlist link and the login button')
-      .toBe(2);
+    const userMenuHarness = await getUserMenuHarness();
+    await userMenuHarness.open();
+
+    const userMenuItems = await userMenuHarness.getItems();
+    expect(userMenuItems.length)
+      .withContext('The user menu should have one item: the logout button')
+      .toBe(1);
+
+    const userMenuName = debugElement.query(By.css('[data-testid=user-menu-name]'));
+    expect(userMenuName).toBeTruthy();
+    expect(userMenuName.nativeElement.textContent).toContain(mockUser.name);
+
+    const userMenuEmail = debugElement.query(By.css('[data-testid=user-menu-email]'));
+    expect(userMenuEmail).toBeTruthy();
+    expect(userMenuEmail.nativeElement.textContent).toContain(mockUser.email);
+  });
+
+  it('should call the `MatDialog` service to open the auth dialog', async () => {
+    const { getLoginButtonHarness, dialogSpy } = setup();
+    const loginButtonHarness = await getLoginButtonHarness();
+
+    await loginButtonHarness.click();
+
+    expect(dialogSpy.open).toHaveBeenCalledOnceWith(AuthDialog, { width: '400px' });
+  });
+
+  it('should call the `AuthApiClient` service and logout the user', async () => {
+    const { fixture, getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = setup();
+    currentUser.set(mockUser);
+    fixture.detectChanges();
+
+    const userMenuHarness = await getUserMenuHarness();
+    await userMenuHarness.open();
+    await userMenuHarness.clickItem({ selector: '[data-testid=logout-button]' });
+
+    expect(authApiClientSpy.logout).toHaveBeenCalled();
   });
 });

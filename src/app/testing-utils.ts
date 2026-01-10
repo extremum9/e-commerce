@@ -1,4 +1,12 @@
 import { Product } from './models/product';
+import { CurrentUser } from './models/current-user';
+
+export const createMockUser = (user: Partial<CurrentUser> = {}): CurrentUser => ({
+  name: 'Test',
+  email: 'test@mail.com',
+  imageUrl: 'https://placehold.co/20x20/png',
+  ...user
+});
 
 export const createMockProduct = (product: Partial<Product> = {}): Product => ({
   id: '1',

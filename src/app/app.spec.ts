@@ -37,7 +37,6 @@ describe(App.name, () => {
   it('should display nothing if the user is undefined', () => {
     const { fixture, debugElement, currentUser } = setup();
     currentUser.set(undefined);
-
     fixture.detectChanges();
 
     expect(debugElement.query(By.directive(Navbar))).toBeFalsy();

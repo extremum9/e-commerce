@@ -31,17 +31,36 @@ import { AuthApiClient } from '../auth/auth-api-client';
             <mat-icon>shopping_cart</mat-icon>
           </a>
           @if (user(); as user) {
-            <button matIconButton [matMenuTriggerFor]="userMenu" aria-label="Toggle user menu">
-              <img class="rounded-full" [src]="user.imageUrl || 'person.jpg'" alt="Profile image" />
+            <button
+              data-testid="user-menu-button"
+              matIconButton
+              [matMenuTriggerFor]="userMenu"
+              aria-label="Toggle user menu"
+            >
+              <img
+                data-testid="user-profile-image"
+                class="rounded-full"
+                [src]="user.imageUrl || 'person.jpg'"
+                alt="Profile image"
+              />
             </button>
 
             <mat-menu #userMenu="matMenu" xPosition="before">
               <div class="flex flex-col min-w-[180px] px-3">
-                <span class="text-sm font-medium">{{ user.name }}</span>
-                <span class="text-xs text-gray-500">{{ user.email }}</span>
+                <span data-testid="user-menu-name" class="text-sm font-medium">{{
+                  user.name
+                }}</span>
+                <span data-testid="user-menu-email" class="text-xs text-gray-500">{{
+                  user.email
+                }}</span>
               </div>
               <mat-divider />
-              <button class="!min-h-[32px]" mat-menu-item (click)="logout()">
+              <button
+                data-testid="logout-button"
+                class="!min-h-[32px]"
+                mat-menu-item
+                (click)="logout()"
+              >
                 <mat-icon>logout</mat-icon>
                 Sign Out
               </button>
