@@ -80,7 +80,11 @@ import { Snackbar } from '../../snackbar';
         }
       </mat-form-field>
 
-      <mat-checkbox class="block! -mt-3 mb-2" name="rememberMe" [(ngModel)]="form.rememberMe"
+      <mat-checkbox
+        data-testid="login-form-remember-me-checkbox"
+        class="block! -mt-3 mb-2"
+        name="rememberMe"
+        [(ngModel)]="form.rememberMe"
         >Remember me</mat-checkbox
       >
 

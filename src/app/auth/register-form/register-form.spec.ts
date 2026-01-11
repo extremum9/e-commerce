@@ -87,7 +87,7 @@ describe(RegisterForm.name, () => {
     };
   };
 
-  it('should display a form with 3 fields and a submit button', async () => {
+  it('should display a form to sign up', async () => {
     const {
       getNameInputHarness,
       getEmailInputHarness,

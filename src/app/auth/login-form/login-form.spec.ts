@@ -7,6 +7,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 
 import { Snackbar } from '../../snackbar';
 import { AuthApiClient } from '../auth-api-client';
@@ -17,7 +18,8 @@ describe(LoginForm.name, () => {
   const setup = () => {
     const mockCredentials = {
       email: 'test@mail.com',
-      password: '123456'
+      password: '123456',
+      rememberMe: true
     };
 
     const login$ = new Subject<void>();
@@ -56,6 +58,10 @@ describe(LoginForm.name, () => {
       loader.getHarness(
         MatInputHarness.with({ selector: '[data-testid=login-form-password-input]' })
       );
+    const getRememberMeCheckboxHarness = () =>
+      loader.getHarness(
+        MatCheckboxHarness.with({ selector: '[data-testid=login-form-remember-me-checkbox]' })
+      );
     const getSubmitButtonHarness = () =>
       loader.getHarness(
         MatButtonHarness.with({
@@ -70,6 +76,7 @@ describe(LoginForm.name, () => {
       loader,
       getEmailInputHarness,
       getPasswordInputHarness,
+      getRememberMeCheckboxHarness,
       getSubmitButtonHarness,
       mockCredentials,
       login$,
@@ -79,8 +86,13 @@ describe(LoginForm.name, () => {
     };
   };
 
-  it('should display a form with 2 fields and a submit button', async () => {
-    const { getEmailInputHarness, getPasswordInputHarness, getSubmitButtonHarness } = setup();
+  it('should display a form to sign in', async () => {
+    const {
+      getEmailInputHarness,
+      getPasswordInputHarness,
+      getRememberMeCheckboxHarness,
+      getSubmitButtonHarness
+    } = setup();
 
     const emailInputHarness = await getEmailInputHarness();
     expect(await emailInputHarness.getType())
@@ -97,6 +109,14 @@ describe(LoginForm.name, () => {
     expect(await passwordInputHarness.getPlaceholder())
       .withContext('The placeholder of the email input is incorrect')
       .toContain('Enter your password');
+
+    const rememberMeCheckboxHarness = await getRememberMeCheckboxHarness();
+    expect(await rememberMeCheckboxHarness.getLabelText())
+      .withContext('The remember-me checkbox should have a text')
+      .toContain('Remember me');
+    expect(await rememberMeCheckboxHarness.isChecked())
+      .withContext('The remember-me checkbox should be unchecked by default')
+      .toBe(false);
 
     const submitButtonHarness = await getSubmitButtonHarness();
     expect(await submitButtonHarness.getType())
@@ -231,6 +251,7 @@ describe(LoginForm.name, () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
+      getRememberMeCheckboxHarness,
       getSubmitButtonHarness,
       mockCredentials,
       login$,
@@ -240,6 +261,9 @@ describe(LoginForm.name, () => {
 
     const emailInputHarness = await getEmailInputHarness();
     await emailInputHarness.setValue(mockCredentials.email);
+
+    const rememberMeCheckboxHarness = await getRememberMeCheckboxHarness();
+    await rememberMeCheckboxHarness.check();
 
     const passwordInputHarness = await getPasswordInputHarness();
     await passwordInputHarness.setValue(mockCredentials.password);
@@ -265,6 +289,7 @@ describe(LoginForm.name, () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
+      getRememberMeCheckboxHarness,
       getSubmitButtonHarness,
       mockCredentials,
       login$,
@@ -278,6 +303,9 @@ describe(LoginForm.name, () => {
 
     const passwordInputHarness = await getPasswordInputHarness();
     await passwordInputHarness.setValue(mockCredentials.password);
+
+    const rememberMeCheckboxHarness = await getRememberMeCheckboxHarness();
+    await rememberMeCheckboxHarness.check();
 
     const submitButtonHarness = await getSubmitButtonHarness();
     await submitButtonHarness.click();
