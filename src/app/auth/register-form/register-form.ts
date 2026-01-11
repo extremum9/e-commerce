@@ -144,12 +144,18 @@ export class RegisterForm {
     }
     this.submitted.set(true);
     this.snackBar.dismiss();
-    this.authApiClient.register(this.ngForm().value).subscribe({
-      next: () => this.dialogClosed.emit(),
-      error: () => {
-        this.submitted.set(false);
-        this.snackBar.showError('Try again with another email');
-      }
-    });
+    this.authApiClient
+      .register({
+        name: this.form.name(),
+        email: this.form.email(),
+        password: this.form.password()
+      })
+      .subscribe({
+        next: () => this.dialogClosed.emit(),
+        error: () => {
+          this.submitted.set(false);
+          this.snackBar.showError('Try again with another email');
+        }
+      });
   }
 }

@@ -12,6 +12,8 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 
 import { AuthApiClient } from '../auth-api-client';
 import { Snackbar } from '../../snackbar';
@@ -80,13 +82,20 @@ import { Snackbar } from '../../snackbar';
         }
       </mat-form-field>
 
-      <mat-checkbox
-        data-testid="login-form-remember-me-checkbox"
-        class="block! -mt-3 mb-2"
-        name="rememberMe"
-        [(ngModel)]="form.rememberMe"
-        >Remember me</mat-checkbox
-      >
+      <div class="flex justify-between items-center gap-2 -mt-2 mb-4">
+        <mat-checkbox
+          data-testid="login-form-remember-me-checkbox"
+          name="rememberMe"
+          [(ngModel)]="form.rememberMe"
+          >Remember me</mat-checkbox
+        >
+
+        @if (passwordResetLoading()) {
+          <mat-spinner class="mr-2" [diameter]="20" />
+        } @else {
+          <button matButton type="button" (click)="resetPassword()">Forgot password?</button>
+        }
+      </div>
 
       <button
         data-testid="login-form-submit-button"
@@ -109,7 +118,8 @@ import { Snackbar } from '../../snackbar';
     MatError,
     MatSuffix,
     MatIconButton,
-    MatCheckbox
+    MatCheckbox,
+    MatProgressSpinner
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -124,11 +134,27 @@ export class LoginForm {
   };
 
   protected readonly passwordVisible = signal(false);
+  protected readonly passwordResetLoading = signal(false);
   protected readonly submitted = signal(false);
 
   public readonly dialogClosed = output();
 
   protected readonly ngForm = viewChild.required(NgForm);
+
+  protected resetPassword(): void {
+    const email = this.form.email();
+    if (!email) {
+      return this.snackBar.showError('Please enter your email address');
+    }
+    this.passwordResetLoading.set(true);
+    this.authApiClient
+      .resetPassword(email)
+      .pipe(finalize(() => this.passwordResetLoading.set(false)))
+      .subscribe({
+        next: () => this.snackBar.showDefault(`A password reset link has been sent to ${email}`),
+        error: () => this.snackBar.showError('Could not send reset email')
+      });
+  }
 
   protected login(): void {
     if (this.ngForm().invalid) {
@@ -136,18 +162,18 @@ export class LoginForm {
     }
     this.submitted.set(true);
     this.snackBar.dismiss();
-
-    const credentials = {
-      email: this.form.email(),
-      password: this.form.password(),
-      rememberMe: this.form.rememberMe()
-    };
-    this.authApiClient.login(credentials).subscribe({
-      next: () => this.dialogClosed.emit(),
-      error: () => {
-        this.submitted.set(false);
-        this.snackBar.showError('The email or password is incorrect');
-      }
-    });
+    this.authApiClient
+      .login({
+        email: this.form.email(),
+        password: this.form.password(),
+        rememberMe: this.form.rememberMe()
+      })
+      .subscribe({
+        next: () => this.dialogClosed.emit(),
+        error: () => {
+          this.submitted.set(false);
+          this.snackBar.showError('The email or password is incorrect');
+        }
+      });
   }
 }
