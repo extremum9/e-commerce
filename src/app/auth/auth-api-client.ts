@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { from, map, Observable, switchMap } from 'rxjs';
 import {
   Auth,
+  browserLocalPersistence,
+  browserSessionPersistence,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
@@ -32,8 +34,14 @@ export class AuthApiClient {
     initialValue: undefined
   });
 
-  public login({ email, password }: LoginCredentials): Observable<void> {
-    return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(map(() => undefined));
+  public login({ email, password, rememberMe }: LoginCredentials): Observable<void> {
+    const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+
+    return from(this.auth.setPersistence(persistence)).pipe(
+      switchMap(() =>
+        from(signInWithEmailAndPassword(this.auth, email, password)).pipe(map(() => undefined))
+      )
+    );
   }
 
   public loginWithGoogle(): Observable<void> {

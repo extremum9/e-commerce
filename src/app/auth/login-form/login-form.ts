@@ -11,6 +11,7 @@ import { MatInput } from '@angular/material/input';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 import { AuthApiClient } from '../auth-api-client';
 import { Snackbar } from '../../snackbar';
@@ -79,6 +80,10 @@ import { Snackbar } from '../../snackbar';
         }
       </mat-form-field>
 
+      <mat-checkbox class="block! -mt-3 mb-2" name="rememberMe" [(ngModel)]="form.rememberMe"
+        >Remember me</mat-checkbox
+      >
+
       <button
         data-testid="login-form-submit-button"
         class="w-full"
@@ -99,7 +104,8 @@ import { Snackbar } from '../../snackbar';
     MatButton,
     MatError,
     MatSuffix,
-    MatIconButton
+    MatIconButton,
+    MatCheckbox
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -109,7 +115,8 @@ export class LoginForm {
 
   protected readonly form = {
     email: signal(''),
-    password: signal('')
+    password: signal(''),
+    rememberMe: signal(false)
   };
 
   protected readonly passwordVisible = signal(false);
@@ -125,7 +132,13 @@ export class LoginForm {
     }
     this.submitted.set(true);
     this.snackBar.dismiss();
-    this.authApiClient.login(this.ngForm().value).subscribe({
+
+    const credentials = {
+      email: this.form.email(),
+      password: this.form.password(),
+      rememberMe: this.form.rememberMe()
+    };
+    this.authApiClient.login(credentials).subscribe({
       next: () => this.dialogClosed.emit(),
       error: () => {
         this.submitted.set(false);
