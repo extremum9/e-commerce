@@ -5,6 +5,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class Snackbar {
   private readonly snackbar = inject(MatSnackBar);
 
+  public showDefault(message: string): void {
+    this.snackbar.open(message, 'Ok', { duration: 5000 });
+  }
+
   public showError(message: string): void {
     this.snackbar.open(message, '', { panelClass: 'snackbar-error', duration: 3000 });
   }

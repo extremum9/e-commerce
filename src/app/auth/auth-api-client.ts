@@ -6,6 +6,7 @@ import {
   browserSessionPersistence,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
@@ -55,6 +56,10 @@ export class AuthApiClient {
       ),
       map(() => undefined)
     );
+  }
+
+  public resetPassword(email: string): Observable<void> {
+    return from(sendPasswordResetEmail(this.auth, email));
   }
 
   public logout(): Observable<void> {
