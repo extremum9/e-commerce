@@ -16,7 +16,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 
 import { AuthApiClient } from '../auth-api-client';
-import { Snackbar } from '../../snackbar';
+import { Snackbar } from '../../snackbar/snackbar';
 
 @Component({
   selector: 'app-login-form',

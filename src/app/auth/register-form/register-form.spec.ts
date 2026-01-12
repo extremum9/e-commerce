@@ -9,7 +9,7 @@ import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { AuthApiClient } from '../auth-api-client';
-import { Snackbar } from '../../snackbar';
+import { Snackbar } from '../../snackbar/snackbar';
 
 import { RegisterForm } from './register-form';
 
