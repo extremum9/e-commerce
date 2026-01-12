@@ -91,9 +91,16 @@ import { Snackbar } from '../../snackbar';
         >
 
         @if (passwordResetLoading()) {
-          <mat-spinner class="mr-2" [diameter]="20" />
+          <mat-spinner data-testid="loading-reset-password-spinner" class="mr-2" [diameter]="20" />
         } @else {
-          <button matButton type="button" (click)="resetPassword()">Forgot password?</button>
+          <button
+            data-testid="reset-password-button"
+            matButton
+            type="button"
+            (click)="resetPassword()"
+          >
+            Forgot password?
+          </button>
         }
       </div>
 

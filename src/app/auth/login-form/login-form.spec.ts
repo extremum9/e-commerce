@@ -8,6 +8,7 @@ import { MatInputHarness } from '@angular/material/input/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
+import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 
 import { Snackbar } from '../../snackbar';
 import { AuthApiClient } from '../auth-api-client';
@@ -23,10 +24,19 @@ describe(LoginForm.name, () => {
     };
 
     const login$ = new Subject<void>();
-    const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', ['login']);
+    const resetPassword$ = new Subject<void>();
+    const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', [
+      'login',
+      'resetPassword'
+    ]);
     authApiClientSpy.login.and.returnValue(login$);
+    authApiClientSpy.resetPassword.and.returnValue(resetPassword$);
 
-    const snackbarSpy = jasmine.createSpyObj<Snackbar>('Snackbar', ['showError', 'dismiss']);
+    const snackbarSpy = jasmine.createSpyObj<Snackbar>('Snackbar', [
+      'showDefault',
+      'showError',
+      'dismiss'
+    ]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -62,6 +72,8 @@ describe(LoginForm.name, () => {
       loader.getHarness(
         MatCheckboxHarness.with({ selector: '[data-testid=login-form-remember-me-checkbox]' })
       );
+    const getResetPasswordButtonHarness = () =>
+      loader.getHarness(MatButtonHarness.with({ selector: '[data-testid=reset-password-button]' }));
     const getSubmitButtonHarness = () =>
       loader.getHarness(
         MatButtonHarness.with({
@@ -77,9 +89,11 @@ describe(LoginForm.name, () => {
       getEmailInputHarness,
       getPasswordInputHarness,
       getRememberMeCheckboxHarness,
+      getResetPasswordButtonHarness,
       getSubmitButtonHarness,
       mockCredentials,
       login$,
+      resetPassword$,
       dialogClosedSpy,
       authApiClientSpy,
       snackbarSpy
@@ -91,6 +105,7 @@ describe(LoginForm.name, () => {
       getEmailInputHarness,
       getPasswordInputHarness,
       getRememberMeCheckboxHarness,
+      getResetPasswordButtonHarness,
       getSubmitButtonHarness
     } = setup();
 
@@ -112,11 +127,16 @@ describe(LoginForm.name, () => {
 
     const rememberMeCheckboxHarness = await getRememberMeCheckboxHarness();
     expect(await rememberMeCheckboxHarness.getLabelText())
-      .withContext('The remember-me checkbox should have a text')
+      .withContext('The remember-me checkbox should have text')
       .toContain('Remember me');
     expect(await rememberMeCheckboxHarness.isChecked())
       .withContext('The remember-me checkbox should be unchecked by default')
       .toBe(false);
+
+    const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
+    expect(await resetPasswordButtonHarness.getText())
+      .withContext('The reset-password button should have text')
+      .toContain('Forgot password?');
 
     const submitButtonHarness = await getSubmitButtonHarness();
     expect(await submitButtonHarness.getType())
@@ -126,7 +146,7 @@ describe(LoginForm.name, () => {
       'The submit button should NOT be disabled when the status is NOT submitting'
     );
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have a text')
+      .withContext('The submit button should have text')
       .toContain('Sign In');
   });
 
@@ -238,7 +258,89 @@ describe(LoginForm.name, () => {
       .toBe('visibility_off');
   });
 
-  it('should NOT call the `AuthApiClient` service if the form is invalid', async () => {
+  it('should NOT call the `AuthApiClient` service to reset the password if the email is missing', async () => {
+    const { getResetPasswordButtonHarness, authApiClientSpy, snackbarSpy } = setup();
+    const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
+    await resetPasswordButtonHarness.click();
+
+    expect(snackbarSpy.showError).toHaveBeenCalledWith('Please enter your email address');
+    expect(authApiClientSpy.resetPassword).not.toHaveBeenCalled();
+  });
+
+  it('should call the `AuthApiClient` service to reset the password and display a default snackbar on success', async () => {
+    const {
+      loader,
+      getEmailInputHarness,
+      getResetPasswordButtonHarness,
+      mockCredentials,
+      resetPassword$,
+      authApiClientSpy,
+      snackbarSpy
+    } = setup();
+    const { email } = mockCredentials;
+
+    const emailInputHarness = await getEmailInputHarness();
+    await emailInputHarness.setValue(email);
+
+    const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
+    await resetPasswordButtonHarness.click();
+
+    let spinner = await loader.hasHarness(
+      MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
+    );
+    expect(spinner).toBe(true);
+
+    expect(authApiClientSpy.resetPassword).toHaveBeenCalledOnceWith(email);
+
+    resetPassword$.next();
+    resetPassword$.complete();
+
+    spinner = await loader.hasHarness(
+      MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
+    );
+    expect(spinner).toBe(false);
+
+    expect(snackbarSpy.showDefault).toHaveBeenCalledOnceWith(
+      `A password reset link has been sent to ${email}`
+    );
+  });
+
+  it('should call the `AuthApiClient` service to reset the password and display an error snackbar on failure', async () => {
+    const {
+      loader,
+      getEmailInputHarness,
+      getResetPasswordButtonHarness,
+      mockCredentials,
+      resetPassword$,
+      authApiClientSpy,
+      snackbarSpy
+    } = setup();
+    const { email } = mockCredentials;
+
+    const emailInputHarness = await getEmailInputHarness();
+    await emailInputHarness.setValue(email);
+
+    const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
+    await resetPasswordButtonHarness.click();
+
+    let spinner = await loader.hasHarness(
+      MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
+    );
+    expect(spinner).toBe(true);
+
+    expect(authApiClientSpy.resetPassword).toHaveBeenCalledOnceWith(email);
+
+    resetPassword$.error(new Error());
+
+    spinner = await loader.hasHarness(
+      MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
+    );
+    expect(spinner).toBe(false);
+
+    expect(snackbarSpy.showError).toHaveBeenCalledOnceWith('Could not send reset email');
+  });
+
+  it('should NOT call the `AuthApiClient` service to sign in if the form is invalid', async () => {
     const { getSubmitButtonHarness, authApiClientSpy } = setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
@@ -247,7 +349,7 @@ describe(LoginForm.name, () => {
     expect(authApiClientSpy.login).not.toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service and close the dialog on success', async () => {
+  it('should call the `AuthApiClient` service to sign in and close the dialog on success', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
@@ -285,7 +387,7 @@ describe(LoginForm.name, () => {
     expect(dialogClosedSpy).toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service and display an error snackbar on failure', async () => {
+  it('should call the `AuthApiClient` service to sign in and display an error snackbar on failure', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
