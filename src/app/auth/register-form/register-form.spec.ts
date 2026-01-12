@@ -6,7 +6,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
-import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { AuthApiClient } from '../auth-api-client';
 import { Snackbar } from '../../snackbar';
@@ -28,6 +28,7 @@ describe(RegisterForm.name, () => {
     const snackbarSpy = jasmine.createSpyObj<Snackbar>('Snackbar', ['showError', 'dismiss']);
 
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
         {
@@ -87,7 +88,7 @@ describe(RegisterForm.name, () => {
     };
   };
 
-  it('should display a form to sign up', async () => {
+  it('should display form to register', async () => {
     const {
       getNameInputHarness,
       getEmailInputHarness,
@@ -97,37 +98,35 @@ describe(RegisterForm.name, () => {
 
     const nameInputHarness = await getNameInputHarness();
     expect(await nameInputHarness.getType())
-      .withContext('The type of the name input is incorrect')
+      .withContext('Name input type')
       .toBe('text');
     expect(await nameInputHarness.getPlaceholder())
-      .withContext('The placeholder of the name input is incorrect')
+      .withContext('Name input placeholder')
       .toContain('Enter your name');
 
     const emailInputHarness = await getEmailInputHarness();
     expect(await emailInputHarness.getType())
-      .withContext('The type of the email input is incorrect')
+      .withContext('Email input type')
       .toBe('email');
     expect(await emailInputHarness.getPlaceholder())
-      .withContext('The placeholder of the email input is incorrect')
+      .withContext('Email input placeholder')
       .toContain('Enter your email');
 
     const passwordInputHarness = await getPasswordInputHarness();
     expect(await passwordInputHarness.getType())
-      .withContext('The type of the password input is incorrect')
+      .withContext('Password input type')
       .toBe('password');
     expect(await passwordInputHarness.getPlaceholder())
-      .withContext('The placeholder of the email input is incorrect')
+      .withContext('Password input placeholder')
       .toContain('Enter your password');
 
     const submitButtonHarness = await getSubmitButtonHarness();
     expect(await submitButtonHarness.getType())
-      .withContext('The type of the submit button is incorrect')
+      .withContext('Submit button type')
       .toBe('submit');
-    expect(await submitButtonHarness.isDisabled()).withContext(
-      'The submit button should NOT be disabled when the status is NOT submitting'
-    );
+    expect(await submitButtonHarness.isDisabled()).withContext('Submit button disabled state');
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have a text')
+      .withContext('Submit button text')
       .toContain('Sign Up');
   });
 
@@ -143,9 +142,7 @@ describe(RegisterForm.name, () => {
     await nameInputHarness.blur();
 
     const nameErrorMessages = await nameFieldHarness.getTextErrors();
-    expect(nameErrorMessages.length)
-      .withContext('You should have an error message if the name field is required')
-      .toBe(1);
+    expect(nameErrorMessages.length).withContext('Name input error messages').toBe(1);
     expect(nameErrorMessages[0]).toContain('Name is required');
 
     const emailFieldHarness = await loader.getHarness(
@@ -157,17 +154,13 @@ describe(RegisterForm.name, () => {
     await emailInputHarness.blur();
 
     let emailErrorMessages = await emailFieldHarness.getTextErrors();
-    expect(emailErrorMessages.length)
-      .withContext('You should have an error message if the email field is required')
-      .toBe(1);
+    expect(emailErrorMessages.length).withContext('Email error messages').toBe(1);
     expect(emailErrorMessages[0]).toContain('Email is required');
 
     await emailInputHarness.setValue('test');
 
     emailErrorMessages = await emailFieldHarness.getTextErrors();
-    expect(emailErrorMessages.length)
-      .withContext('You should have an error message if the email field is invalid')
-      .toBe(1);
+    expect(emailErrorMessages.length).withContext('Email error messages').toBe(1);
     expect(emailErrorMessages[0]).toContain('Email is invalid');
 
     const passwordFieldHarness = await loader.getHarness(
@@ -179,17 +172,13 @@ describe(RegisterForm.name, () => {
     await passwordInputHarness.blur();
 
     let passwordErrorMessages = await passwordFieldHarness.getTextErrors();
-    expect(passwordErrorMessages.length)
-      .withContext('You should have an error message if the password field is required')
-      .toBe(1);
+    expect(passwordErrorMessages.length).withContext('Password error messages').toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password is required');
 
     await passwordInputHarness.setValue('1234');
 
     passwordErrorMessages = await passwordFieldHarness.getTextErrors();
-    expect(passwordErrorMessages.length)
-      .withContext('You should have an error message if the password field is too short')
-      .toBe(1);
+    expect(passwordErrorMessages.length).withContext('Password error messages').toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password must be at least 6 characters long');
   });
 
@@ -203,57 +192,43 @@ describe(RegisterForm.name, () => {
     );
     const button = await buttonHarness.host();
     expect(await button.getAttribute('aria-label'))
-      .withContext(
-        'The `aria-label` attribute of the password-visibility-toggle button is incorrect'
-      )
+      .withContext('Toggle button aria-label')
       .toBe('Toggle password visibility');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext(
-        'The `aria-pressed` attribute of the password-visibility-toggle button should be `false` by default'
-      )
+      .withContext('Toggle button aria-pressed')
       .toBe('false');
 
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
     expect(await buttonIconHarness.getName())
-      .withContext(
-        'The icon of the password-visibility-toggle button should be `visibility_off` by default'
-      )
+      .withContext('Toggle button default icon')
       .toBe('visibility_off');
 
     await buttonHarness.click();
 
     expect(await passwordInputHarness.getType())
-      .withContext('The type of the password input should be `text` when toggled once')
+      .withContext('Password input type after 1st toggle')
       .toBe('text');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext(
-        'The `aria-pressed` attribute of the password-visibility-toggle button should be `true` when toggled once'
-      )
+      .withContext('Toggle button aria-pressed after 1st toggle')
       .toBe('true');
     expect(await buttonIconHarness.getName())
-      .withContext(
-        'The icon of the password-visibility-toggle button should be `visibility` when toggled once'
-      )
+      .withContext('Toggle button icon after 1st toggle')
       .toBe('visibility');
 
     await buttonHarness.click();
 
     expect(await passwordInputHarness.getType())
-      .withContext('The type of the password input should be `password` when toggled twice')
+      .withContext('Password input type after 2nd toggle')
       .toBe('password');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext(
-        'The `aria-pressed` attribute of the password-visibility-toggle button should be `false` when toggled twice'
-      )
+      .withContext('Toggle button aria-pressed after 2nd toggle')
       .toBe('false');
     expect(await buttonIconHarness.getName())
-      .withContext(
-        'The icon of the password-visibility-toggle button should be `visibility_off` when toggled twice'
-      )
+      .withContext('Toggle button icon after 2nd toggle')
       .toBe('visibility_off');
   });
 
-  it('should NOT call the `AuthApiClient` service if the form is invalid', async () => {
+  it('should NOT call AuthApiClient.register if form is invalid', async () => {
     const { getSubmitButtonHarness, authApiClientSpy } = setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
@@ -262,7 +237,7 @@ describe(RegisterForm.name, () => {
     expect(authApiClientSpy.register).not.toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service and close the dialog on success', async () => {
+  it('should call AuthApiClient.register and close dialog on success', async () => {
     const {
       getNameInputHarness,
       getEmailInputHarness,
@@ -287,10 +262,10 @@ describe(RegisterForm.name, () => {
     await submitButtonHarness.click();
 
     expect(await submitButtonHarness.isDisabled())
-      .withContext('The submit button should be disabled when the status is submitting')
+      .withContext('Submit button disabled state after click')
       .toBe(true);
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have a different text when the status is submitting')
+      .withContext('Submit button text after click')
       .toContain('Signing Up...');
 
     expect(authApiClientSpy.register).toHaveBeenCalledOnceWith(mockCredentials);
@@ -300,7 +275,7 @@ describe(RegisterForm.name, () => {
     expect(dialogClosedSpy).toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service and display an error snackbar on failure', async () => {
+  it('should call AuthApiClient.register and display error snackbar on failure', async () => {
     const {
       getNameInputHarness,
       getEmailInputHarness,
@@ -330,10 +305,10 @@ describe(RegisterForm.name, () => {
     register$.error(new Error());
 
     expect(await submitButtonHarness.isDisabled())
-      .withContext('The submit button should NOT be disabled when the status is NOT submitting')
+      .withContext('Submit button disabled state after error')
       .toBe(false);
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have a default text when the status is NOT submitting')
+      .withContext('Submit button text after error')
       .toContain('Sign Up');
 
     expect(dialogClosedSpy).not.toHaveBeenCalled();

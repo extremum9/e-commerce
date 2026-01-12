@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
-import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 
@@ -39,6 +39,7 @@ describe(LoginForm.name, () => {
     ]);
 
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
         {
@@ -100,7 +101,7 @@ describe(LoginForm.name, () => {
     };
   };
 
-  it('should display a form to sign in', async () => {
+  it('should display form to log in', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
@@ -111,42 +112,40 @@ describe(LoginForm.name, () => {
 
     const emailInputHarness = await getEmailInputHarness();
     expect(await emailInputHarness.getType())
-      .withContext('The type of the email input is incorrect')
+      .withContext('Email input type')
       .toBe('email');
     expect(await emailInputHarness.getPlaceholder())
-      .withContext('The placeholder of the email input is incorrect')
+      .withContext('Email input placeholder')
       .toContain('Enter your email');
 
     const passwordInputHarness = await getPasswordInputHarness();
     expect(await passwordInputHarness.getType())
-      .withContext('The type of the password input is incorrect')
+      .withContext('Password input type')
       .toBe('password');
     expect(await passwordInputHarness.getPlaceholder())
-      .withContext('The placeholder of the email input is incorrect')
+      .withContext('Password input placeholder')
       .toContain('Enter your password');
 
     const rememberMeCheckboxHarness = await getRememberMeCheckboxHarness();
     expect(await rememberMeCheckboxHarness.getLabelText())
-      .withContext('The remember-me checkbox should have text')
+      .withContext('Remember-me checkbox text')
       .toContain('Remember me');
     expect(await rememberMeCheckboxHarness.isChecked())
-      .withContext('The remember-me checkbox should be unchecked by default')
+      .withContext('Remember-me checkbox checked state')
       .toBe(false);
 
     const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
     expect(await resetPasswordButtonHarness.getText())
-      .withContext('The reset-password button should have text')
+      .withContext('Reset-password button text')
       .toContain('Forgot password?');
 
     const submitButtonHarness = await getSubmitButtonHarness();
     expect(await submitButtonHarness.getType())
-      .withContext('The type of the submit button is incorrect')
+      .withContext('Submit button type')
       .toBe('submit');
-    expect(await submitButtonHarness.isDisabled()).withContext(
-      'The submit button should NOT be disabled when the status is NOT submitting'
-    );
+    expect(await submitButtonHarness.isDisabled()).withContext('Submit button disabled state');
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have text')
+      .withContext('Submit button text')
       .toContain('Sign In');
   });
 
@@ -162,17 +161,13 @@ describe(LoginForm.name, () => {
     await emailInputHarness.blur();
 
     let emailErrorMessages = await emailFieldHarness.getTextErrors();
-    expect(emailErrorMessages.length)
-      .withContext('You should have an error message if the email field is required')
-      .toBe(1);
+    expect(emailErrorMessages.length).withContext('Email error messages').toBe(1);
     expect(emailErrorMessages[0]).toContain('Email is required');
 
     await emailInputHarness.setValue('test');
 
     emailErrorMessages = await emailFieldHarness.getTextErrors();
-    expect(emailErrorMessages.length)
-      .withContext('You should have an error message if the email field is invalid')
-      .toBe(1);
+    expect(emailErrorMessages.length).withContext('Email error messages').toBe(1);
     expect(emailErrorMessages[0]).toContain('Email is invalid');
 
     const passwordFieldHarness = await loader.getHarness(
@@ -184,17 +179,13 @@ describe(LoginForm.name, () => {
     await passwordInputHarness.blur();
 
     let passwordErrorMessages = await passwordFieldHarness.getTextErrors();
-    expect(passwordErrorMessages.length)
-      .withContext('You should have an error message if the password field is required')
-      .toBe(1);
+    expect(passwordErrorMessages.length).withContext('Password error messages').toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password is required');
 
     await passwordInputHarness.setValue('1234');
 
     passwordErrorMessages = await passwordFieldHarness.getTextErrors();
-    expect(passwordErrorMessages.length)
-      .withContext('You should have an error message if the password field is too short')
-      .toBe(1);
+    expect(passwordErrorMessages.length).withContext('Password error messages').toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password must be at least 6 characters long');
   });
 
@@ -208,57 +199,43 @@ describe(LoginForm.name, () => {
     );
     const button = await buttonHarness.host();
     expect(await button.getAttribute('aria-label'))
-      .withContext(
-        'The `aria-label` attribute of the password-visibility-toggle button is incorrect'
-      )
+      .withContext('Toggle button aria-label')
       .toBe('Toggle password visibility');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext(
-        'The `aria-pressed` attribute of the password-visibility-toggle button should be `false` by default'
-      )
+      .withContext('Toggle button aria-pressed')
       .toBe('false');
 
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
     expect(await buttonIconHarness.getName())
-      .withContext(
-        'The icon of the password-visibility-toggle button should be `visibility_off` by default'
-      )
+      .withContext('Toggle button default icon')
       .toBe('visibility_off');
 
     await buttonHarness.click();
 
     expect(await passwordInputHarness.getType())
-      .withContext('The type of the password input should be `text` when toggled once')
+      .withContext('Password input type after 1st toggle')
       .toBe('text');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext(
-        'The `aria-pressed` attribute of the password-visibility-toggle button should be `true` when toggled once'
-      )
+      .withContext('Toggle button aria-pressed after 1st toggle')
       .toBe('true');
     expect(await buttonIconHarness.getName())
-      .withContext(
-        'The icon of the password-visibility-toggle button should be `visibility` when toggled once'
-      )
+      .withContext('Toggle button icon after 1st toggle')
       .toBe('visibility');
 
     await buttonHarness.click();
 
     expect(await passwordInputHarness.getType())
-      .withContext('The type of the password input should be `password` when toggled twice')
+      .withContext('Password input type after 2nd toggle')
       .toBe('password');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext(
-        'The `aria-pressed` attribute of the password-visibility-toggle button should be `false` when toggled twice'
-      )
+      .withContext('Toggle button aria-pressed after 2nd toggle')
       .toBe('false');
     expect(await buttonIconHarness.getName())
-      .withContext(
-        'The icon of the password-visibility-toggle button should be `visibility_off` when toggled twice'
-      )
+      .withContext('Toggle button icon after 2nd toggle')
       .toBe('visibility_off');
   });
 
-  it('should NOT call the `AuthApiClient` service to reset the password if the email is missing', async () => {
+  it('should NOT call AuthApiClient.resetPassword if email is missing', async () => {
     const { getResetPasswordButtonHarness, authApiClientSpy, snackbarSpy } = setup();
     const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
     await resetPasswordButtonHarness.click();
@@ -267,7 +244,7 @@ describe(LoginForm.name, () => {
     expect(authApiClientSpy.resetPassword).not.toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service to reset the password and display a default snackbar on success', async () => {
+  it('should call AuthApiClient.resetPassword and display default snackbar on success', async () => {
     const {
       loader,
       getEmailInputHarness,
@@ -288,7 +265,7 @@ describe(LoginForm.name, () => {
     let spinner = await loader.hasHarness(
       MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
     );
-    expect(spinner).toBe(true);
+    expect(spinner).withContext('Reset password spinner visibility after click').toBe(true);
 
     expect(authApiClientSpy.resetPassword).toHaveBeenCalledOnceWith(email);
 
@@ -298,14 +275,14 @@ describe(LoginForm.name, () => {
     spinner = await loader.hasHarness(
       MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
     );
-    expect(spinner).toBe(false);
+    expect(spinner).withContext('Reset password spinner visibility after success').toBe(false);
 
     expect(snackbarSpy.showDefault).toHaveBeenCalledOnceWith(
       `A password reset link has been sent to ${email}`
     );
   });
 
-  it('should call the `AuthApiClient` service to reset the password and display an error snackbar on failure', async () => {
+  it('should call AuthApiClient.resetPassword and display error snackbar on failure', async () => {
     const {
       loader,
       getEmailInputHarness,
@@ -326,7 +303,7 @@ describe(LoginForm.name, () => {
     let spinner = await loader.hasHarness(
       MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
     );
-    expect(spinner).toBe(true);
+    expect(spinner).withContext('Reset password spinner visibility after click').toBe(true);
 
     expect(authApiClientSpy.resetPassword).toHaveBeenCalledOnceWith(email);
 
@@ -335,12 +312,12 @@ describe(LoginForm.name, () => {
     spinner = await loader.hasHarness(
       MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-reset-password-spinner]' })
     );
-    expect(spinner).toBe(false);
+    expect(spinner).withContext('Reset password spinner visibility after error').toBe(false);
 
     expect(snackbarSpy.showError).toHaveBeenCalledOnceWith('Could not send reset email');
   });
 
-  it('should NOT call the `AuthApiClient` service to sign in if the form is invalid', async () => {
+  it('should NOT call AuthApiClient.login if form is invalid', async () => {
     const { getSubmitButtonHarness, authApiClientSpy } = setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
@@ -349,7 +326,7 @@ describe(LoginForm.name, () => {
     expect(authApiClientSpy.login).not.toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service to sign in and close the dialog on success', async () => {
+  it('should call AuthApiClient.login and close dialog on success', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
@@ -374,10 +351,10 @@ describe(LoginForm.name, () => {
     await submitButtonHarness.click();
 
     expect(await submitButtonHarness.isDisabled())
-      .withContext('The submit button should be disabled when the status is submitting')
+      .withContext('Submit button disabled state after click')
       .toBe(true);
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have a different text when the status is submitting')
+      .withContext('Submit button text after click')
       .toContain('Signing In...');
 
     expect(authApiClientSpy.login).toHaveBeenCalledOnceWith(mockCredentials);
@@ -387,7 +364,7 @@ describe(LoginForm.name, () => {
     expect(dialogClosedSpy).toHaveBeenCalled();
   });
 
-  it('should call the `AuthApiClient` service to sign in and display an error snackbar on failure', async () => {
+  it('should call AuthApiClient.login and display error snackbar on failure', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
@@ -417,10 +394,10 @@ describe(LoginForm.name, () => {
     login$.error(new Error());
 
     expect(await submitButtonHarness.isDisabled())
-      .withContext('The submit button should NOT be disabled when the status is NOT submitting')
+      .withContext('Submit button disabled state after error')
       .toBe(false);
     expect(await submitButtonHarness.getText())
-      .withContext('The submit button should have a default text when the status is NOT submitting')
+      .withContext('Submit button text after error')
       .toContain('Sign In');
 
     expect(dialogClosedSpy).not.toHaveBeenCalled();

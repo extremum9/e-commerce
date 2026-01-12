@@ -123,7 +123,7 @@ import { Snackbar } from '../../snackbar';
 })
 export class RegisterForm {
   private readonly authApiClient = inject(AuthApiClient);
-  private readonly snackBar = inject(Snackbar);
+  private readonly snackbar = inject(Snackbar);
 
   protected readonly form = {
     name: signal(''),
@@ -143,7 +143,7 @@ export class RegisterForm {
       return;
     }
     this.submitted.set(true);
-    this.snackBar.dismiss();
+    this.snackbar.dismiss();
     this.authApiClient
       .register({
         name: this.form.name(),
@@ -154,7 +154,7 @@ export class RegisterForm {
         next: () => this.dialogClosed.emit(),
         error: () => {
           this.submitted.set(false);
-          this.snackBar.showError('Try again with another email');
+          this.snackbar.showError('Try again with another email');
         }
       });
   }

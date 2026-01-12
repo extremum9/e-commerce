@@ -128,24 +128,22 @@ describe(AuthDialog.name, () => {
       setup();
 
     const tabs = await rootLoader.getAllHarnesses(MatTabHarness);
-    expect(tabs.length)
-      .withContext('You should have 2 tabs: one for a login form, and one for a register form')
-      .toBe(2);
+    expect(tabs.length).withContext('Tab count').toBe(2);
 
     await selectSignInTab();
 
     expect(getLoginFormStub())
-      .withContext('You should display a login form when selecting the first tab')
+      .withContext('Login form visibility after selecting `Sign in`')
       .toBeTruthy();
 
     await selectSignUpTab();
 
     expect(getRegisterFormStub())
-      .withContext('You should display a register form when selecting the second tab')
+      .withContext('Register form visibility after selecting `Sing up`')
       .toBeTruthy();
   });
 
-  it('should close the dialog on login success', async () => {
+  it('should close dialog on login success', async () => {
     const { selectSignInTab, dialogRefSpy, getLoginFormStub } = setup();
     await selectSignInTab();
 
@@ -155,7 +153,7 @@ describe(AuthDialog.name, () => {
     expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
   });
 
-  it('should close the dialog on registration success', async () => {
+  it('should close dialog on registration success', async () => {
     const { selectSignUpTab, dialogRefSpy, getRegisterFormStub } = setup();
     await selectSignUpTab();
 
@@ -165,7 +163,7 @@ describe(AuthDialog.name, () => {
     expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
   });
 
-  it('should log in with google and close the dialog on success', async () => {
+  it('should log in with google and close dialog on success', async () => {
     const { rootLoader, authApiClientSpy, dialogRefSpy } = setup();
 
     const buttonHarness = await rootLoader.getHarness(
@@ -175,12 +173,12 @@ describe(AuthDialog.name, () => {
       })
     );
     expect(await buttonHarness.getText())
-      .withContext('The login-with-google button should have a text')
+      .withContext('Login-with-google button text')
       .toContain('Continue with Google');
 
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
     expect(await buttonIconHarness.getName())
-      .withContext('The button should have an icon')
+      .withContext('Login-with-google button icon')
       .toBe('google');
 
     await buttonHarness.click();
