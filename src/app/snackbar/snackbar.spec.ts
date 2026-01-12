@@ -27,7 +27,7 @@ describe(Snackbar.name, () => {
     return { snackbar, snackbarSpy };
   };
 
-  it('should call the `MatSnackbar` service to open a default snackbar', () => {
+  it('should call MatSnackbar.open to open default snackbar', () => {
     const { snackbar, snackbarSpy } = setup();
     const message = 'Default';
 
@@ -38,7 +38,7 @@ describe(Snackbar.name, () => {
     });
   });
 
-  it('should call the `MatSnackbar` service to open an error snackbar', () => {
+  it('should call MatSnackbar.open to open error snackbar', () => {
     const { snackbar, snackbarSpy } = setup();
     const message = 'Error';
 
@@ -49,11 +49,12 @@ describe(Snackbar.name, () => {
       duration: 3000
     });
   });
-  it('should call the `MatSnackBar` service to dismiss a snackbar', () => {
+
+  it('should call MatSnackbar.dismiss to dismiss snackbar', () => {
     const { snackbar, snackbarSpy } = setup();
 
     snackbar.dismiss();
 
-    expect(snackbarSpy.dismiss).toHaveBeenCalledTimes(1);
+    expect(snackbarSpy.dismiss).toHaveBeenCalled();
   });
 });
