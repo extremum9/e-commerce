@@ -34,7 +34,7 @@ describe(App.name, () => {
     return { fixture, debugElement, currentUser };
   };
 
-  it('should display nothing if the user is undefined', () => {
+  it('should display nothing if user is undefined', () => {
     const { fixture, debugElement, currentUser } = setup();
     currentUser.set(undefined);
     fixture.detectChanges();
@@ -43,7 +43,7 @@ describe(App.name, () => {
     expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
   });
 
-  it('should display a navbar along with a router outlet if the user is defined', () => {
+  it('should display navbar along with router outlet if user is defined', () => {
     const { debugElement } = setup();
 
     expect(debugElement.query(By.directive(Navbar))).toBeTruthy();
