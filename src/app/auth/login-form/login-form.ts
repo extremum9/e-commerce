@@ -132,7 +132,7 @@ import { Snackbar } from '../../snackbar';
 })
 export class LoginForm {
   private readonly authApiClient = inject(AuthApiClient);
-  private readonly snackBar = inject(Snackbar);
+  private readonly snackbar = inject(Snackbar);
 
   protected readonly form = {
     email: signal(''),
@@ -151,15 +151,15 @@ export class LoginForm {
   protected resetPassword(): void {
     const email = this.form.email();
     if (!email) {
-      return this.snackBar.showError('Please enter your email address');
+      return this.snackbar.showError('Please enter your email address');
     }
     this.passwordResetLoading.set(true);
     this.authApiClient
       .resetPassword(email)
       .pipe(finalize(() => this.passwordResetLoading.set(false)))
       .subscribe({
-        next: () => this.snackBar.showDefault(`A password reset link has been sent to ${email}`),
-        error: () => this.snackBar.showError('Could not send reset email')
+        next: () => this.snackbar.showDefault(`A password reset link has been sent to ${email}`),
+        error: () => this.snackbar.showError('Could not send reset email')
       });
   }
 
@@ -168,7 +168,7 @@ export class LoginForm {
       return;
     }
     this.submitted.set(true);
-    this.snackBar.dismiss();
+    this.snackbar.dismiss();
     this.authApiClient
       .login({
         email: this.form.email(),
@@ -179,7 +179,7 @@ export class LoginForm {
         next: () => this.dialogClosed.emit(),
         error: () => {
           this.submitted.set(false);
-          this.snackBar.showError('The email or password is incorrect');
+          this.snackbar.showError('The email or password is incorrect');
         }
       });
   }
