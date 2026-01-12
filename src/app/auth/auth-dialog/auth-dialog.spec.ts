@@ -128,7 +128,7 @@ describe(AuthDialog.name, () => {
       setup();
 
     const tabs = await rootLoader.getAllHarnesses(MatTabHarness);
-    expect(tabs.length).withContext('Tab count').toBe(2);
+    expect(tabs.length).withContext('Tabs').toBe(2);
 
     await selectSignInTab();
 

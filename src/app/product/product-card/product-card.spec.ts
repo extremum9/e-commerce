@@ -25,83 +25,73 @@ describe(ProductCard.name, () => {
     return { fixture, debugElement, loader, mockProduct };
   };
 
-  it('should display an image', () => {
+  it('should display image', () => {
     const { debugElement, mockProduct } = setup();
     const image = debugElement.query(By.css('[data-testid=product-image]'));
-    expect(image).withContext('The image is missing').toBeTruthy();
+    expect(image).withContext('Image element').toBeTruthy();
     const imageElement: HTMLImageElement = image.nativeElement;
-    expect(imageElement.getAttribute('src'))
-      .withContext('The `src` attribute of the image is incorrect')
-      .toBe(mockProduct.imageUrl);
-    expect(imageElement.getAttribute('width'))
-      .withContext('The `width` attribute of the image is incorrect')
-      .toBe('400');
-    expect(imageElement.getAttribute('height'))
-      .withContext('The `height` attribute of the image is incorrect')
-      .toBe('400');
-    expect(imageElement.getAttribute('alt'))
-      .withContext('The `alt` attribute of the image is incorrect')
-      .toBe(mockProduct.name);
+    expect(imageElement.getAttribute('src')).withContext('Image src').toBe(mockProduct.imageUrl);
+    expect(imageElement.getAttribute('width')).withContext('Image width').toBe('400');
+    expect(imageElement.getAttribute('height')).withContext('Image height').toBe('400');
+    expect(imageElement.getAttribute('alt')).withContext('Image alt text').toBe(mockProduct.name);
   });
 
-  it('should display a name and description', () => {
+  it('should display name and description', () => {
     const { debugElement, mockProduct } = setup();
 
     const name = debugElement.query(By.css('[data-testid=product-name]'));
-    expect(name).withContext('The name is missing').toBeTruthy();
-    expect(name.nativeElement.textContent)
-      .withContext('The name is incorrect')
-      .toContain(mockProduct.name);
+    expect(name).withContext('Name element').toBeTruthy();
+    expect(name.nativeElement.textContent).withContext('Name text').toContain(mockProduct.name);
 
     const description = debugElement.query(By.css('[data-testid=product-description]'));
-    expect(description).withContext('The description is missing').toBeTruthy();
+    expect(description).withContext('Description element').toBeTruthy();
     expect(description.nativeElement.textContent)
-      .withContext('The description is incorrect')
+      .withContext('Description text')
       .toContain(mockProduct.description);
   });
 
-  it('should display availability status', () => {
+  it('should display availability', () => {
     const { fixture, debugElement, mockProduct } = setup();
     const availability = debugElement.query(By.css('[data-testid=product-availability]'));
-    expect(availability).withContext('The availability status is missing').toBeTruthy();
+    expect(availability).withContext('Availability element').toBeTruthy();
     const availabilityElement: HTMLElement = availability.nativeElement;
     expect(availabilityElement.textContent)
-      .withContext('The availability status is incorrect when the product is in stock')
+      .withContext('Availability text when in stock')
       .toContain('In Stock');
     expect(availabilityElement.classList)
-      .withContext('The availability status should be green when the product is in stock')
+      .withContext('Availability appearance when in stock')
       .toContain('text-green-600');
 
     fixture.componentRef.setInput('product', { ...mockProduct, inStock: false });
     fixture.detectChanges();
 
     expect(availability.nativeElement.textContent)
-      .withContext('The availability status is incorrect when the product out of stock')
+      .withContext('Availability text when out stock')
       .toContain('Out of Stock');
     expect(availability.nativeElement.classList)
-      .withContext('The availability status should be red when the product is out of stock')
+      .withContext('Availability appearance when out of stock')
       .toContain('text-red-700');
   });
 
-  it('should display a price and an add-to-cart button', async () => {
+  it('should display price and add-to-cart button', async () => {
     const { loader, debugElement, mockProduct } = setup();
 
     const price = debugElement.query(By.css('[data-testid=product-price]'));
-    expect(price).withContext('The price is missing').toBeTruthy();
+    expect(price).withContext('Price element').toBeTruthy();
     expect(price.nativeElement.textContent)
-      .withContext('The price is incorrect')
+      .withContext('Price text')
       .toContain(`$${mockProduct.price}`);
 
     const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=product-add-to-cart-button]' })
     );
     expect(await buttonHarness.getText())
-      .withContext('The add-to-cart button should have a text')
+      .withContext('Add-to-cart button text')
       .toContain('Add to Cart');
 
     const iconHarness = await buttonHarness.getHarness(MatIconHarness);
     expect(await iconHarness.getName())
-      .withContext('The add-to-cart button should have an icon')
+      .withContext('Add-to-cart button icon')
       .toBe('shopping_cart');
   });
 });
