@@ -68,15 +68,13 @@ describe(Navbar.name, () => {
     };
   };
 
-  it('should display the brand', () => {
+  it('should display brand', () => {
     const { debugElement } = setup();
     const brandLink = debugElement.query(By.css('[data-testid=navbar-brand]'));
-    expect(brandLink).withContext('The brand link is missing').toBeTruthy();
-    expect(brandLink.nativeElement.getAttribute('href'))
-      .withContext('The `href` attribute of the brand link is incorrect')
-      .toBe('/');
+    expect(brandLink).withContext('Brand link element').toBeTruthy();
+    expect(brandLink.nativeElement.getAttribute('href')).withContext('Brand link href').toBe('/');
     expect(brandLink.nativeElement.textContent)
-      .withContext('The brand link should have a text')
+      .withContext('Brand link text')
       .toContain('MiniStore');
   });
 
@@ -88,15 +86,15 @@ describe(Navbar.name, () => {
     );
     const wishlistLink = await wishlistLinkHarness.host();
     expect(await wishlistLink.getAttribute('href'))
-      .withContext('The `href` attribute of the wishlist link is incorrect')
+      .withContext('Wishlist link href')
       .toBe('/wishlist');
     expect(await wishlistLink.getAttribute('aria-label'))
-      .withContext('The `aria-label` attribute of the wishlist link is incorrect')
+      .withContext('Wishlist link aria-label')
       .toContain('Wishlist');
 
     const wishlistLinkIconHarness = await wishlistLinkHarness.getHarness(MatIconHarness);
     expect(await wishlistLinkIconHarness.getName())
-      .withContext('The wishlist link should have an icon')
+      .withContext('Wishlist link icon')
       .toBe('favorite');
 
     const cartLinkHarness = await loader.getHarness(
@@ -104,20 +102,20 @@ describe(Navbar.name, () => {
     );
     const cartLink = await cartLinkHarness.host();
     expect(await cartLink.getAttribute('href'))
-      .withContext('The `href` attribute of the cart link is incorrect')
+      .withContext('Cart link href')
       .toBe('/cart');
     expect(await cartLink.getAttribute('aria-label'))
-      .withContext('The `aria-label` attribute of the cart link is incorrect')
+      .withContext('Cart link aria-label')
       .toContain('Cart');
 
     const cartLinkIconHarness = await cartLinkHarness.getHarness(MatIconHarness);
     expect(await cartLinkIconHarness.getName())
-      .withContext('The cart link should have an icon')
+      .withContext('Cart link icon')
       .toBe('shopping_cart');
 
     const loginButtonHarness = await getLoginButtonHarness();
     expect(await loginButtonHarness.getText())
-      .withContext('The login button should have a text')
+      .withContext('Login button text')
       .toContain('Sign In');
   });
 
@@ -127,7 +125,7 @@ describe(Navbar.name, () => {
     fixture.detectChanges();
 
     expect(debugElement.query(By.css('[data-testid=navbar-login-button]')))
-      .withContext('You should NOT have a login button')
+      .withContext('Login button visibility when logged in')
       .toBeFalsy();
 
     const userMenuButtonHarness = await loader.getHarness(
@@ -135,43 +133,45 @@ describe(Navbar.name, () => {
     );
     const userMenuButton = await userMenuButtonHarness.host();
     expect(await userMenuButton.getAttribute('aria-label'))
-      .withContext('The `aria-label` attribute of the user menu button is incorrect')
+      .withContext('User menu button aria-label')
       .toBe('Toggle user menu');
 
     const userProfileImage = debugElement.query(By.css('[data-testid=user-profile-image]'));
-    expect(userProfileImage).withContext('The user profile image is missing').toBeTruthy();
+    expect(userProfileImage).withContext('User profile image element').toBeTruthy();
     expect(userProfileImage.nativeElement.getAttribute('src'))
-      .withContext('The `src` attribute of the user profile image is incorrect')
+      .withContext('User profile image src')
       .toBe(mockUser.imageUrl);
     expect(userProfileImage.nativeElement.getAttribute('alt'))
-      .withContext('The `alt` attribute of the user profile image is incorrect')
+      .withContext('User profile image alt text')
       .toBe('Profile image');
 
     currentUser.set({ ...mockUser, imageUrl: null });
     fixture.detectChanges();
 
     expect(userProfileImage.nativeElement.getAttribute('src'))
-      .withContext('You should display a fallback image if the user does not have their own')
+      .withContext('User profile fallback image src')
       .toBe('person.jpg');
 
     const userMenuHarness = await getUserMenuHarness();
     await userMenuHarness.open();
 
     const userMenuItems = await userMenuHarness.getItems();
-    expect(userMenuItems.length)
-      .withContext('The user menu should have one item: the logout button')
-      .toBe(1);
+    expect(userMenuItems.length).withContext('User menu items').toBe(1);
 
     const userMenuName = debugElement.query(By.css('[data-testid=user-menu-name]'));
     expect(userMenuName).toBeTruthy();
-    expect(userMenuName.nativeElement.textContent).toContain(mockUser.name);
+    expect(userMenuName.nativeElement.textContent)
+      .withContext('User menu name')
+      .toContain(mockUser.name);
 
     const userMenuEmail = debugElement.query(By.css('[data-testid=user-menu-email]'));
     expect(userMenuEmail).toBeTruthy();
-    expect(userMenuEmail.nativeElement.textContent).toContain(mockUser.email);
+    expect(userMenuEmail.nativeElement.textContent)
+      .withContext('User menu email')
+      .toContain(mockUser.email);
   });
 
-  it('should call the `MatDialog` service to open the auth dialog', async () => {
+  it('should call MatDialog.open to open auth dialog', async () => {
     const { getLoginButtonHarness, dialogSpy } = setup();
     const loginButtonHarness = await getLoginButtonHarness();
 
@@ -180,7 +180,7 @@ describe(Navbar.name, () => {
     expect(dialogSpy.open).toHaveBeenCalledOnceWith(AuthDialog, { width: '400px' });
   });
 
-  it('should call the `AuthApiClient` service and logout the user', async () => {
+  it('should call AuthApiClient.logout and logout user', async () => {
     const { fixture, getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = setup();
     currentUser.set(mockUser);
     fixture.detectChanges();
