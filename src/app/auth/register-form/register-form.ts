@@ -13,7 +13,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 
 import { AuthApiClient } from '../auth-api-client';
-import { Snackbar } from '../../snackbar';
+import { Snackbar } from '../../snackbar/snackbar';
 
 @Component({
   selector: 'app-register-form',

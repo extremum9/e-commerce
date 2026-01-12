@@ -10,7 +10,7 @@ import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/tes
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 
-import { Snackbar } from '../../snackbar';
+import { Snackbar } from '../../snackbar/snackbar';
 import { AuthApiClient } from '../auth-api-client';
 
 import { LoginForm } from './login-form';
