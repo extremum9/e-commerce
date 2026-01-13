@@ -16,5 +16,30 @@ test.describe('Navbar', () => {
 
     await expect(navbar.loginButton).toBeVisible();
     await expect(navbar.loginButton).toContainText('Sign In');
+
+    await expect(navbar.userMenuButton).toBeHidden();
+  });
+
+  test('should display logged in user', async ({ navbar, login }) => {
+    await login();
+
+    await expect(navbar.loginButton).toBeHidden();
+
+    await expect(navbar.userMenuButton).toBeVisible();
+    await expect(navbar.userProfileImage).toBeVisible();
+
+    await navbar.userMenuButton.click();
+
+    await expect(navbar.userMenuName).toBeVisible();
+    await expect(navbar.userMenuName).toHaveText('John Doe');
+    await expect(navbar.userMenuEmail).toBeVisible();
+    await expect(navbar.userMenuEmail).toHaveText('john.doe@mail.com');
+    await expect(navbar.logoutButton).toBeVisible();
+    await expect(navbar.logoutButton).toContainText('Sign Out');
+
+    await navbar.logoutButton.click();
+
+    await expect(navbar.userMenuButton).toBeHidden();
+    await expect(navbar.loginButton).toBeVisible();
   });
 });
