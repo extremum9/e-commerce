@@ -3,6 +3,8 @@ import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter, RouterOutlet } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { MatIconTestingModule } from '@angular/material/icon/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 
 import { App } from './app';
 import { Navbar } from './navbar/navbar';
@@ -29,24 +31,44 @@ describe(App.name, () => {
     });
     const fixture = TestBed.createComponent(App);
     const debugElement = fixture.debugElement;
+    const loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
 
-    return { fixture, debugElement, currentUser };
+    const hasSpinner = () =>
+      loader.hasHarness(
+        MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-app-spinner]' })
+      );
+
+    return { fixture, debugElement, hasSpinner, currentUser };
   };
 
-  it('should display nothing if user is undefined', () => {
-    const { fixture, debugElement, currentUser } = setup();
+  it('should display spinner if user is undefined', async () => {
+    const { fixture, debugElement, hasSpinner, currentUser } = setup();
     currentUser.set(undefined);
     fixture.detectChanges();
 
-    expect(debugElement.query(By.directive(Navbar))).toBeFalsy();
-    expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
+    const spinner = await hasSpinner();
+
+    expect(spinner).withContext('spinner').toBe(true);
+    expect(debugElement.query(By.directive(Navbar)))
+      .withContext('Navbar')
+      .toBeFalsy();
+    expect(debugElement.query(By.directive(RouterOutlet)))
+      .withContext('RouterOutlet')
+      .toBeFalsy();
   });
 
-  it('should display navbar along with router outlet if user is defined', () => {
-    const { debugElement } = setup();
+  it('should display navbar along with router outlet if user is defined', async () => {
+    const { debugElement, hasSpinner } = setup();
 
-    expect(debugElement.query(By.directive(Navbar))).toBeTruthy();
-    expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
+    const spinner = await hasSpinner();
+
+    expect(spinner).withContext('spinner').toBe(false);
+    expect(debugElement.query(By.directive(Navbar)))
+      .withContext('Navbar')
+      .toBeTruthy();
+    expect(debugElement.query(By.directive(RouterOutlet)))
+      .withContext('RouterOutlet')
+      .toBeTruthy();
   });
 });
