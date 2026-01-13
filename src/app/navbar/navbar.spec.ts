@@ -4,9 +4,10 @@ import { By } from '@angular/platform-browser';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { MatMenuHarness } from '@angular/material/menu/testing';
 import { MatDialog } from '@angular/material/dialog';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { createMockUser } from '../testing-utils';
 import { CurrentUser } from '../models/current-user';
@@ -26,9 +27,14 @@ describe(Navbar.name, () => {
     const dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
 
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
         provideRouter([]),
+        {
+          provide: MATERIAL_ANIMATIONS,
+          useValue: { animationsDisabled: true }
+        },
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy
@@ -71,10 +77,10 @@ describe(Navbar.name, () => {
   it('should display brand', () => {
     const { debugElement } = setup();
     const brandLink = debugElement.query(By.css('[data-testid=navbar-brand]'));
-    expect(brandLink).withContext('Brand link element').toBeTruthy();
-    expect(brandLink.nativeElement.getAttribute('href')).withContext('Brand link href').toBe('/');
+    expect(brandLink).withContext('brand link element').toBeTruthy();
+    expect(brandLink.nativeElement.getAttribute('href')).withContext('brand link href').toBe('/');
     expect(brandLink.nativeElement.textContent)
-      .withContext('Brand link text')
+      .withContext('brand link text')
       .toContain('MiniStore');
   });
 
@@ -86,15 +92,15 @@ describe(Navbar.name, () => {
     );
     const wishlistLink = await wishlistLinkHarness.host();
     expect(await wishlistLink.getAttribute('href'))
-      .withContext('Wishlist link href')
+      .withContext('wishlist link href')
       .toBe('/wishlist');
     expect(await wishlistLink.getAttribute('aria-label'))
-      .withContext('Wishlist link aria-label')
+      .withContext('wishlist link aria-label')
       .toContain('Wishlist');
 
     const wishlistLinkIconHarness = await wishlistLinkHarness.getHarness(MatIconHarness);
     expect(await wishlistLinkIconHarness.getName())
-      .withContext('Wishlist link icon')
+      .withContext('wishlist link icon')
       .toBe('favorite');
 
     const cartLinkHarness = await loader.getHarness(
@@ -102,20 +108,20 @@ describe(Navbar.name, () => {
     );
     const cartLink = await cartLinkHarness.host();
     expect(await cartLink.getAttribute('href'))
-      .withContext('Cart link href')
+      .withContext('cart link href')
       .toBe('/cart');
     expect(await cartLink.getAttribute('aria-label'))
-      .withContext('Cart link aria-label')
+      .withContext('cart link aria-label')
       .toContain('Cart');
 
     const cartLinkIconHarness = await cartLinkHarness.getHarness(MatIconHarness);
     expect(await cartLinkIconHarness.getName())
-      .withContext('Cart link icon')
+      .withContext('cart link icon')
       .toBe('shopping_cart');
 
     const loginButtonHarness = await getLoginButtonHarness();
     expect(await loginButtonHarness.getText())
-      .withContext('Login button text')
+      .withContext('login button text')
       .toContain('Sign In');
   });
 
@@ -125,7 +131,7 @@ describe(Navbar.name, () => {
     fixture.detectChanges();
 
     expect(debugElement.query(By.css('[data-testid=navbar-login-button]')))
-      .withContext('Login button visibility when logged in')
+      .withContext('login button (logged in)')
       .toBeFalsy();
 
     const userMenuButtonHarness = await loader.getHarness(
@@ -133,41 +139,41 @@ describe(Navbar.name, () => {
     );
     const userMenuButton = await userMenuButtonHarness.host();
     expect(await userMenuButton.getAttribute('aria-label'))
-      .withContext('User menu button aria-label')
+      .withContext('user menu button aria-label')
       .toBe('Toggle user menu');
 
     const userProfileImage = debugElement.query(By.css('[data-testid=user-profile-image]'));
     expect(userProfileImage).withContext('User profile image element').toBeTruthy();
     expect(userProfileImage.nativeElement.getAttribute('src'))
-      .withContext('User profile image src')
+      .withContext('user profile image src')
       .toBe(mockUser.imageUrl);
     expect(userProfileImage.nativeElement.getAttribute('alt'))
-      .withContext('User profile image alt text')
+      .withContext('user profile image alt text')
       .toBe('Profile image');
 
     currentUser.set({ ...mockUser, imageUrl: null });
     fixture.detectChanges();
 
     expect(userProfileImage.nativeElement.getAttribute('src'))
-      .withContext('User profile fallback image src')
+      .withContext('user profile image src (fallback)')
       .toBe('person.jpg');
 
     const userMenuHarness = await getUserMenuHarness();
     await userMenuHarness.open();
 
     const userMenuItems = await userMenuHarness.getItems();
-    expect(userMenuItems.length).withContext('User menu items').toBe(1);
+    expect(userMenuItems.length).withContext('user menu items').toBe(1);
 
     const userMenuName = debugElement.query(By.css('[data-testid=user-menu-name]'));
     expect(userMenuName).toBeTruthy();
     expect(userMenuName.nativeElement.textContent)
-      .withContext('User menu name')
+      .withContext('user menu name')
       .toContain(mockUser.name);
 
     const userMenuEmail = debugElement.query(By.css('[data-testid=user-menu-email]'));
     expect(userMenuEmail).toBeTruthy();
     expect(userMenuEmail.nativeElement.textContent)
-      .withContext('User menu email')
+      .withContext('user menu email')
       .toContain(mockUser.email);
   });
 

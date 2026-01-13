@@ -7,6 +7,8 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { By } from '@angular/platform-browser';
 import { Observable, of, Subject } from 'rxjs';
 import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
+import { MatIconTestingModule } from '@angular/material/icon/testing';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { Product } from '../../models/product';
 import { ProductCard } from '../product-card/product-card';
@@ -53,12 +55,17 @@ describe(ProductList.name, () => {
       }
     });
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
         provideRouter(
           [{ matcher: productCategoryMatcher, component: ProductList }],
           withComponentInputBinding()
         ),
+        {
+          provide: MATERIAL_ANIMATIONS,
+          useValue: { animationsDisabled: true }
+        },
         { provide: ProductApiClient, useValue: productApiClientSpy }
       ]
     });
@@ -75,22 +82,22 @@ describe(ProductList.name, () => {
     const categoryLinks = await loader.getAllHarnesses(
       MatButtonHarness.with({ selector: '[data-testid=category-link]' })
     );
-    expect(categoryLinks.length).withContext('Category links').toBe(5);
+    expect(categoryLinks.length).withContext('category links').toBe(5);
 
     const allLinkHarness = categoryLinks[0];
     expect(await allLinkHarness.getAppearance())
-      .withContext('Active category link appearance')
+      .withContext('active category link')
       .toBe('filled');
     expect(await allLinkHarness.getText())
-      .withContext('Active category link text')
+      .withContext('active category link text')
       .toBe('All');
 
     const allLink = await allLinkHarness.host();
     expect(await allLink.getAttribute('href'))
-      .withContext('Active category href')
+      .withContext('active category link href')
       .toBe('/products');
     expect(await allLink.getAttribute('aria-current'))
-      .withContext('Active category link aria-current')
+      .withContext('active category link aria-current')
       .toBe('page');
 
     const electronicsLinkHarness = await loader.getHarness(
@@ -99,19 +106,19 @@ describe(ProductList.name, () => {
     await electronicsLinkHarness.click();
 
     expect(await electronicsLinkHarness.getAppearance())
-      .withContext('Category link appearance after click')
+      .withContext('category link (clicked)')
       .toBe('filled');
 
     const electronicsLink = await electronicsLinkHarness.host();
     expect(await electronicsLink.getAttribute('aria-current'))
-      .withContext('Category link aria-current after click')
+      .withContext('category link aria-current (clicked)')
       .toBe('page');
 
     expect(await allLinkHarness.getAppearance())
-      .withContext('Inactive category link appearance')
+      .withContext('inactive category link')
       .toBe('outlined');
     expect(await allLink.getAttribute('aria-current'))
-      .withContext('Inactive category link aria-current')
+      .withContext('inactive category link aria-current')
       .toBeNull();
   });
 
@@ -120,25 +127,25 @@ describe(ProductList.name, () => {
     const { loader, mockProducts } = await setup({ listReturn$: loadingSubject });
 
     let spinner = await loader.hasHarness(MatProgressSpinnerHarness);
-    expect(spinner).withContext('Spinner visibility before load').toBe(true);
+    expect(spinner).withContext('spinner (loading)').toBe(true);
 
     loadingSubject.next(mockProducts);
 
     spinner = await loader.hasHarness(MatProgressSpinnerHarness);
-    expect(spinner).withContext('Spinner visibility after load').toBe(false);
+    expect(spinner).withContext('spinner (loaded)').toBe(false);
   });
 
   it('should display all products by default when data is loaded', async () => {
     const { debugElement, mockProducts } = await setup();
 
     const productCount = debugElement.query(By.css('[data-testid=product-count]'));
-    expect(productCount).withContext('Product count element').toBeTruthy();
+    expect(productCount).withContext('product count').toBeTruthy();
     expect(productCount.nativeElement.textContent)
-      .withContext('Product count text')
+      .withContext('product count text')
       .toContain(`${mockProducts.length} products found`);
 
     const productNames = debugElement.queryAll(By.directive(ProductCardStub));
-    expect(productNames.length).withContext('Product names').toBe(2);
+    expect(productNames.length).withContext('product names').toBe(2);
     expect((productNames[0].componentInstance as ProductCardStub).product().name).toBe(
       mockProducts[0].name
     );
@@ -164,7 +171,7 @@ describe(ProductList.name, () => {
     expect(router.url).toBe('/products/clothing');
 
     const productNames = debugElement.queryAll(By.directive(ProductCardStub));
-    expect(productNames.length).withContext('Product names').toBe(2);
+    expect(productNames.length).withContext('product names').toBe(2);
     expect((productNames[0].componentInstance as ProductCardStub).product().name).toBe(
       mockProducts[0].name
     );

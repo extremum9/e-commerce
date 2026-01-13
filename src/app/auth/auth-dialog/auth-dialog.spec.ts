@@ -128,19 +128,15 @@ describe(AuthDialog.name, () => {
       setup();
 
     const tabs = await rootLoader.getAllHarnesses(MatTabHarness);
-    expect(tabs.length).withContext('Tabs').toBe(2);
+    expect(tabs.length).withContext('tabs').toBe(2);
 
     await selectSignInTab();
 
-    expect(getLoginFormStub())
-      .withContext('Login form visibility after selecting `Sign in`')
-      .toBeTruthy();
+    expect(getLoginFormStub()).withContext('login form (sign-in tab)').toBeTruthy();
 
     await selectSignUpTab();
 
-    expect(getRegisterFormStub())
-      .withContext('Register form visibility after selecting `Sing up`')
-      .toBeTruthy();
+    expect(getRegisterFormStub()).withContext('register form (sign-up tab)').toBeTruthy();
   });
 
   it('should close dialog on login success', async () => {
@@ -173,12 +169,12 @@ describe(AuthDialog.name, () => {
       })
     );
     expect(await buttonHarness.getText())
-      .withContext('Login-with-google button text')
+      .withContext('login-with-google button text')
       .toContain('Continue with Google');
 
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
     expect(await buttonIconHarness.getName())
-      .withContext('Login-with-google button icon')
+      .withContext('login-with-google button icon')
       .toBe('google');
 
     await buttonHarness.click();
