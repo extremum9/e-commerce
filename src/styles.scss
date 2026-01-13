@@ -6,6 +6,11 @@
 @use '@angular/material' as mat;
 @use 'tailwindcss';
 
+html,
+body {
+  height: 100%;
+}
+
 html {
   @include mat.theme(
     (
@@ -32,19 +37,10 @@ body {
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 
   // Reset the user agent margin.
   margin: 0;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 @utility container {
