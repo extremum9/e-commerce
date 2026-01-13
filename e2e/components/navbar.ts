@@ -6,9 +6,11 @@ export class Navbar {
   public readonly wishlistLink: Locator;
   public readonly cartLink: Locator;
   public readonly loginButton: Locator;
-  public readonly menuButton: Locator;
-  public readonly menuWishlistLink: Locator;
-  public readonly menuLoginButton: Locator;
+  public readonly userMenuButton: Locator;
+  public readonly userProfileImage: Locator;
+  public readonly userMenuName: Locator;
+  public readonly userMenuEmail: Locator;
+  public readonly logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -16,16 +18,10 @@ export class Navbar {
     this.wishlistLink = page.getByTestId('navbar-wishlist-link');
     this.cartLink = page.getByTestId('navbar-cart-link');
     this.loginButton = page.getByTestId('navbar-login-button');
-    this.menuButton = page.getByTestId('navbar-menu-button');
-    this.menuWishlistLink = page.getByTestId('menu-wishlist-link');
-    this.menuLoginButton = page.getByTestId('menu-login-button');
-  }
-
-  public async openMenu(): Promise<void> {
-    await this.menuButton.click();
-  }
-
-  public async closeMenu(): Promise<void> {
-    await this.menuButton.click({ force: true });
+    this.userMenuButton = page.getByTestId('user-menu-button');
+    this.userProfileImage = page.getByTestId('user-profile-image');
+    this.userMenuName = page.getByTestId('user-menu-name');
+    this.userMenuEmail = page.getByTestId('user-menu-email');
+    this.logoutButton = page.getByTestId('logout-button');
   }
 }

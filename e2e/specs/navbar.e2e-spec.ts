@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures';
 
 test.describe('Navbar', () => {
-  test('should display the brand and user links', async ({ page, navbar }) => {
+  test('should display brand and user links', async ({ page, navbar }) => {
     await page.goto('/');
 
     await expect(navbar.brandLink).toBeVisible();
@@ -16,30 +16,5 @@ test.describe('Navbar', () => {
 
     await expect(navbar.loginButton).toBeVisible();
     await expect(navbar.loginButton).toContainText('Sign In');
-
-    await expect(navbar.menuButton).toBeHidden();
-  });
-
-  test('should display a mobile menu on smaller screens', async ({ page, navbar }) => {
-    await page.goto('/');
-    await page.setViewportSize({ width: 375, height: 667 });
-
-    await expect(navbar.brandLink).toBeVisible();
-    await expect(navbar.cartLink).toBeVisible();
-    await expect(navbar.menuButton).toBeVisible();
-    await expect(navbar.wishlistLink).toBeHidden();
-    await expect(navbar.loginButton).toBeHidden();
-
-    await navbar.openMenu();
-
-    await expect(navbar.menuWishlistLink).toBeVisible();
-    await expect(navbar.menuWishlistLink).toContainText('Wishlist');
-    await expect(navbar.menuLoginButton).toBeVisible();
-    await expect(navbar.menuLoginButton).toContainText('Sign In');
-
-    await navbar.closeMenu();
-
-    await expect(navbar.menuWishlistLink).toBeHidden();
-    await expect(navbar.menuLoginButton).toBeHidden();
   });
 });
