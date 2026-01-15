@@ -8,7 +8,7 @@ type Fixtures = {
   navbar: Navbar;
   authDialog: AuthDialog;
   productsPage: ProductsPage;
-  login: (credentials?: LoginCredentials) => Promise<void>;
+  login: (credentials?: Partial<LoginCredentials>) => Promise<void>;
 };
 
 export const test = base.extend<Fixtures>({
@@ -22,10 +22,10 @@ export const test = base.extend<Fixtures>({
     await use(new ProductsPage(page));
   },
   login: async ({ page, navbar, authDialog }, use) => {
-    await use(async (credentials: Partial<{ email: string; password: string }> = {}) => {
+    await use(async (credentials: Partial<LoginCredentials> = {}) => {
       await page.goto('/');
       await navbar.loginButton.click();
-      await authDialog.login({ email: 'john.doe@mail.com', password: '123456', ...credentials });
+      await authDialog.login(credentials);
     });
   }
 });
