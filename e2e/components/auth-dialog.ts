@@ -43,7 +43,7 @@ export class AuthDialog {
     this.loginEmailInput = page.getByTestId('login-email-input');
     this.loginPasswordInput = page.getByTestId('login-password-input');
     this.loginPasswordToggleButton = page.getByTestId('login-password-toggle-button');
-    this.loginRememberMeCheckbox = page.getByTestId('login-remember-me-checkbox');
+    this.loginRememberMeCheckbox = page.getByRole('checkbox', { name: 'Remember me' });
     this.loginSubmitButton = page.getByTestId('login-submit-button');
 
     this.registerNameInput = page.getByTestId('register-name-input');
