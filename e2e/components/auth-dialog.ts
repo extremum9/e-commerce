@@ -40,19 +40,17 @@ export class AuthDialog {
 
     this.signUpTab = page.getByRole('tab', { name: 'Sign Up' });
 
-    this.loginEmailInput = page.getByTestId('login-form-email-input');
-    this.loginPasswordInput = page.getByTestId('login-form-password-input');
-    this.loginPasswordToggleButton = page.getByTestId('login-password-visibility-toggle-button');
-    this.loginRememberMeCheckbox = page.getByTestId('login-form-remember-me-checkbox');
-    this.loginSubmitButton = page.getByTestId('login-form-submit-button');
+    this.loginEmailInput = page.getByTestId('login-email-input');
+    this.loginPasswordInput = page.getByTestId('login-password-input');
+    this.loginPasswordToggleButton = page.getByTestId('login-password-toggle-button');
+    this.loginRememberMeCheckbox = page.getByTestId('login-remember-me-checkbox');
+    this.loginSubmitButton = page.getByTestId('login-submit-button');
 
-    this.registerNameInput = page.getByTestId('register-form-name-input');
-    this.registerEmailInput = page.getByTestId('register-form-email-input');
-    this.registerPasswordInput = page.getByTestId('register-form-password-input');
-    this.registerPasswordToggleButton = page.getByTestId(
-      'register-password-visibility-toggle-button'
-    );
-    this.registerSubmitButton = page.getByTestId('register-form-submit-button');
+    this.registerNameInput = page.getByTestId('register-name-input');
+    this.registerEmailInput = page.getByTestId('register-email-input');
+    this.registerPasswordInput = page.getByTestId('register-password-input');
+    this.registerPasswordToggleButton = page.getByTestId('register-password-toggle-button');
+    this.registerSubmitButton = page.getByTestId('register-submit-button');
 
     this.errorMessage = page.locator('mat-error');
 

@@ -53,21 +53,17 @@ describe(RegisterForm.name, () => {
     const dialogClosedSpy = spyOn(component.dialogClosed, 'emit');
 
     const getNameInputHarness = () =>
-      loader.getHarness(
-        MatInputHarness.with({ selector: '[data-testid=register-form-name-input]' })
-      );
+      loader.getHarness(MatInputHarness.with({ selector: '[data-testid=register-name-input]' }));
     const getEmailInputHarness = () =>
-      loader.getHarness(
-        MatInputHarness.with({ selector: '[data-testid=register-form-email-input]' })
-      );
+      loader.getHarness(MatInputHarness.with({ selector: '[data-testid=register-email-input]' }));
     const getPasswordInputHarness = () =>
       loader.getHarness(
-        MatInputHarness.with({ selector: '[data-testid=register-form-password-input]' })
+        MatInputHarness.with({ selector: '[data-testid=register-password-input]' })
       );
     const getSubmitButtonHarness = () =>
       loader.getHarness(
         MatButtonHarness.with({
-          selector: '[data-testid=register-form-submit-button]',
+          selector: '[data-testid=register-submit-button]',
           appearance: 'filled'
         })
       );
@@ -134,7 +130,7 @@ describe(RegisterForm.name, () => {
     const { loader, getNameInputHarness, getEmailInputHarness, getPasswordInputHarness } = setup();
 
     const nameFieldHarness = await loader.getHarness(
-      MatFormFieldHarness.with({ selector: '[data-testid=register-form-name-field]' })
+      MatFormFieldHarness.with({ selector: '[data-testid=register-name-field]' })
     );
     const nameInputHarness = await getNameInputHarness();
 
@@ -146,7 +142,7 @@ describe(RegisterForm.name, () => {
     expect(nameErrorMessages[0]).toContain('Name is required');
 
     const emailFieldHarness = await loader.getHarness(
-      MatFormFieldHarness.with({ selector: '[data-testid=register-form-email-field]' })
+      MatFormFieldHarness.with({ selector: '[data-testid=register-email-field]' })
     );
     const emailInputHarness = await getEmailInputHarness();
 
@@ -164,7 +160,7 @@ describe(RegisterForm.name, () => {
     expect(emailErrorMessages[0]).toContain('Email is invalid');
 
     const passwordFieldHarness = await loader.getHarness(
-      MatFormFieldHarness.with({ selector: '[data-testid=register-form-password-field]' })
+      MatFormFieldHarness.with({ selector: '[data-testid=register-password-field]' })
     );
     const passwordInputHarness = await getPasswordInputHarness();
 
@@ -189,7 +185,7 @@ describe(RegisterForm.name, () => {
 
     const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({
-        selector: '[data-testid=register-password-visibility-toggle-button]'
+        selector: '[data-testid=register-password-toggle-button]'
       })
     );
     const button = await buttonHarness.host();
