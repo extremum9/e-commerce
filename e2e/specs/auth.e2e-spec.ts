@@ -140,4 +140,19 @@ test.describe('Authentication', () => {
     await expect(authDialog.resetPasswordSpinner).toBeHidden();
     await expect(authDialog.resetPasswordButton).toBeVisible();
   });
+
+  test('should login with google', async ({ page, authDialog }) => {
+    const popupPromise = page.waitForEvent('popup');
+
+    await authDialog.loginWithGoogleButton.click();
+
+    const popup = await popupPromise;
+    await popup.waitForLoadState('domcontentloaded');
+    await popup.getByRole('button', { name: 'Add new account' }).click();
+    await popup.getByRole('button', { name: /Auto-generate/ }).click();
+    await popup.getByRole('button', { name: /Sign in/ }).click();
+    await popup.waitForEvent('close');
+
+    await expect(authDialog.loginWithGoogleButton).toBeHidden();
+  });
 });
