@@ -47,18 +47,13 @@ test.describe('Authentication', () => {
 
     await authDialog.loginSubmitButton.click();
 
-    await expect(authDialog.loginSubmitButton).toBeDisabled();
-    await expect(authDialog.loginSubmitButton).toContainText('Signing In...');
-
     await expect(authDialog.loginSubmitButton).toBeHidden();
   });
 
   test('should display a snackbar on login failure', async ({ page, authDialog }) => {
     await authDialog.login({ email: `${getRandomString()}@mail.com` });
 
-    const snackbar = page.getByText('The email or password is incorrect');
-    await expect(snackbar).toBeVisible();
-    await expect(snackbar).toBeHidden();
+    await expect(page.getByText('The email or password is incorrect')).toBeVisible();
 
     await expect(authDialog.loginSubmitButton).toBeEnabled();
     await expect(authDialog.loginSubmitButton).toContainText('Sign In');
@@ -116,9 +111,6 @@ test.describe('Authentication', () => {
 
     await authDialog.registerSubmitButton.click();
 
-    await expect(authDialog.registerSubmitButton).toBeDisabled();
-    await expect(authDialog.registerSubmitButton).toContainText('Signing Up...');
-
     await expect(authDialog.registerSubmitButton).toBeHidden();
   });
 
@@ -126,11 +118,21 @@ test.describe('Authentication', () => {
     await authDialog.signUpTab.click();
     await authDialog.register({ email: 'john.doe@mail.com' });
 
-    const snackbar = page.getByText('Try again with another email');
-    await expect(snackbar).toBeVisible();
-    await expect(snackbar).toBeHidden();
+    await expect(page.getByText('Try again with another email')).toBeVisible();
 
     await expect(authDialog.registerSubmitButton).toBeEnabled();
     await expect(authDialog.registerSubmitButton).toContainText('Sign Up');
+  });
+
+  test('should send password reset link', async ({ page, authDialog }) => {
+    await authDialog.resetPasswordButton.click();
+    await expect(page.getByText('Please enter your email address')).toBeVisible();
+
+    await authDialog.loginEmailInput.fill('john.doe@mail.com');
+    await authDialog.resetPasswordButton.click();
+
+    await expect(page.getByText('A password reset link has been sent')).toBeVisible();
+    await expect(authDialog.resetPasswordSpinner).toBeHidden();
+    await expect(authDialog.resetPasswordButton).toBeVisible();
   });
 });

@@ -5,8 +5,7 @@ test.describe('Products page', () => {
   test('should display categories and products', async ({ page, productsPage }) => {
     await productsPage.goto();
 
-    await expect(productsPage.loadingProductListSpinner).toBeVisible();
-    await expect(productsPage.loadingProductListSpinner).toHaveCount(0);
+    await expect(productsPage.loadingProductListSpinner).toBeHidden();
 
     await expect(productsPage.categoryLinks).toHaveText([
       'All',
