@@ -45,6 +45,11 @@ test.describe('Authentication', () => {
     await authDialog.loginPasswordToggleButton.click();
     await expect(authDialog.loginPasswordInput).toHaveAttribute('type', 'password');
 
+    await expect(authDialog.loginRememberMeCheckbox).toBeVisible();
+    await expect(authDialog.loginRememberMeCheckbox).not.toBeChecked();
+    await authDialog.loginRememberMeCheckbox.check();
+    await expect(authDialog.loginRememberMeCheckbox).toBeChecked();
+
     await authDialog.loginSubmitButton.click();
 
     await expect(authDialog.loginSubmitButton).toBeHidden();
