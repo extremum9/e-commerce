@@ -72,7 +72,7 @@ import { Snackbar } from '../../snackbar/snackbar';
         />
         <mat-icon matPrefix>lock</mat-icon>
         <button
-          data-testid="password-visibility-toggle-button"
+          data-testid="register-password-visibility-toggle-button"
           class="mr-2"
           matIconButton
           matSuffix

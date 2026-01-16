@@ -1,4 +1,5 @@
 import { expect, test } from '../fixtures';
+import { getRandomString } from '../utils';
 
 test.describe('Authentication', () => {
   test.beforeEach(async ({ page, navbar }) => {
@@ -6,59 +7,130 @@ test.describe('Authentication', () => {
     await navbar.loginButton.click();
   });
 
-  test('should display a sign-in tab', async ({ authDialog }) => {
-    await expect(authDialog.submitButton).toBeVisible();
-    await expect(authDialog.submitButton).toBeEnabled();
+  test('should display a login tab', async ({ authDialog }) => {
+    await expect(authDialog.loginSubmitButton).toBeVisible();
+    await expect(authDialog.loginSubmitButton).toBeEnabled();
 
-    await authDialog.emailInput.fill('');
-    await authDialog.emailInput.blur();
+    await authDialog.loginEmailInput.fill('');
+    await authDialog.loginEmailInput.blur();
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Email is required');
 
-    await authDialog.emailInput.fill('john');
+    await authDialog.loginEmailInput.fill('john');
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Email is invalid');
 
-    await authDialog.emailInput.fill('john.doe@mail.com');
+    await authDialog.loginEmailInput.fill('john.doe@mail.com');
     await expect(authDialog.errorMessage).toBeHidden();
 
-    await authDialog.passwordInput.fill('');
-    await authDialog.passwordInput.blur();
+    await authDialog.loginPasswordInput.fill('');
+    await authDialog.loginPasswordInput.blur();
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Password is required');
 
-    await authDialog.passwordInput.fill('1234');
+    await authDialog.loginPasswordInput.fill('1234');
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText(
       'Password must be at least 6 characters long'
     );
 
-    await authDialog.passwordInput.fill('123456');
+    await authDialog.loginPasswordInput.fill('123456');
     await expect(authDialog.errorMessage).toBeHidden();
 
-    await authDialog.passwordVisibilityToggleButton.click();
-    await expect(authDialog.passwordInput).toHaveAttribute('type', 'text');
+    await expect(authDialog.loginPasswordToggleButton).toBeVisible();
 
-    await authDialog.passwordVisibilityToggleButton.click();
-    await expect(authDialog.passwordInput).toHaveAttribute('type', 'password');
+    await authDialog.loginPasswordToggleButton.click();
+    await expect(authDialog.loginPasswordInput).toHaveAttribute('type', 'text');
 
-    await authDialog.submitButton.click();
+    await authDialog.loginPasswordToggleButton.click();
+    await expect(authDialog.loginPasswordInput).toHaveAttribute('type', 'password');
 
-    await expect(authDialog.submitButton).toBeDisabled();
-    await expect(authDialog.submitButton).toContainText('Signing In...');
+    await authDialog.loginSubmitButton.click();
 
-    await expect(authDialog.submitButton).toBeHidden();
+    await expect(authDialog.loginSubmitButton).toBeDisabled();
+    await expect(authDialog.loginSubmitButton).toContainText('Signing In...');
+
+    await expect(authDialog.loginSubmitButton).toBeHidden();
   });
 
   test('should display a snackbar on login failure', async ({ page, authDialog }) => {
-    await authDialog.login({ email: 'john@mail.com' });
-
-    await expect(authDialog.submitButton).toBeEnabled();
-    await expect(authDialog.submitButton).toContainText('Sign In');
-    await expect(authDialog.submitButton).toBeVisible();
+    await authDialog.login({ email: `${getRandomString()}@mail.com` });
 
     const snackbar = page.getByText('The email or password is incorrect');
     await expect(snackbar).toBeVisible();
     await expect(snackbar).toBeHidden();
+
+    await expect(authDialog.loginSubmitButton).toBeEnabled();
+    await expect(authDialog.loginSubmitButton).toContainText('Sign In');
+  });
+
+  test('should display a register tab', async ({ authDialog }) => {
+    await authDialog.signUpTab.click();
+
+    await expect(authDialog.registerSubmitButton).toBeVisible();
+    await expect(authDialog.registerSubmitButton).toBeEnabled();
+
+    await authDialog.registerNameInput.fill('');
+    await authDialog.registerNameInput.blur();
+    await expect(authDialog.errorMessage).toBeVisible();
+    await expect(authDialog.errorMessage).toContainText('Name is required');
+
+    const name = getRandomString();
+    await authDialog.registerNameInput.fill(name);
+    await expect(authDialog.errorMessage).toBeHidden();
+
+    await authDialog.registerEmailInput.fill('');
+    await authDialog.registerEmailInput.blur();
+    await expect(authDialog.errorMessage).toBeVisible();
+    await expect(authDialog.errorMessage).toContainText('Email is required');
+
+    await authDialog.registerEmailInput.fill('test');
+    await expect(authDialog.errorMessage).toBeVisible();
+    await expect(authDialog.errorMessage).toContainText('Email is invalid');
+
+    const email = `${getRandomString()}@mail.com`;
+    await authDialog.registerEmailInput.fill(email);
+    await expect(authDialog.errorMessage).toBeHidden();
+
+    await authDialog.registerPasswordInput.fill('');
+    await authDialog.registerPasswordInput.blur();
+    await expect(authDialog.errorMessage).toBeVisible();
+    await expect(authDialog.errorMessage).toContainText('Password is required');
+
+    await authDialog.registerPasswordInput.fill('1234');
+    await expect(authDialog.errorMessage).toBeVisible();
+    await expect(authDialog.errorMessage).toContainText(
+      'Password must be at least 6 characters long'
+    );
+
+    await authDialog.registerPasswordInput.fill('123456');
+    await expect(authDialog.errorMessage).toBeHidden();
+
+    await expect(authDialog.registerPasswordToggleButton).toBeVisible();
+
+    await authDialog.registerPasswordToggleButton.click();
+    await expect(authDialog.registerPasswordInput).toHaveAttribute('type', 'text');
+
+    await authDialog.registerPasswordToggleButton.click();
+    await expect(authDialog.registerPasswordInput).toHaveAttribute('type', 'password');
+
+    await authDialog.registerSubmitButton.click();
+
+    await expect(authDialog.registerSubmitButton).toBeDisabled();
+    await expect(authDialog.registerSubmitButton).toContainText('Signing Up...');
+
+    await expect(authDialog.registerSubmitButton).toBeHidden();
+  });
+
+  test('should display a snackbar on register failure', async ({ page, authDialog }) => {
+    await authDialog.signUpTab.click();
+    await authDialog.register({ email: 'john.doe@mail.com' });
+
+    const snackbar = page.getByText('Try again with another email');
+    await expect(snackbar).toBeVisible();
+    await expect(snackbar).toBeHidden();
+
+    await expect(authDialog.registerSubmitButton).toBeEnabled();
+    await expect(authDialog.registerSubmitButton).toContainText('Sign Up');
   });
 });

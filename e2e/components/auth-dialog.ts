@@ -1,14 +1,14 @@
 import { Locator, Page } from '@playwright/test';
 
+import { getRandomString } from '../utils';
+
 export type LoginCredentials = {
   email: string;
   password: string;
 };
 
-export type RegisterCredentials = {
+export type RegisterCredentials = LoginCredentials & {
   name: string;
-  email: string;
-  password?: string;
 };
 
 export class AuthDialog {
@@ -16,13 +16,19 @@ export class AuthDialog {
 
   public readonly signUpTab: Locator;
 
-  public readonly nameInput: Locator;
-  public readonly emailInput: Locator;
-  public readonly passwordInput: Locator;
-  public readonly passwordVisibilityToggleButton: Locator;
-  public readonly rememberMeCheckbox: Locator;
+  public readonly loginEmailInput: Locator;
+  public readonly loginPasswordInput: Locator;
+  public readonly loginPasswordToggleButton: Locator;
+  public readonly loginRememberMeCheckbox: Locator;
+  public readonly loginSubmitButton: Locator;
+
+  public readonly registerNameInput: Locator;
+  public readonly registerEmailInput: Locator;
+  public readonly registerPasswordInput: Locator;
+  public readonly registerPasswordToggleButton: Locator;
+  public readonly registerSubmitButton: Locator;
+
   public readonly errorMessage: Locator;
-  public readonly submitButton: Locator;
 
   public readonly resetPasswordButton: Locator;
   public readonly resetPasswordSpinner: Locator;
@@ -34,12 +40,20 @@ export class AuthDialog {
 
     this.signUpTab = page.getByRole('tab', { name: 'Sign Up' });
 
-    this.nameInput = page.getByPlaceholder('Enter your name');
-    this.emailInput = page.getByPlaceholder('Enter your email');
-    this.passwordInput = page.getByPlaceholder('Enter your password');
-    this.passwordVisibilityToggleButton = page.getByTestId('password-visibility-toggle-button');
-    this.rememberMeCheckbox = page.getByTestId('login-form-remember-me-checkbox');
-    this.submitButton = page.locator('button[type=submit]');
+    this.loginEmailInput = page.getByTestId('login-form-email-input');
+    this.loginPasswordInput = page.getByTestId('login-form-password-input');
+    this.loginPasswordToggleButton = page.getByTestId('login-password-visibility-toggle-button');
+    this.loginRememberMeCheckbox = page.getByTestId('login-form-remember-me-checkbox');
+    this.loginSubmitButton = page.getByTestId('login-form-submit-button');
+
+    this.registerNameInput = page.getByTestId('register-form-name-input');
+    this.registerEmailInput = page.getByTestId('register-form-email-input');
+    this.registerPasswordInput = page.getByTestId('register-form-password-input');
+    this.registerPasswordToggleButton = page.getByTestId(
+      'register-password-visibility-toggle-button'
+    );
+    this.registerSubmitButton = page.getByTestId('register-form-submit-button');
+
     this.errorMessage = page.locator('mat-error');
 
     this.resetPasswordButton = page.getByTestId('reset-password-button');
@@ -52,15 +66,19 @@ export class AuthDialog {
     email = 'john.doe@mail.com',
     password = '123456'
   }: Partial<LoginCredentials> = {}): Promise<void> {
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.submitButton.click();
+    await this.loginEmailInput.fill(email);
+    await this.loginPasswordInput.fill(password);
+    await this.loginSubmitButton.click();
   }
 
-  public async register({ name, email, password = '123456' }: RegisterCredentials): Promise<void> {
-    await this.nameInput.fill(name);
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.submitButton.click();
+  public async register({
+    name = getRandomString(),
+    email = `${getRandomString()}@mail.com`,
+    password = '123456'
+  }: Partial<RegisterCredentials> = {}): Promise<void> {
+    await this.registerNameInput.fill(name);
+    await this.registerEmailInput.fill(email);
+    await this.registerPasswordInput.fill(password);
+    await this.registerSubmitButton.click();
   }
 }
