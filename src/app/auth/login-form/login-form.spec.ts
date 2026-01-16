@@ -64,21 +64,19 @@ describe(LoginForm.name, () => {
     const dialogClosedSpy = spyOn(component.dialogClosed, 'emit');
 
     const getEmailInputHarness = () =>
-      loader.getHarness(MatInputHarness.with({ selector: '[data-testid=login-form-email-input]' }));
+      loader.getHarness(MatInputHarness.with({ selector: '[data-testid=login-email-input]' }));
     const getPasswordInputHarness = () =>
-      loader.getHarness(
-        MatInputHarness.with({ selector: '[data-testid=login-form-password-input]' })
-      );
+      loader.getHarness(MatInputHarness.with({ selector: '[data-testid=login-password-input]' }));
     const getRememberMeCheckboxHarness = () =>
       loader.getHarness(
-        MatCheckboxHarness.with({ selector: '[data-testid=login-form-remember-me-checkbox]' })
+        MatCheckboxHarness.with({ selector: '[data-testid=login-remember-me-checkbox]' })
       );
     const getResetPasswordButtonHarness = () =>
       loader.getHarness(MatButtonHarness.with({ selector: '[data-testid=reset-password-button]' }));
     const getSubmitButtonHarness = () =>
       loader.getHarness(
         MatButtonHarness.with({
-          selector: '[data-testid=login-form-submit-button]',
+          selector: '[data-testid=login-submit-button]',
           appearance: 'filled'
         })
       );
@@ -153,7 +151,7 @@ describe(LoginForm.name, () => {
     const { loader, getEmailInputHarness, getPasswordInputHarness } = setup();
 
     const emailFieldHarness = await loader.getHarness(
-      MatFormFieldHarness.with({ selector: '[data-testid=login-form-email-field]' })
+      MatFormFieldHarness.with({ selector: '[data-testid=login-email-field]' })
     );
     const emailInputHarness = await getEmailInputHarness();
 
@@ -171,7 +169,7 @@ describe(LoginForm.name, () => {
     expect(emailErrorMessages[0]).toContain('Email is invalid');
 
     const passwordFieldHarness = await loader.getHarness(
-      MatFormFieldHarness.with({ selector: '[data-testid=login-form-password-field]' })
+      MatFormFieldHarness.with({ selector: '[data-testid=login-password-field]' })
     );
     const passwordInputHarness = await getPasswordInputHarness();
 
@@ -195,7 +193,7 @@ describe(LoginForm.name, () => {
     const passwordInputHarness = await getPasswordInputHarness();
 
     const buttonHarness = await loader.getHarness(
-      MatButtonHarness.with({ selector: '[data-testid=login-password-visibility-toggle-button]' })
+      MatButtonHarness.with({ selector: '[data-testid=login-password-toggle-button]' })
     );
     const button = await buttonHarness.host();
     expect(await button.getAttribute('aria-label'))

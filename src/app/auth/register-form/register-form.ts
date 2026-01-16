@@ -19,9 +19,9 @@ import { Snackbar } from '../../snackbar/snackbar';
   selector: 'app-register-form',
   template: `
     <form (ngSubmit)="register()" #ngForm="ngForm">
-      <mat-form-field data-testid="register-form-name-field" class="mb-2" appearance="outline">
+      <mat-form-field data-testid="register-name-field" class="mb-2" appearance="outline">
         <input
-          data-testid="register-form-name-input"
+          data-testid="register-name-input"
           matInput
           type="text"
           name="name"
@@ -37,9 +37,9 @@ import { Snackbar } from '../../snackbar/snackbar';
         }
       </mat-form-field>
 
-      <mat-form-field data-testid="register-form-email-field" class="mb-2" appearance="outline">
+      <mat-form-field data-testid="register-email-field" class="mb-2" appearance="outline">
         <input
-          data-testid="register-form-email-input"
+          data-testid="register-email-input"
           matInput
           type="email"
           name="email"
@@ -58,9 +58,9 @@ import { Snackbar } from '../../snackbar/snackbar';
         }
       </mat-form-field>
 
-      <mat-form-field data-testid="register-form-password-field" class="mb-2" appearance="outline">
+      <mat-form-field data-testid="register-password-field" class="mb-2" appearance="outline">
         <input
-          data-testid="register-form-password-input"
+          data-testid="register-password-input"
           matInput
           [type]="passwordVisible() ? 'text' : 'password'"
           name="password"
@@ -72,7 +72,7 @@ import { Snackbar } from '../../snackbar/snackbar';
         />
         <mat-icon matPrefix>lock</mat-icon>
         <button
-          data-testid="register-password-visibility-toggle-button"
+          data-testid="register-password-toggle-button"
           class="mr-2"
           matIconButton
           matSuffix
@@ -98,7 +98,7 @@ import { Snackbar } from '../../snackbar/snackbar';
       </mat-form-field>
 
       <button
-        data-testid="register-form-submit-button"
+        data-testid="register-submit-button"
         class="w-full"
         matButton="filled"
         type="submit"

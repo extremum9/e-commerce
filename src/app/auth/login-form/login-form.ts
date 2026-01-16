@@ -22,9 +22,9 @@ import { Snackbar } from '../../snackbar/snackbar';
   selector: 'app-login-form',
   template: `
     <form (ngSubmit)="login()" #ngForm="ngForm">
-      <mat-form-field data-testid="login-form-email-field" class="mb-2" appearance="outline">
+      <mat-form-field data-testid="login-email-field" class="mb-2" appearance="outline">
         <input
-          data-testid="login-form-email-input"
+          data-testid="login-email-input"
           matInput
           type="email"
           name="email"
@@ -43,9 +43,9 @@ import { Snackbar } from '../../snackbar/snackbar';
         }
       </mat-form-field>
 
-      <mat-form-field data-testid="login-form-password-field" class="mb-2" appearance="outline">
+      <mat-form-field data-testid="login-password-field" class="mb-2" appearance="outline">
         <input
-          data-testid="login-form-password-input"
+          data-testid="login-password-input"
           matInput
           [type]="passwordVisible() ? 'text' : 'password'"
           name="password"
@@ -57,7 +57,7 @@ import { Snackbar } from '../../snackbar/snackbar';
         />
         <mat-icon matPrefix>lock</mat-icon>
         <button
-          data-testid="login-password-visibility-toggle-button"
+          data-testid="login-password-toggle-button"
           class="mr-2"
           matIconButton
           matSuffix
@@ -84,7 +84,7 @@ import { Snackbar } from '../../snackbar/snackbar';
 
       <div class="flex justify-between items-center gap-2 -mt-2 mb-4">
         <mat-checkbox
-          data-testid="login-form-remember-me-checkbox"
+          data-testid="login-remember-me-checkbox"
           name="rememberMe"
           [(ngModel)]="form.rememberMe"
           >Remember me</mat-checkbox
@@ -105,7 +105,7 @@ import { Snackbar } from '../../snackbar/snackbar';
       </div>
 
       <button
-        data-testid="login-form-submit-button"
+        data-testid="login-submit-button"
         class="w-full"
         matButton="filled"
         type="submit"
