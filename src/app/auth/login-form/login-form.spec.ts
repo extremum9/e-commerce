@@ -195,7 +195,7 @@ describe(LoginForm.name, () => {
     const passwordInputHarness = await getPasswordInputHarness();
 
     const buttonHarness = await loader.getHarness(
-      MatButtonHarness.with({ selector: '[data-testid=password-visibility-toggle-button]' })
+      MatButtonHarness.with({ selector: '[data-testid=login-password-visibility-toggle-button]' })
     );
     const button = await buttonHarness.host();
     expect(await button.getAttribute('aria-label'))
