@@ -38,6 +38,9 @@ jobs:
       - name: Check format
         run: pnpm format:check
 
+      - name: Run security rules tests
+        run: pnpm test:rules
+
       - name: Run unit tests
         run: pnpm test:ci
 
