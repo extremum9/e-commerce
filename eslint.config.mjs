@@ -175,7 +175,11 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.mjs', 'playwright.config.ts']
+          allowDefaultProject: [
+            'eslint.config.mjs',
+            'playwright.config.ts',
+            'firestore.rules.spec.ts'
+          ]
         },
         tsconfigRootDir: import.meta.dirname
       }
