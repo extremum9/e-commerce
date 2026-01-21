@@ -22,4 +22,8 @@ export class ProductsPage {
   public async selectCategory(category: string): Promise<void> {
     await this.categoryLinks.filter({ hasText: category }).click();
   }
+
+  public getProductCard(name: string | RegExp): Locator {
+    return this.productCards.filter({ hasText: name });
+  }
 }

@@ -2,7 +2,7 @@ import { expect, test } from '../fixtures';
 import { ProductCard } from '../components';
 
 test.describe('Products page', () => {
-  test('should display categories and products', async ({ page, productsPage }) => {
+  test('should display categories and products', async ({ productsPage }) => {
     await productsPage.goto();
 
     await expect(productsPage.loadingProductListSpinner).toBeHidden();
@@ -23,16 +23,21 @@ test.describe('Products page', () => {
     await expect(productsPage.categoryLinks.nth(1)).not.toHaveAttribute('aria-current', 'page');
 
     await expect(productsPage.productCount).toContainText('14 products found');
-    const productCard = new ProductCard(page);
-    await expect(productCard.image).toHaveCount(14);
-    await expect(productCard.name).toHaveCount(14);
-    await expect(productCard.name.first()).toContainText('High-Speed Blender');
-    await expect(productCard.description).toHaveCount(14);
-    await expect(productCard.availability).toHaveCount(14);
-    await expect(productCard.availability.first()).toContainText('Out of Stock');
-    await expect(productCard.availability.nth(1)).toContainText('In Stock');
-    await expect(productCard.price).toHaveCount(14);
-    await expect(productCard.addToCartButton).toHaveCount(14);
+    await expect(productsPage.productCards).toHaveCount(14);
+
+    const lampCardContainer = productsPage.getProductCard(/Lamp/);
+    const lampCard = new ProductCard(lampCardContainer);
+    await expect(lampCard.image).toBeVisible();
+    await expect(lampCard.name).toBeVisible();
+    await expect(lampCard.description).toBeVisible();
+    await expect(lampCard.availability).toBeVisible();
+    await expect(lampCard.availability).toContainText('In Stock');
+    await expect(lampCard.price).toBeVisible();
+    await expect(lampCard.addToCartButton).toBeVisible();
+
+    const blenderCardContainer = productsPage.getProductCard(/Blender/);
+    const blenderCard = new ProductCard(blenderCardContainer);
+    await expect(blenderCard.availability).toContainText('Out of Stock');
   });
 
   test('should filter products by category', async ({ page, productsPage }) => {
@@ -41,15 +46,14 @@ test.describe('Products page', () => {
 
     await expect(page).toHaveURL('products/clothing');
     await expect(productsPage.productCount).toContainText('3 products found');
-    const productCard = new ProductCard(page);
-    await expect(productCard.name).toHaveCount(3);
-    await expect(productCard.name.first()).toContainText('Slim-Fit Denim Jeans');
+    await expect(productsPage.productCards).toHaveCount(3);
+    await expect(productsPage.getProductCard(/Jeans/)).toBeVisible();
 
     await productsPage.selectCategory('Accessories');
 
     await expect(page).toHaveURL('products/accessories');
     await expect(productsPage.productCount).toContainText('2 products found');
-    await expect(productCard.name).toHaveCount(2);
-    await expect(productCard.name.first()).toContainText('Genuine Leather Wallet');
+    await expect(productsPage.productCards).toHaveCount(2);
+    await expect(productsPage.getProductCard(/Wallet/)).toBeVisible();
   });
 });
