@@ -14,7 +14,7 @@ import { Snackbar } from '../../snackbar/snackbar';
 import { RegisterForm } from './register-form';
 
 describe(RegisterForm.name, () => {
-  const setup = () => {
+  const setup = async () => {
     const mockCredentials = {
       name: 'Test',
       email: 'test@mail.com',
@@ -48,7 +48,7 @@ describe(RegisterForm.name, () => {
     const fixture = TestBed.createComponent(RegisterForm);
     const component = fixture.componentInstance;
     const loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const dialogClosedSpy = spyOn(component.dialogClosed, 'emit');
 
@@ -69,7 +69,6 @@ describe(RegisterForm.name, () => {
       );
 
     return {
-      fixture,
       component,
       loader,
       getNameInputHarness,
@@ -90,7 +89,7 @@ describe(RegisterForm.name, () => {
       getEmailInputHarness,
       getPasswordInputHarness,
       getSubmitButtonHarness
-    } = setup();
+    } = await setup();
 
     const nameInputHarness = await getNameInputHarness();
     expect(await nameInputHarness.getType())
@@ -127,7 +126,8 @@ describe(RegisterForm.name, () => {
   });
 
   it('should display validation error messages if fields are invalid', async () => {
-    const { loader, getNameInputHarness, getEmailInputHarness, getPasswordInputHarness } = setup();
+    const { loader, getNameInputHarness, getEmailInputHarness, getPasswordInputHarness } =
+      await setup();
 
     const nameFieldHarness = await loader.getHarness(
       MatFormFieldHarness.with({ selector: '[data-testid=register-name-field]' })
@@ -179,7 +179,7 @@ describe(RegisterForm.name, () => {
   });
 
   it('should toggle password visibility', async () => {
-    const { loader, getPasswordInputHarness } = setup();
+    const { loader, getPasswordInputHarness } = await setup();
 
     const passwordInputHarness = await getPasswordInputHarness();
 
@@ -227,7 +227,7 @@ describe(RegisterForm.name, () => {
   });
 
   it('should NOT call AuthApiClient.register if form is invalid', async () => {
-    const { getSubmitButtonHarness, authApiClientSpy } = setup();
+    const { getSubmitButtonHarness, authApiClientSpy } = await setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
     await submitButtonHarness.click();
@@ -245,7 +245,7 @@ describe(RegisterForm.name, () => {
       register$,
       dialogClosedSpy,
       authApiClientSpy
-    } = setup();
+    } = await setup();
 
     const nameInputHarness = await getNameInputHarness();
     await nameInputHarness.setValue(mockCredentials.name);
@@ -284,7 +284,7 @@ describe(RegisterForm.name, () => {
       dialogClosedSpy,
       authApiClientSpy,
       snackbarSpy
-    } = setup();
+    } = await setup();
 
     const nameInputHarness = await getNameInputHarness();
     await nameInputHarness.setValue(mockCredentials.name);

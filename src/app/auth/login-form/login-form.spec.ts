@@ -16,7 +16,7 @@ import { AuthApiClient } from '../auth-api-client';
 import { LoginForm } from './login-form';
 
 describe(LoginForm.name, () => {
-  const setup = () => {
+  const setup = async () => {
     const mockCredentials = {
       email: 'test@mail.com',
       password: '123456',
@@ -59,7 +59,7 @@ describe(LoginForm.name, () => {
     const fixture = TestBed.createComponent(LoginForm);
     const component = fixture.componentInstance;
     const loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const dialogClosedSpy = spyOn(component.dialogClosed, 'emit');
 
@@ -82,7 +82,6 @@ describe(LoginForm.name, () => {
       );
 
     return {
-      fixture,
       component,
       loader,
       getEmailInputHarness,
@@ -106,7 +105,7 @@ describe(LoginForm.name, () => {
       getRememberMeCheckboxHarness,
       getResetPasswordButtonHarness,
       getSubmitButtonHarness
-    } = setup();
+    } = await setup();
 
     const emailInputHarness = await getEmailInputHarness();
     expect(await emailInputHarness.getType())
@@ -148,7 +147,7 @@ describe(LoginForm.name, () => {
   });
 
   it('should display validation error messages if fields are invalid', async () => {
-    const { loader, getEmailInputHarness, getPasswordInputHarness } = setup();
+    const { loader, getEmailInputHarness, getPasswordInputHarness } = await setup();
 
     const emailFieldHarness = await loader.getHarness(
       MatFormFieldHarness.with({ selector: '[data-testid=login-email-field]' })
@@ -188,7 +187,7 @@ describe(LoginForm.name, () => {
   });
 
   it('should toggle password visibility', async () => {
-    const { loader, getPasswordInputHarness } = setup();
+    const { loader, getPasswordInputHarness } = await setup();
 
     const passwordInputHarness = await getPasswordInputHarness();
 
@@ -234,7 +233,7 @@ describe(LoginForm.name, () => {
   });
 
   it('should NOT call AuthApiClient.resetPassword if email is missing', async () => {
-    const { getResetPasswordButtonHarness, authApiClientSpy, snackbarSpy } = setup();
+    const { getResetPasswordButtonHarness, authApiClientSpy, snackbarSpy } = await setup();
     const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
     await resetPasswordButtonHarness.click();
 
@@ -251,7 +250,7 @@ describe(LoginForm.name, () => {
       resetPassword$,
       authApiClientSpy,
       snackbarSpy
-    } = setup();
+    } = await setup();
     const { email } = mockCredentials;
 
     const emailInputHarness = await getEmailInputHarness();
@@ -289,7 +288,7 @@ describe(LoginForm.name, () => {
       resetPassword$,
       authApiClientSpy,
       snackbarSpy
-    } = setup();
+    } = await setup();
     const { email } = mockCredentials;
 
     const emailInputHarness = await getEmailInputHarness();
@@ -316,7 +315,7 @@ describe(LoginForm.name, () => {
   });
 
   it('should NOT call AuthApiClient.login if form is invalid', async () => {
-    const { getSubmitButtonHarness, authApiClientSpy } = setup();
+    const { getSubmitButtonHarness, authApiClientSpy } = await setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
     await submitButtonHarness.click();
@@ -334,7 +333,7 @@ describe(LoginForm.name, () => {
       login$,
       dialogClosedSpy,
       authApiClientSpy
-    } = setup();
+    } = await setup();
 
     const emailInputHarness = await getEmailInputHarness();
     await emailInputHarness.setValue(mockCredentials.email);
@@ -373,7 +372,7 @@ describe(LoginForm.name, () => {
       dialogClosedSpy,
       authApiClientSpy,
       snackbarSpy
-    } = setup();
+    } = await setup();
 
     const emailInputHarness = await getEmailInputHarness();
     await emailInputHarness.setValue(mockCredentials.email);
