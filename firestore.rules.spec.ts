@@ -31,7 +31,7 @@ describe('Firestore security rules', () => {
       const db = context.firestore();
       const existingProductDocRef = doc(db, 'products', 'existingDoc');
 
-      await Promise.all([setDoc(existingProductDocRef, { name: 'test product' })]);
+      await Promise.all([setDoc(existingProductDocRef, { name: 'test' })]);
     });
   });
 
@@ -47,8 +47,8 @@ describe('Firestore security rules', () => {
 
       await Promise.all([
         assertSucceeds(getDoc(existingDocRef)),
-        assertFails(setDoc(newDocRef, { name: 'new product' })),
-        assertFails(setDoc(existingDocRef, { name: 'updated product' })),
+        assertFails(setDoc(newDocRef, { name: 'test' })),
+        assertFails(setDoc(existingDocRef, { name: 'test' })),
         assertFails(deleteDoc(existingDocRef))
       ]);
     });
@@ -62,8 +62,8 @@ describe('Firestore security rules', () => {
 
       await Promise.all([
         assertSucceeds(getDoc(existingDocRef)),
-        assertFails(setDoc(newDocRef, { name: 'new product' })),
-        assertFails(setDoc(existingDocRef, { name: 'updated product' })),
+        assertFails(setDoc(newDocRef, { name: 'test' })),
+        assertFails(setDoc(existingDocRef, { name: 'test' })),
         assertFails(deleteDoc(existingDocRef))
       ]);
     });
