@@ -11,7 +11,7 @@ import { createMockProduct } from '../../testing-utils';
 import { ProductCard } from './product-card';
 
 describe(ProductCard.name, () => {
-  const setup = () => {
+  const setup = async () => {
     const mockProduct = createMockProduct();
 
     TestBed.configureTestingModule({
@@ -28,13 +28,13 @@ describe(ProductCard.name, () => {
     const debugElement = fixture.debugElement;
     const loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.componentRef.setInput('product', mockProduct);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     return { fixture, debugElement, loader, mockProduct };
   };
 
-  it('should display product image', () => {
-    const { debugElement, mockProduct } = setup();
+  it('should display product image', async () => {
+    const { debugElement, mockProduct } = await setup();
     const image = debugElement.query(By.css('[data-testid=product-image]'));
     expect(image).withContext('image').toBeTruthy();
     const imageElement: HTMLImageElement = image.nativeElement;
@@ -44,8 +44,8 @@ describe(ProductCard.name, () => {
     expect(imageElement.getAttribute('alt')).withContext('image alt text').toBe(mockProduct.name);
   });
 
-  it('should display product name and description', () => {
-    const { debugElement, mockProduct } = setup();
+  it('should display product name and description', async () => {
+    const { debugElement, mockProduct } = await setup();
 
     const name = debugElement.query(By.css('[data-testid=product-name]'));
     expect(name).withContext('name').toBeTruthy();
@@ -58,8 +58,8 @@ describe(ProductCard.name, () => {
       .toContain(mockProduct.description);
   });
 
-  it('should display product availability', () => {
-    const { fixture, debugElement, mockProduct } = setup();
+  it('should display product availability', async () => {
+    const { fixture, debugElement, mockProduct } = await setup();
     const availability = debugElement.query(By.css('[data-testid=product-availability]'));
     expect(availability).withContext('availability').toBeTruthy();
     const availabilityElement: HTMLElement = availability.nativeElement;
@@ -71,7 +71,7 @@ describe(ProductCard.name, () => {
       .toContain('text-green-600');
 
     fixture.componentRef.setInput('product', { ...mockProduct, inStock: false });
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(availability.nativeElement.textContent)
       .withContext('availability text (out of stock)')
@@ -82,7 +82,7 @@ describe(ProductCard.name, () => {
   });
 
   it('should display product price and add-to-cart button', async () => {
-    const { loader, debugElement, mockProduct } = setup();
+    const { loader, debugElement, mockProduct } = await setup();
 
     const price = debugElement.query(By.css('[data-testid=product-price]'));
     expect(price).withContext('price').toBeTruthy();

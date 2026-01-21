@@ -12,7 +12,7 @@ import { AuthApiClient } from './auth/auth-api-client';
 import { CurrentUser } from './models/current-user';
 
 describe(App.name, () => {
-  const setup = () => {
+  const setup = async () => {
     const currentUser = signal<CurrentUser | null | undefined>(null);
     const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', [], {
       currentUser
@@ -32,20 +32,19 @@ describe(App.name, () => {
     const fixture = TestBed.createComponent(App);
     const debugElement = fixture.debugElement;
     const loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const hasSpinner = () =>
       loader.hasHarness(
         MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-app-spinner]' })
       );
 
-    return { fixture, debugElement, hasSpinner, currentUser };
+    return { debugElement, hasSpinner, currentUser };
   };
 
   it('should display spinner if user is undefined', async () => {
-    const { fixture, debugElement, hasSpinner, currentUser } = setup();
+    const { debugElement, hasSpinner, currentUser } = await setup();
     currentUser.set(undefined);
-    fixture.detectChanges();
 
     const spinner = await hasSpinner();
 
@@ -59,7 +58,7 @@ describe(App.name, () => {
   });
 
   it('should display navbar along with router outlet if user is defined', async () => {
-    const { debugElement, hasSpinner } = setup();
+    const { debugElement, hasSpinner } = await setup();
 
     const spinner = await hasSpinner();
 

@@ -51,7 +51,7 @@ class RegisterFormStub {
 }
 
 describe(AuthDialog.name, () => {
-  const setup = () => {
+  const setup = async () => {
     const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', [
       'loginWithGoogle'
     ]);
@@ -87,7 +87,7 @@ describe(AuthDialog.name, () => {
     });
     const fixture = TestBed.createComponent(AuthDialogTestHost);
     const rootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const overlayContainer = TestBed.inject(OverlayContainer);
     const overlayContainerDebugElement = getDebugNode(
@@ -125,7 +125,7 @@ describe(AuthDialog.name, () => {
 
   it('should display tabs', async () => {
     const { rootLoader, selectSignInTab, selectSignUpTab, getLoginFormStub, getRegisterFormStub } =
-      setup();
+      await setup();
 
     const tabs = await rootLoader.getAllHarnesses(MatTabHarness);
     expect(tabs.length).withContext('tabs').toBe(2);
@@ -140,7 +140,7 @@ describe(AuthDialog.name, () => {
   });
 
   it('should close dialog on login success', async () => {
-    const { selectSignInTab, dialogRefSpy, getLoginFormStub } = setup();
+    const { selectSignInTab, dialogRefSpy, getLoginFormStub } = await setup();
     await selectSignInTab();
 
     const loginFormStubComponent: LoginFormStub = getLoginFormStub().componentInstance;
@@ -150,7 +150,7 @@ describe(AuthDialog.name, () => {
   });
 
   it('should close dialog on registration success', async () => {
-    const { selectSignUpTab, dialogRefSpy, getRegisterFormStub } = setup();
+    const { selectSignUpTab, dialogRefSpy, getRegisterFormStub } = await setup();
     await selectSignUpTab();
 
     const registerFormStubComponent: LoginFormStub = getRegisterFormStub().componentInstance;
@@ -160,7 +160,7 @@ describe(AuthDialog.name, () => {
   });
 
   it('should log in with google and close dialog on success', async () => {
-    const { rootLoader, authApiClientSpy, dialogRefSpy } = setup();
+    const { rootLoader, authApiClientSpy, dialogRefSpy } = await setup();
 
     const buttonHarness = await rootLoader.getHarness(
       MatButtonHarness.with({

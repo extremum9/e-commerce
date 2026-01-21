@@ -17,7 +17,7 @@ import { AuthDialog } from '../auth/auth-dialog/auth-dialog';
 import { Navbar } from './navbar';
 
 describe(Navbar.name, () => {
-  const setup = () => {
+  const setup = async () => {
     const mockUser = createMockUser();
     const currentUser = signal<CurrentUser | null>(null);
     const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', ['logout'], {
@@ -48,7 +48,7 @@ describe(Navbar.name, () => {
     const fixture = TestBed.createComponent(Navbar);
     const debugElement = fixture.debugElement;
     const loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const getLoginButtonHarness = () =>
       loader.getHarness(
@@ -74,8 +74,8 @@ describe(Navbar.name, () => {
     };
   };
 
-  it('should display brand', () => {
-    const { debugElement } = setup();
+  it('should display brand', async () => {
+    const { debugElement } = await setup();
     const brandLink = debugElement.query(By.css('[data-testid=navbar-brand]'));
     expect(brandLink).withContext('brand link element').toBeTruthy();
     expect(brandLink.nativeElement.getAttribute('href')).withContext('brand link href').toBe('/');
@@ -85,7 +85,7 @@ describe(Navbar.name, () => {
   });
 
   it('should display user links', async () => {
-    const { loader, getLoginButtonHarness } = setup();
+    const { loader, getLoginButtonHarness } = await setup();
 
     const wishlistLinkHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=navbar-wishlist-link]' })
@@ -126,9 +126,10 @@ describe(Navbar.name, () => {
   });
 
   it('should display user profile if logged in', async () => {
-    const { fixture, debugElement, loader, getUserMenuHarness, mockUser, currentUser } = setup();
+    const { fixture, debugElement, loader, getUserMenuHarness, mockUser, currentUser } =
+      await setup();
     currentUser.set(mockUser);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(debugElement.query(By.css('[data-testid=navbar-login-button]')))
       .withContext('login button (logged in)')
@@ -152,7 +153,7 @@ describe(Navbar.name, () => {
       .toBe('Profile image');
 
     currentUser.set({ ...mockUser, imageUrl: null });
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(userProfileImage.nativeElement.getAttribute('src'))
       .withContext('user profile image src (fallback)')
@@ -178,7 +179,7 @@ describe(Navbar.name, () => {
   });
 
   it('should call MatDialog.open to open auth dialog', async () => {
-    const { getLoginButtonHarness, dialogSpy } = setup();
+    const { getLoginButtonHarness, dialogSpy } = await setup();
     const loginButtonHarness = await getLoginButtonHarness();
 
     await loginButtonHarness.click();
@@ -187,7 +188,7 @@ describe(Navbar.name, () => {
   });
 
   it('should call AuthApiClient.logout and logout user', async () => {
-    const { fixture, getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = setup();
+    const { fixture, getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = await setup();
     currentUser.set(mockUser);
     fixture.detectChanges();
 
