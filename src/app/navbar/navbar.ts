@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, PendingTasks } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -7,7 +7,6 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 
-import AuthDialog from '../auth/auth-dialog/auth-dialog';
 import { AuthApiClient } from '../auth/auth-api-client';
 
 @Component({
@@ -88,13 +87,17 @@ import { AuthApiClient } from '../auth/auth-api-client';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Navbar {
+  private readonly pendingTasks = inject(PendingTasks);
   private readonly authApiClient = inject(AuthApiClient);
   private readonly dialog = inject(MatDialog);
 
   protected readonly user = this.authApiClient.currentUser;
 
   protected openAuthDialog(): void {
-    this.dialog.open(AuthDialog, { width: '400px' });
+    this.pendingTasks.run(async () => {
+      const { AuthDialog } = await import('../auth/auth-dialog/auth-dialog');
+      this.dialog.open(AuthDialog, { width: '400px' });
+    });
   }
 
   protected logout(): void {

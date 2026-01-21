@@ -21,7 +21,7 @@ import { AuthApiClient } from '../auth-api-client';
 import { LoginForm } from '../login-form/login-form';
 import { RegisterForm } from '../register-form/register-form';
 
-import AuthDialog from './auth-dialog';
+import { AuthDialog } from './auth-dialog';
 
 @Component({
   template: `<button data-testid="open-dialog-button" (click)="open()">Open dialog</button>`
