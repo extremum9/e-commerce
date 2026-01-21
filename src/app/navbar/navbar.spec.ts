@@ -12,7 +12,7 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { createMockUser } from '../testing-utils';
 import { CurrentUser } from '../models/current-user';
 import { AuthApiClient } from '../auth/auth-api-client';
-import AuthDialog from '../auth/auth-dialog/auth-dialog';
+import { AuthDialog } from '../auth/auth-dialog/auth-dialog';
 
 import { Navbar } from './navbar';
 

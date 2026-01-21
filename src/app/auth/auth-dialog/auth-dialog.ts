@@ -52,7 +52,7 @@ import { AuthApiClient } from '../auth-api-client';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class AuthDialog {
+export class AuthDialog {
   private readonly authApiClient = inject(AuthApiClient);
   private readonly dialogRef = inject(MatDialogRef);
 
