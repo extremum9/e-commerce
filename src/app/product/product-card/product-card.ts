@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../../models/product';
@@ -9,7 +9,7 @@ import { Product } from '../../models/product';
   template: `
     <article
       data-testid="product-card"
-      class="flex flex-col h-full overflow-hidden rounded-xl bg-white shadow-lg transition-[translate,box-shadow] duration-200 ease-in-out hover:-translate-y-1 hover:shadow-xl"
+      class="group flex flex-col relative h-full overflow-hidden rounded-xl bg-white shadow-lg transition-[translate,box-shadow] duration-200 ease-in-out hover:-translate-y-1 hover:shadow-xl"
     >
       <img
         data-testid="product-image"
@@ -19,6 +19,16 @@ import { Product } from '../../models/product';
         height="400"
         [alt]="product().name"
       />
+
+      <button
+        class="absolute! top-3 right-3 opacity-0 transition-opacity duration-200! group-hover:opacity-100 focus:opacity-100"
+        [class.text-red-500!]="product().favorite"
+        matMiniFab
+        type="button"
+      >
+        <mat-icon>{{ product().favorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+      </button>
+
       <div class="flex flex-col flex-1 p-5">
         <h3 data-testid="product-name" class="mb-2 leading-tight text-lg font-medium text-gray-900">
           {{ product().name }}
@@ -48,7 +58,7 @@ import { Product } from '../../models/product';
       </div>
     </article>
   `,
-  imports: [MatButton, MatIcon],
+  imports: [MatButton, MatIcon, MatMiniFabButton],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCard {
