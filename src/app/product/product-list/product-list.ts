@@ -9,6 +9,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ProductCard } from '../product-card/product-card';
 import { ProductApiClient } from '../product-api-client';
 import { CategoryApiClient } from '../category-api-client';
+import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 
 @Component({
   template: `
@@ -35,7 +36,7 @@ import { CategoryApiClient } from '../category-api-client';
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
-              <app-product-card [product]="product" />
+              <app-product-card [product]="product" (toggledWishlist)="toggleWishlist($event)" />
             </li>
           }
         </ul>
@@ -52,6 +53,7 @@ import { CategoryApiClient } from '../category-api-client';
 export default class ProductList {
   private readonly categoryApiClient = inject(CategoryApiClient);
   private readonly productApiClient = inject(ProductApiClient);
+  private readonly wishlistApiClient = inject(WishlistApiClient);
 
   protected readonly categories = signal(this.categoryApiClient.list());
 
@@ -68,4 +70,18 @@ export default class ProductList {
       )
     )
   );
+
+  protected toggleWishlist({
+    productId,
+    inWishlist
+  }: {
+    productId: string;
+    inWishlist: boolean;
+  }): void {
+    if (inWishlist) {
+      this.wishlistApiClient.delete(productId).subscribe();
+    } else {
+      this.wishlistApiClient.create(productId).subscribe();
+    }
+  }
 }

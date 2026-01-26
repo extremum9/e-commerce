@@ -2,6 +2,7 @@ import { Product } from './models/product';
 import { CurrentUser } from './models/current-user';
 
 export const createMockUser = (user: Partial<CurrentUser> = {}): CurrentUser => ({
+  uid: '1',
   name: 'test name',
   email: 'test@mail.com',
   imageUrl: 'https://placehold.co/20x20/png',

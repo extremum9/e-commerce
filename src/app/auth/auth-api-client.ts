@@ -27,7 +27,12 @@ export class AuthApiClient {
   private readonly user$: Observable<CurrentUser | null> = user(this.auth).pipe(
     map((user) =>
       user
-        ? { name: user.displayName ?? '', email: user.email ?? '', imageUrl: user.photoURL }
+        ? {
+            uid: user.uid,
+            name: user.displayName ?? '',
+            email: user.email ?? '',
+            imageUrl: user.photoURL
+          }
         : null
     )
   );
