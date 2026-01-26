@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../../models/product';
+import { WishlistState } from '../../wishlist/wishlist-state';
 
 @Component({
   selector: 'app-product-card',
@@ -21,12 +22,13 @@ import { Product } from '../../models/product';
       />
 
       <button
-        class="absolute! top-3 right-3 opacity-0 transition-opacity duration-200! group-hover:opacity-100 focus:opacity-100"
-        [class.text-red-500!]="product().favorite"
+        class="absolute! top-3 right-3 transition-opacity duration-200! group-hover:opacity-100 focus:opacity-100"
+        [class.text-red-500!]="inWishlist()"
         matMiniFab
         type="button"
+        (click)="toggleWishlist(product().id)"
       >
-        <mat-icon>{{ product().favorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+        <mat-icon>{{ inWishlist() ? 'favorite' : 'favorite_border' }}</mat-icon>
       </button>
 
       <div class="flex flex-col flex-1 p-5">
@@ -62,5 +64,16 @@ import { Product } from '../../models/product';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCard {
+  private readonly wishlistState = inject(WishlistState);
+
   public readonly product = input.required<Product>();
+  public readonly toggledWishlist = output<{ productId: string; inWishlist: boolean }>();
+
+  protected readonly inWishlist = computed(() =>
+    this.wishlistState.wishlist().includes(this.product().id)
+  );
+
+  protected toggleWishlist(productId: string): void {
+    this.toggledWishlist.emit({ productId, inWishlist: this.inWishlist() });
+  }
 }
