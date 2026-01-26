@@ -1,9 +1,13 @@
 rules_version='2'
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /products/{product} {
+    match /products/{productId} {
       allow read: if true;
       allow write: if false;
+    }
+
+    match /users/{userId}/wishlist/{productId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
