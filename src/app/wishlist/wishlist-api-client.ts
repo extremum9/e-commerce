@@ -29,8 +29,7 @@ export class WishlistApiClient {
     this.wishlistLocalStorage.change$.pipe(
       startWith(undefined),
       switchMap(() => this.list().pipe(map((items) => items.map((item) => item.productId))))
-    ),
-    { initialValue: [] }
+    )
   );
 
   public list(): Observable<WishlistItem[]> {
