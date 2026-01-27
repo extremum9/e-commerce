@@ -7,24 +7,37 @@ import {
   Firestore,
   setDoc
 } from '@angular/fire/firestore';
-import { defer, from, Observable, of, switchMap } from 'rxjs';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { defer, from, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistItem } from '../models/wishlist-item';
+
+import { WishlistLocalStorage } from './wishlist-local-storage';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WishlistApiClient {
   private readonly firestore = inject(Firestore);
+  private readonly wishlistLocalStorage = inject(WishlistLocalStorage);
+
   private readonly user = inject(AuthApiClient).currentUser;
+  private readonly user$ = toObservable(this.user);
+
+  public readonly wishlist = toSignal(
+    this.wishlistLocalStorage.change$.pipe(
+      startWith(undefined),
+      switchMap(() => this.list().pipe(map((items) => items.map((item) => item.productId))))
+    ),
+    { initialValue: [] }
+  );
 
   public list(): Observable<WishlistItem[]> {
-    return toObservable(this.user).pipe(
+    return this.user$.pipe(
       switchMap((user) => {
         if (!user) {
-          return of([]);
+          return of(this.wishlistLocalStorage.get());
         }
 
         const wishlistCollection = collection(this.firestore, `users/${user.uid}/wishlist`);
@@ -38,23 +51,33 @@ export class WishlistApiClient {
 
   public create(productId: string): Observable<void> {
     const user = this.user();
-    if (!user) {
-      return of(undefined);
-    }
 
-    const docRef = doc(this.firestore, `users/${user.uid}/wishlist/${productId}`);
+    return defer(() => {
+      if (!user) {
+        this.wishlistLocalStorage.add(productId);
 
-    return defer(() => setDoc(docRef, { productId }));
+        return of(undefined);
+      }
+
+      const docRef = doc(this.firestore, `users/${user.uid}/wishlist/${productId}`);
+
+      return setDoc(docRef, { productId });
+    });
   }
 
   public delete(productId: string): Observable<void> {
     const user = this.user();
-    if (!user) {
-      return of(undefined);
-    }
 
-    const docRef = doc(this.firestore, `users/${user.uid}/wishlist/${productId}`);
+    return defer(() => {
+      if (!user) {
+        this.wishlistLocalStorage.remove(productId);
 
-    return defer(() => deleteDoc(docRef));
+        return of(undefined);
+      }
+
+      const docRef = doc(this.firestore, `users/${user.uid}/wishlist/${productId}`);
+
+      return deleteDoc(docRef);
+    });
   }
 }

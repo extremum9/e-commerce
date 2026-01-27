@@ -3,7 +3,7 @@ import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../../models/product';
-import { WishlistState } from '../../wishlist/wishlist-state';
+import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 
 @Component({
   selector: 'app-product-card',
@@ -64,13 +64,13 @@ import { WishlistState } from '../../wishlist/wishlist-state';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCard {
-  private readonly wishlistState = inject(WishlistState);
+  private readonly wishlistApiClient = inject(WishlistApiClient);
 
   public readonly product = input.required<Product>();
   public readonly toggledWishlist = output<{ productId: string; inWishlist: boolean }>();
 
   protected readonly inWishlist = computed(() =>
-    this.wishlistState.wishlist().includes(this.product().id)
+    this.wishlistApiClient.wishlist().includes(this.product().id)
   );
 
   protected toggleWishlist(productId: string): void {
