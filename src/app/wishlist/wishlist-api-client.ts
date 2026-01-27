@@ -25,10 +25,14 @@ export class WishlistApiClient {
   private readonly user = inject(AuthApiClient).currentUser;
   private readonly user$ = toObservable(this.user);
 
-  public readonly wishlist = toSignal(
+  public readonly wishlistSet = toSignal(
     this.wishlistLocalStorage.change$.pipe(
       startWith(undefined),
-      switchMap(() => this.list().pipe(map((items) => items.map((item) => item.productId))))
+      switchMap(() =>
+        this.list().pipe(
+          map((items) => new Set(items.map((item) => item.productId)) as ReadonlySet<string>)
+        )
+      )
     )
   );
 
