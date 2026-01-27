@@ -70,12 +70,12 @@ export default class ProductList {
         cat === 'all' ? productApiClient.list() : productApiClient.listByCategory(cat)
       )
     );
-    const wishlist$ = toObservable(this.wishlistApiClient.wishlist).pipe(filter(Boolean));
+    const wishlistSet$ = toObservable(this.wishlistApiClient.wishlistSet).pipe(filter(Boolean));
 
     this.products = toSignal(
-      combineLatest([products$, wishlist$]).pipe(
-        map(([products, wishlist]) =>
-          products.map((product) => ({ ...product, favorite: wishlist.includes(product.id) }))
+      combineLatest([products$, wishlistSet$]).pipe(
+        map(([products, wishlistSet]) =>
+          products.map((product) => ({ ...product, favorite: wishlistSet.has(product.id) }))
         )
       )
     );
