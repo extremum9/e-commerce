@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, Signal, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
+import { combineLatest, filter, map, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ProductCard } from '../product-card/product-card';
 import { ProductApiClient } from '../product-api-client';
 import { CategoryApiClient } from '../category-api-client';
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
+import { Product } from '../../models/product';
 
 @Component({
   template: `
@@ -36,7 +37,7 @@ import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
-              <app-product-card [product]="product" (toggledWishlist)="toggleWishlist($event)" />
+              <app-product-card [product]="product" (toggledWishlist)="toggleWishlist(product)" />
             </li>
           }
         </ul>
@@ -51,37 +52,40 @@ import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductList {
-  private readonly categoryApiClient = inject(CategoryApiClient);
-  private readonly productApiClient = inject(ProductApiClient);
   private readonly wishlistApiClient = inject(WishlistApiClient);
 
-  protected readonly categories = signal(this.categoryApiClient.list());
+  protected readonly categories = signal(inject(CategoryApiClient).list());
 
   protected readonly category = input.required({
     transform: (value?: string) => value?.toLowerCase().trim() || 'all'
   });
 
-  protected readonly products = toSignal(
-    toObservable(this.category).pipe(
-      switchMap((category) =>
-        category === 'all'
-          ? this.productApiClient.list()
-          : this.productApiClient.listByCategory(category)
-      )
-    )
-  );
+  protected readonly products: Signal<Product[] | undefined>;
 
-  protected toggleWishlist({
-    productId,
-    inWishlist
-  }: {
-    productId: string;
-    inWishlist: boolean;
-  }): void {
-    if (inWishlist) {
-      this.wishlistApiClient.delete(productId).subscribe();
+  constructor() {
+    const productApiClient = inject(ProductApiClient);
+
+    const products$ = toObservable(this.category).pipe(
+      switchMap((cat) =>
+        cat === 'all' ? productApiClient.list() : productApiClient.listByCategory(cat)
+      )
+    );
+    const wishlist$ = toObservable(this.wishlistApiClient.wishlist).pipe(filter(Boolean));
+
+    this.products = toSignal(
+      combineLatest([products$, wishlist$]).pipe(
+        map(([products, wishlist]) =>
+          products.map((product) => ({ ...product, favorite: wishlist.includes(product.id) }))
+        )
+      )
+    );
+  }
+
+  protected toggleWishlist(product: Product): void {
+    if (product.favorite) {
+      this.wishlistApiClient.delete(product.id).subscribe();
     } else {
-      this.wishlistApiClient.create(productId).subscribe();
+      this.wishlistApiClient.create(product.id).subscribe();
     }
   }
 }
