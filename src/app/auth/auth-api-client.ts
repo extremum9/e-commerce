@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { from, map, Observable, switchMap } from 'rxjs';
+import { concatMap, filter, from, map, Observable, switchMap } from 'rxjs';
 import {
   Auth,
   browserLocalPersistence,
@@ -17,6 +17,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { LoginCredentials } from '../models/login-credentials';
 import { RegisterCredentials } from '../models/register-credentials';
 import { CurrentUser } from '../models/current-user';
+import { WishlistLocalStorage } from '../wishlist/wishlist-local-storage';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,17 @@ export class AuthApiClient {
   public readonly currentUser = toSignal<CurrentUser | null | undefined>(this.user$, {
     initialValue: undefined
   });
+
+  constructor() {
+    const wishlistLocalStorage = inject(WishlistLocalStorage);
+
+    this.user$
+      .pipe(
+        filter(Boolean),
+        concatMap((user) => wishlistLocalStorage.syncToFirestore(user.uid))
+      )
+      .subscribe();
+  }
 
   public login({ email, password, rememberMe }: LoginCredentials): Observable<void> {
     const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;

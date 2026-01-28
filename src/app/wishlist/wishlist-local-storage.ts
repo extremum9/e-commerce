@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { forkJoin, from, map, Observable, of, Subject, tap } from 'rxjs';
+import { doc, Firestore, setDoc } from '@angular/fire/firestore';
 
 import { WishlistItem } from '../models/wishlist-item';
 
@@ -9,6 +10,8 @@ const WISHLIST_KEY = 'e-commerce-wishlist';
   providedIn: 'root'
 })
 export class WishlistLocalStorage {
+  private readonly firestore = inject(Firestore);
+
   public readonly change$ = new Subject<void>();
 
   public get(): WishlistItem[] {
@@ -37,6 +40,24 @@ export class WishlistLocalStorage {
     this.save(filtered);
   }
 
+  public syncToFirestore(userId: string): Observable<void> {
+    const wishlist = this.get();
+    if (!wishlist.length) {
+      return of(undefined);
+    }
+
+    const batch$ = wishlist.map(({ productId }) => {
+      const docRef = doc(this.firestore, `users/${userId}/wishlist/${productId}`);
+
+      return from(setDoc(docRef, { productId }, { merge: true }));
+    });
+
+    return forkJoin(batch$).pipe(
+      tap(() => this.clear()),
+      map(() => undefined)
+    );
+  }
+
   private save(wishlist: WishlistItem[]): void {
     try {
       window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
@@ -45,5 +66,9 @@ export class WishlistLocalStorage {
       // eslint-disable-next-line no-console
       console.error('Error saving wishlist data to local storage:', error);
     }
+  }
+
+  private clear(): void {
+    window.localStorage.removeItem(WISHLIST_KEY);
   }
 }
