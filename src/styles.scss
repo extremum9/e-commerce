@@ -49,6 +49,16 @@ body {
   padding-inline: 1rem;
 }
 
+button[matButton='outlined'].danger {
+  @include mat.button-overrides(
+    (
+      outlined-label-text-color: var(--mat-sys-error),
+      outlined-outline-color: var(--mat-sys-error),
+      outlined-state-layer-color: var(--mat-sys-error)
+    )
+  );
+}
+
 mat-form-field {
   @include mat.theme(
     (

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/cor
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, of, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatMiniFabButton } from '@angular/material/button';
+import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../models/product';
@@ -18,11 +18,11 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
       @if (products(); as products) {
         @if (products.length) {
           <div class="flex items-center justify-between gap-x-2 mb-6">
-            <h1 class="text-2xl font-medium">My Wishlist</h1>
-            <p class="text-xl text-gray-500">{{ products.length }} items</p>
+            <h1 class="text-xl sm:text-2xl font-medium">My Wishlist</h1>
+            <p class="text-lg sm:text-xl text-gray-500">{{ products.length }} items</p>
           </div>
 
-          <ul class="fluid-grid">
+          <ul class="fluid-grid mb-8">
             @for (product of products; track product.id) {
               <li>
                 <app-product-card [product]="product">
@@ -30,7 +30,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
                     class="absolute! top-3 right-3"
                     matMiniFab
                     type="button"
-                    (click)="remove(product.id)"
+                    (click)="delete(product.id)"
                   >
                     <mat-icon>delete</mat-icon>
                   </button>
@@ -38,6 +38,12 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
               </li>
             }
           </ul>
+
+          <div class="text-center">
+            <button class="danger" matButton="outlined" (click)="deleteAll()">
+              Clear Wishlist
+            </button>
+          </div>
         } @else {
           <app-wishlist-empty-block />
         }
@@ -48,7 +54,14 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
       }
     </div>
   `,
-  imports: [MatProgressSpinner, ProductCard, MatMiniFabButton, MatIcon, WishlistEmptyBlock],
+  imports: [
+    MatProgressSpinner,
+    ProductCard,
+    MatMiniFabButton,
+    MatIcon,
+    WishlistEmptyBlock,
+    MatButton
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Wishlist {
@@ -75,7 +88,11 @@ export default class Wishlist {
     );
   }
 
-  protected remove(productId: string): void {
+  protected delete(productId: string): void {
     this.wishlistApiClient.delete(productId).subscribe();
+  }
+
+  protected deleteAll(): void {
+    this.wishlistApiClient.deleteAll().subscribe();
   }
 }

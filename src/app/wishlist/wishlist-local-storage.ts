@@ -40,6 +40,11 @@ export class WishlistLocalStorage {
     this.save(filtered);
   }
 
+  public clear(): void {
+    window.localStorage.removeItem(WISHLIST_KEY);
+    this.change$.next();
+  }
+
   public syncToFirestore(userId: string): Observable<void> {
     const wishlist = this.get();
     if (!wishlist.length) {
@@ -66,9 +71,5 @@ export class WishlistLocalStorage {
       // eslint-disable-next-line no-console
       console.error('Error saving wishlist data to local storage:', error);
     }
-  }
-
-  private clear(): void {
-    window.localStorage.removeItem(WISHLIST_KEY);
   }
 }

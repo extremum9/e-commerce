@@ -5,7 +5,9 @@ import {
   deleteDoc,
   doc,
   Firestore,
-  setDoc
+  getDocs,
+  setDoc,
+  writeBatch
 } from '@angular/fire/firestore';
 import { defer, from, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -81,6 +83,35 @@ export class WishlistApiClient {
       const docRef = doc(this.firestore, `users/${user.uid}/wishlist/${productId}`);
 
       return deleteDoc(docRef);
+    });
+  }
+
+  public deleteAll(): Observable<void> {
+    const user = this.user();
+
+    return defer(() => {
+      if (!user) {
+        this.wishlistLocalStorage.clear();
+
+        return of(undefined);
+      }
+
+      const wishlistCollection = collection(this.firestore, `users/${user.uid}/wishlist`);
+
+      return from(getDocs(wishlistCollection)).pipe(
+        switchMap((snapshot) => {
+          if (snapshot.empty) {
+            return of(undefined);
+          }
+
+          const batch = writeBatch(this.firestore);
+          snapshot.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+
+          return from(batch.commit());
+        })
+      );
     });
   }
 }
