@@ -17,6 +17,11 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
     <div class="container">
       @if (products(); as products) {
         @if (products.length) {
+          <div class="flex items-center justify-between gap-x-2 mb-6">
+            <h1 class="text-2xl font-medium">My Wishlist</h1>
+            <p class="text-xl text-gray-500">{{ products.length }} items</p>
+          </div>
+
           <ul class="fluid-grid">
             @for (product of products; track product.id) {
               <li>
