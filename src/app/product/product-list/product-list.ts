@@ -42,7 +42,7 @@ import { Product } from '../../models/product';
           }
         </ul>
       } @else {
-        <div class="flex justify-center py-6">
+        <div class="flex justify-center">
           <mat-spinner data-testid="loading-product-list-spinner" [diameter]="50" />
         </div>
       }
