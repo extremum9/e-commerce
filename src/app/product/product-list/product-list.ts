@@ -11,6 +11,7 @@ import { ProductApiClient } from '../product-api-client';
 import { CategoryApiClient } from '../category-api-client';
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { Product } from '../../models/product';
+import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
 
 @Component({
   template: `
@@ -37,7 +38,13 @@ import { Product } from '../../models/product';
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
-              <app-product-card [product]="product" (toggledWishlist)="toggleWishlist(product)" />
+              <app-product-card [product]="product">
+                <app-toggle-wishlist-button
+                  class="absolute! top-3 right-3"
+                  [favorite]="product.favorite"
+                  (toggled)="toggleWishlist(product)"
+                />
+              </app-product-card>
             </li>
           }
         </ul>
@@ -48,7 +55,14 @@ import { Product } from '../../models/product';
       }
     </div>
   `,
-  imports: [ProductCard, MatButton, TitleCasePipe, RouterLink, MatProgressSpinner],
+  imports: [
+    ProductCard,
+    MatButton,
+    TitleCasePipe,
+    RouterLink,
+    MatProgressSpinner,
+    ToggleWishlistButton
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductList {
