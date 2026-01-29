@@ -11,5 +11,9 @@ export const APP_ROUTES: Routes = [
   {
     matcher: productCategoryMatcher,
     loadComponent: () => import('./product/product-list/product-list')
+  },
+  {
+    path: 'wishlist',
+    loadComponent: () => import('./wishlist/wishlist')
   }
 ];
