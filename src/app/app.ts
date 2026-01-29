@@ -12,7 +12,9 @@ import { AuthApiClient } from './auth/auth-api-client';
   template: `
     @if (user() !== undefined) {
       <app-navbar />
-      <router-outlet />
+      <main class="py-6">
+        <router-outlet />
+      </main>
     } @else {
       <div class="grid place-items-center h-screen">
         <mat-spinner data-testid="loading-app-spinner" [diameter]="80" />

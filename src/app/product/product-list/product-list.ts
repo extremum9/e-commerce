@@ -14,7 +14,7 @@ import { Product } from '../../models/product';
 
 @Component({
   template: `
-    <div class="p-5 md:p-8">
+    <div class="px-5 md:px-8">
       <ul class="flex flex-wrap justify-center gap-3 mb-6">
         @for (cat of categories(); track cat) {
           <li>
