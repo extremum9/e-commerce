@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { MatButton, MatMiniFabButton } from '@angular/material/button';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../../models/product';
@@ -20,15 +20,7 @@ import { Product } from '../../models/product';
         [alt]="product().name"
       />
 
-      <button
-        class="absolute! top-3 right-3"
-        [class.text-red-500!]="product().favorite"
-        matMiniFab
-        type="button"
-        (click)="toggledWishlist.emit()"
-      >
-        <mat-icon>{{ product().favorite ? 'favorite' : 'favorite_border' }}</mat-icon>
-      </button>
+      <ng-content />
 
       <div class="flex flex-col flex-1 p-5">
         <h3 data-testid="product-name" class="mb-2 leading-tight text-lg font-medium text-gray-900">
@@ -59,11 +51,9 @@ import { Product } from '../../models/product';
       </div>
     </article>
   `,
-  imports: [MatButton, MatIcon, MatMiniFabButton],
+  imports: [MatButton, MatIcon],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCard {
   public readonly product = input.required<Product>();
-
-  public readonly toggledWishlist = output();
 }

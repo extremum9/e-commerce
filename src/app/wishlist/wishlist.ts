@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/cor
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, of, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatMiniFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../models/product';
 import { ProductApiClient } from '../product/product-api-client';
@@ -16,7 +18,16 @@ import { WishlistApiClient } from './wishlist-api-client';
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
-              <app-product-card [product]="product" (toggledWishlist)="remove(product.id)" />
+              <app-product-card [product]="product">
+                <button
+                  class="absolute! top-3 right-3"
+                  matMiniFab
+                  type="button"
+                  (click)="remove(product.id)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </app-product-card>
             </li>
           }
         </ul>
@@ -27,7 +38,7 @@ import { WishlistApiClient } from './wishlist-api-client';
       }
     </div>
   `,
-  imports: [MatProgressSpinner, ProductCard],
+  imports: [MatProgressSpinner, ProductCard, MatMiniFabButton, MatIcon],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Wishlist {
