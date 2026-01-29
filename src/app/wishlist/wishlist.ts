@@ -10,27 +10,32 @@ import { ProductApiClient } from '../product/product-api-client';
 import { ProductCard } from '../product/product-card/product-card';
 
 import { WishlistApiClient } from './wishlist-api-client';
+import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block';
 
 @Component({
   template: `
     <div class="container">
       @if (products(); as products) {
-        <ul class="fluid-grid">
-          @for (product of products; track product.id) {
-            <li>
-              <app-product-card [product]="product">
-                <button
-                  class="absolute! top-3 right-3"
-                  matMiniFab
-                  type="button"
-                  (click)="remove(product.id)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </app-product-card>
-            </li>
-          }
-        </ul>
+        @if (products.length) {
+          <ul class="fluid-grid">
+            @for (product of products; track product.id) {
+              <li>
+                <app-product-card [product]="product">
+                  <button
+                    class="absolute! top-3 right-3"
+                    matMiniFab
+                    type="button"
+                    (click)="remove(product.id)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </app-product-card>
+              </li>
+            }
+          </ul>
+        } @else {
+          <app-wishlist-empty-block />
+        }
       } @else {
         <div class="flex justify-center">
           <mat-spinner [diameter]="50" />
@@ -38,7 +43,7 @@ import { WishlistApiClient } from './wishlist-api-client';
       }
     </div>
   `,
-  imports: [MatProgressSpinner, ProductCard, MatMiniFabButton, MatIcon],
+  imports: [MatProgressSpinner, ProductCard, MatMiniFabButton, MatIcon, WishlistEmptyBlock],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Wishlist {
