@@ -15,7 +15,7 @@ import { WishlistApiClient } from '../wishlist/wishlist-api-client';
   selector: 'app-navbar',
   template: `
     <mat-toolbar class="shadow-md">
-      <div class="container flex items-center justify-between gap-2">
+      <div class="container flex items-center justify-between gap-2 px-0">
         <a data-testid="navbar-brand" class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/"
           >MiniStore</a
         >
