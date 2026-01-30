@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, from, map, Observable, of, Subject, tap } from 'rxjs';
-import { doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { from, Observable, of, Subject, tap } from 'rxjs';
+import { doc, Firestore, writeBatch } from '@angular/fire/firestore';
 
 import { WishlistItem } from '../models/wishlist-item';
 
@@ -51,16 +51,13 @@ export class WishlistLocalStorage {
       return of(undefined);
     }
 
-    const batch$ = wishlist.map(({ productId }) => {
+    const batch = writeBatch(this.firestore);
+    wishlist.forEach(({ productId }) => {
       const docRef = doc(this.firestore, `users/${userId}/wishlist/${productId}`);
-
-      return from(setDoc(docRef, { productId }, { merge: true }));
+      batch.set(docRef, { productId }, { merge: true });
     });
 
-    return forkJoin(batch$).pipe(
-      tap(() => this.clear()),
-      map(() => undefined)
-    );
+    return from(batch.commit()).pipe(tap(() => this.clear()));
   }
 
   private save(wishlist: WishlistItem[]): void {
