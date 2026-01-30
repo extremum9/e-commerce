@@ -8,6 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { Product } from '../models/product';
 import { ProductApiClient } from '../product/product-api-client';
 import { ProductCard } from '../product/product-card/product-card';
+import { BackButton } from '../back-button/back-button';
 
 import { WishlistApiClient } from './wishlist-api-client';
 import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block';
@@ -17,6 +18,10 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
     <div class="container">
       @if (products(); as products) {
         @if (products.length) {
+          <app-back-button class="mb-6" navigateTo="/products/all"
+            >Continue Shopping</app-back-button
+          >
+
           <div class="flex items-center justify-between gap-x-2 mb-6">
             <h1 class="text-xl sm:text-2xl font-medium">My Wishlist</h1>
             <p class="text-lg sm:text-xl text-gray-500">{{ products.length }} items</p>
@@ -60,7 +65,8 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
     MatMiniFabButton,
     MatIcon,
     WishlistEmptyBlock,
-    MatButton
+    MatButton,
+    BackButton
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
