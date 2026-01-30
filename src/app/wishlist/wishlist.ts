@@ -18,9 +18,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
     <div class="container">
       @if (products(); as products) {
         @if (products.length) {
-          <app-back-button class="mb-6" navigateTo="/products/all"
-            >Continue Shopping</app-back-button
-          >
+          <app-back-button class="mb-6" navigateTo="/products">Continue Shopping</app-back-button>
 
           <div class="flex items-center justify-between gap-x-2 mb-6">
             <h1 class="text-xl sm:text-2xl font-medium">My Wishlist</h1>
