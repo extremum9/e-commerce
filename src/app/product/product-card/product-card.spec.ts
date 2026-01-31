@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { By } from '@angular/platform-browser';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -10,10 +10,16 @@ import { createMockProduct } from '../../testing-utils';
 
 import { ProductCard } from './product-card';
 
+@Component({
+  template: `<app-product-card [product]="mockProduct()">test content</app-product-card>`,
+  imports: [ProductCard]
+})
+class ProductCardTestHost {
+  mockProduct = signal(createMockProduct());
+}
+
 describe(ProductCard.name, () => {
   const setup = async () => {
-    const mockProduct = createMockProduct();
-
     TestBed.configureTestingModule({
       imports: [MatIconTestingModule],
       providers: [
@@ -24,11 +30,13 @@ describe(ProductCard.name, () => {
         }
       ]
     });
-    const fixture = TestBed.createComponent(ProductCard);
+    const fixture = TestBed.createComponent(ProductCardTestHost);
+    const component = fixture.componentInstance;
     const debugElement = fixture.debugElement;
     const loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.componentRef.setInput('product', mockProduct);
     await fixture.whenStable();
+
+    const mockProduct = component.mockProduct;
 
     return { fixture, debugElement, loader, mockProduct };
   };
@@ -38,10 +46,10 @@ describe(ProductCard.name, () => {
     const image = debugElement.query(By.css('[data-testid=product-image]'));
     expect(image).withContext('image').toBeTruthy();
     const imageElement: HTMLImageElement = image.nativeElement;
-    expect(imageElement.getAttribute('src')).withContext('image src').toBe(mockProduct.imageUrl);
+    expect(imageElement.getAttribute('src')).withContext('image src').toBe(mockProduct().imageUrl);
     expect(imageElement.getAttribute('width')).withContext('image width').toBe('400');
     expect(imageElement.getAttribute('height')).withContext('image height').toBe('400');
-    expect(imageElement.getAttribute('alt')).withContext('image alt text').toBe(mockProduct.name);
+    expect(imageElement.getAttribute('alt')).withContext('image alt text').toBe(mockProduct().name);
   });
 
   it('should display product name and description', async () => {
@@ -49,13 +57,13 @@ describe(ProductCard.name, () => {
 
     const name = debugElement.query(By.css('[data-testid=product-name]'));
     expect(name).withContext('name').toBeTruthy();
-    expect(name.nativeElement.textContent).withContext('name text').toContain(mockProduct.name);
+    expect(name.nativeElement.textContent).withContext('name text').toContain(mockProduct().name);
 
     const description = debugElement.query(By.css('[data-testid=product-description]'));
     expect(description).withContext('description').toBeTruthy();
     expect(description.nativeElement.textContent)
       .withContext('description text')
-      .toContain(mockProduct.description);
+      .toContain(mockProduct().description);
   });
 
   it('should display product availability', async () => {
@@ -70,7 +78,7 @@ describe(ProductCard.name, () => {
       .withContext('availability (in stock)')
       .toContain('text-green-600');
 
-    fixture.componentRef.setInput('product', { ...mockProduct, inStock: false });
+    mockProduct.update((product) => ({ ...product, inStock: false }));
     await fixture.whenStable();
 
     expect(availability.nativeElement.textContent)
@@ -88,7 +96,7 @@ describe(ProductCard.name, () => {
     expect(price).withContext('price').toBeTruthy();
     expect(price.nativeElement.textContent)
       .withContext('price text')
-      .toContain(`$${mockProduct.price}`);
+      .toContain(`$${mockProduct().price}`);
 
     const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=product-add-to-cart-button]' })
@@ -101,5 +109,11 @@ describe(ProductCard.name, () => {
     expect(await iconHarness.getName())
       .withContext('add-to-cart button icon')
       .toBe('shopping_cart');
+  });
+
+  it('should project content', async () => {
+    const { debugElement } = await setup();
+
+    expect(debugElement.nativeElement.textContent).toContain('test content');
   });
 });
