@@ -19,6 +19,7 @@ import { Navbar } from './navbar';
 describe(Navbar.name, () => {
   const setup = async () => {
     const mockUser = createMockUser();
+
     const currentUser = signal<CurrentUser | null>(null);
     const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', ['logout'], {
       currentUser

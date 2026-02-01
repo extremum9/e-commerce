@@ -5,7 +5,13 @@ import { MatMiniFabButton } from '@angular/material/button';
 @Component({
   selector: 'app-toggle-wishlist-button',
   template: `
-    <button [class.text-red-500!]="favorite()" matMiniFab type="button" (click)="toggled.emit()">
+    <button
+      data-testid="toggle-wishlist-button"
+      [class.text-red-500!]="favorite()"
+      matMiniFab
+      type="button"
+      (click)="toggled.emit()"
+    >
       <mat-icon>{{ favorite() ? 'favorite' : 'favorite_border' }}</mat-icon>
     </button>
   `,
@@ -13,7 +19,7 @@ import { MatMiniFabButton } from '@angular/material/button';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToggleWishlistButton {
-  public readonly favorite = input<boolean>();
+  public readonly favorite = input.required<boolean>();
 
   public readonly toggled = output();
 }
