@@ -24,7 +24,7 @@ describe(ToggleWishlistButton.name, () => {
     fixture.componentRef.setInput('favorite', false);
     await fixture.whenStable();
 
-    const getButton = () =>
+    const getButtonHarness = () =>
       loader.getHarness(
         MatButtonHarness.with({
           selector: '[data-testid=toggle-wishlist-button]',
@@ -32,47 +32,39 @@ describe(ToggleWishlistButton.name, () => {
         })
       );
 
-    return { fixture, loader, getButton };
+    return { fixture, loader, getButtonHarness };
   };
 
   it('should display as unfavorite', async () => {
-    const { getButton } = await setup();
+    const { getButtonHarness } = await setup();
 
-    const button = await getButton();
-    const buttonHost = await button.host();
-    expect(await buttonHost.hasClass('text-red-500!'))
-      .withContext('button class')
-      .toBe(false);
+    const buttonHarness = await getButtonHarness();
+    const buttonHost = await buttonHarness.host();
+    expect(await buttonHost.hasClass('text-red-500!')).toBe(false);
 
-    const icon = await button.getHarness(MatIconHarness);
-    expect(await icon.getName())
-      .withContext('button icon')
-      .toBe('favorite_border');
+    const iconHarness = await buttonHarness.getHarness(MatIconHarness);
+    expect(await iconHarness.getName()).toBe('favorite_border');
   });
 
   it('should display as favorite', async () => {
-    const { fixture, getButton } = await setup();
+    const { fixture, getButtonHarness } = await setup();
     fixture.componentRef.setInput('favorite', true);
     await fixture.whenStable();
 
-    const button = await getButton();
-    const buttonHost = await button.host();
-    expect(await buttonHost.hasClass('text-red-500!'))
-      .withContext('button class')
-      .toBe(true);
+    const buttonHarness = await getButtonHarness();
+    const buttonHost = await buttonHarness.host();
+    expect(await buttonHost.hasClass('text-red-500!')).toBe(true);
 
-    const icon = await button.getHarness(MatIconHarness);
-    expect(await icon.getName())
-      .withContext('button icon')
-      .toBe('favorite');
+    const iconHarness = await buttonHarness.getHarness(MatIconHarness);
+    expect(await iconHarness.getName()).toBe('favorite');
   });
 
   it('should emit output event on click', async () => {
-    const { fixture, getButton } = await setup();
+    const { fixture, getButtonHarness } = await setup();
     const toggledSpy = spyOn(fixture.componentInstance.toggled, 'emit');
 
-    const button = await getButton();
-    await button.click();
+    const buttonHarness = await getButtonHarness();
+    await buttonHarness.click();
 
     expect(toggledSpy).toHaveBeenCalled();
   });
