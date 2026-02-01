@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter, RouterOutlet } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { MatIconTestingModule } from '@angular/material/icon/testing';
@@ -11,6 +11,12 @@ import { Navbar } from './navbar/navbar';
 import { AuthApiClient } from './auth/auth-api-client';
 import { CurrentUser } from './models/current-user';
 
+@Component({
+  selector: 'app-navbar',
+  template: ''
+})
+class NavbarStub {}
+
 describe(App.name, () => {
   const setup = async () => {
     const currentUser = signal<CurrentUser | null | undefined>(null);
@@ -18,6 +24,14 @@ describe(App.name, () => {
       currentUser
     });
 
+    TestBed.overrideComponent(App, {
+      remove: {
+        imports: [Navbar]
+      },
+      add: {
+        imports: [NavbarStub]
+      }
+    });
     TestBed.configureTestingModule({
       imports: [MatIconTestingModule],
       providers: [
@@ -47,7 +61,7 @@ describe(App.name, () => {
     currentUser.set(undefined);
 
     expect(await hasSpinnerHarness()).toBe(true);
-    expect(debugElement.query(By.directive(Navbar))).toBeFalsy();
+    expect(debugElement.query(By.directive(NavbarStub))).toBeFalsy();
     expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
   });
 
@@ -55,7 +69,7 @@ describe(App.name, () => {
     const { debugElement, hasSpinnerHarness } = await setup();
 
     expect(await hasSpinnerHarness()).toBe(false);
-    expect(debugElement.query(By.directive(Navbar))).toBeTruthy();
+    expect(debugElement.query(By.directive(NavbarStub))).toBeTruthy();
     expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
   });
 });
