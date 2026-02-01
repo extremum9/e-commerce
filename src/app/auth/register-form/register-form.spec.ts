@@ -204,13 +204,13 @@ describe(RegisterForm.name, () => {
     await buttonHarness.click();
 
     expect(await passwordInputHarness.getType())
-      .withContext('password input type after (toggled once)')
+      .withContext('password input type (toggled once)')
       .toBe('text');
     expect(await button.getAttribute('aria-pressed'))
-      .withContext('toggle button aria-pressed after (toggled once)')
+      .withContext('toggle button aria-pressed (toggled once)')
       .toBe('true');
     expect(await buttonIconHarness.getName())
-      .withContext('toggle button icon after (toggled once)')
+      .withContext('toggle button icon (toggled once)')
       .toBe('visibility');
 
     await buttonHarness.click();
