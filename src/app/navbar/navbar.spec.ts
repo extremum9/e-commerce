@@ -8,10 +8,12 @@ import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/tes
 import { MatMenuHarness } from '@angular/material/menu/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { MatBadgeHarness } from '@angular/material/badge/testing';
 
 import { createMockUser } from '../testing-utils';
 import { CurrentUser } from '../models/current-user';
 import { AuthApiClient } from '../auth/auth-api-client';
+import { WishlistApiClient } from '../wishlist/wishlist-api-client';
 import { AuthDialog } from '../auth/auth-dialog/auth-dialog';
 
 import { Navbar } from './navbar';
@@ -23,6 +25,11 @@ describe(Navbar.name, () => {
     const currentUser = signal<CurrentUser | null>(null);
     const authApiClientSpy = jasmine.createSpyObj<AuthApiClient>('AuthApiClient', ['logout'], {
       currentUser
+    });
+
+    const wishlistSet = signal(new Set<string>([]));
+    const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>('WishlistApiClient', [], {
+      wishlistSet
     });
 
     const dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
@@ -39,6 +46,10 @@ describe(Navbar.name, () => {
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy
+        },
+        {
+          provide: WishlistApiClient,
+          useValue: wishlistApiClientSpy
         },
         {
           provide: MatDialog,
@@ -71,18 +82,17 @@ describe(Navbar.name, () => {
       mockUser,
       currentUser,
       authApiClientSpy,
+      wishlistSet,
       dialogSpy
     };
   };
 
   it('should display brand', async () => {
     const { debugElement } = await setup();
-    const brandLink = debugElement.query(By.css('[data-testid=navbar-brand]'));
-    expect(brandLink).withContext('brand link element').toBeTruthy();
-    expect(brandLink.nativeElement.getAttribute('href')).withContext('brand link href').toBe('/');
-    expect(brandLink.nativeElement.textContent)
-      .withContext('brand link text')
-      .toContain('MiniStore');
+    const brandLinkDebugElement = debugElement.query(By.css('[data-testid=navbar-brand]'));
+    expect(brandLinkDebugElement).toBeTruthy();
+    expect(brandLinkDebugElement.nativeElement.getAttribute('href')).toBe('/');
+    expect(brandLinkDebugElement.nativeElement.textContent).toContain('MiniStore');
   });
 
   it('should display user links', async () => {
@@ -91,92 +101,82 @@ describe(Navbar.name, () => {
     const wishlistLinkHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=navbar-wishlist-link]' })
     );
-    const wishlistLink = await wishlistLinkHarness.host();
-    expect(await wishlistLink.getAttribute('href'))
-      .withContext('wishlist link href')
-      .toBe('/wishlist');
-    expect(await wishlistLink.getAttribute('aria-label'))
-      .withContext('wishlist link aria-label')
-      .toContain('Wishlist');
+    const wishlistLinkHost = await wishlistLinkHarness.host();
+    expect(await wishlistLinkHost.getAttribute('href')).toBe('/wishlist');
+    expect(await wishlistLinkHost.getAttribute('aria-label')).toContain('Wishlist');
 
     const wishlistLinkIconHarness = await wishlistLinkHarness.getHarness(MatIconHarness);
-    expect(await wishlistLinkIconHarness.getName())
-      .withContext('wishlist link icon')
-      .toBe('favorite');
+    expect(await wishlistLinkIconHarness.getName()).toBe('favorite');
 
     const cartLinkHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=navbar-cart-link]' })
     );
-    const cartLink = await cartLinkHarness.host();
-    expect(await cartLink.getAttribute('href'))
-      .withContext('cart link href')
-      .toBe('/cart');
-    expect(await cartLink.getAttribute('aria-label'))
-      .withContext('cart link aria-label')
-      .toContain('Cart');
+    const cartLinkHost = await cartLinkHarness.host();
+    expect(await cartLinkHost.getAttribute('href')).toBe('/cart');
+    expect(await cartLinkHost.getAttribute('aria-label')).toContain('Cart');
 
     const cartLinkIconHarness = await cartLinkHarness.getHarness(MatIconHarness);
-    expect(await cartLinkIconHarness.getName())
-      .withContext('cart link icon')
-      .toBe('shopping_cart');
+    expect(await cartLinkIconHarness.getName()).toBe('shopping_cart');
 
     const loginButtonHarness = await getLoginButtonHarness();
-    expect(await loginButtonHarness.getText())
-      .withContext('login button text')
-      .toContain('Sign In');
+    expect(await loginButtonHarness.getText()).toContain('Sign In');
+  });
+
+  it('should display wishlist badge count if items exist', async () => {
+    const { loader, wishlistSet } = await setup();
+    const badgeHarness = await loader.getHarness(
+      MatBadgeHarness.with({ selector: '[data-testid=navbar-wishlist-link]' })
+    );
+
+    expect(await badgeHarness.isHidden()).toBe(true);
+    wishlistSet.set(new Set(['1', '2', '3']));
+    expect(await badgeHarness.isHidden()).toBe(false);
+    expect(await badgeHarness.getText()).toBe('3');
   });
 
   it('should display user profile if logged in', async () => {
     const { fixture, debugElement, loader, getUserMenuHarness, mockUser, currentUser } =
       await setup();
     currentUser.set(mockUser);
-    await fixture.whenStable();
 
-    expect(debugElement.query(By.css('[data-testid=navbar-login-button]')))
-      .withContext('login button (logged in)')
-      .toBeFalsy();
+    const hasLoginButtonHarness = await loader.hasHarness(
+      MatButtonHarness.with({ selector: '[data-testid=navbar-login-button]' })
+    );
+    expect(hasLoginButtonHarness).toBe(false);
 
     const userMenuButtonHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=user-menu-button]' })
     );
-    const userMenuButton = await userMenuButtonHarness.host();
-    expect(await userMenuButton.getAttribute('aria-label'))
-      .withContext('user menu button aria-label')
-      .toBe('Toggle user menu');
+    const userMenuButtonHost = await userMenuButtonHarness.host();
+    expect(await userMenuButtonHost.getAttribute('aria-label')).toBe('Toggle user menu');
 
-    const userProfileImage = debugElement.query(By.css('[data-testid=user-profile-image]'));
-    expect(userProfileImage).withContext('User profile image element').toBeTruthy();
-    expect(userProfileImage.nativeElement.getAttribute('src'))
-      .withContext('user profile image src')
-      .toBe(mockUser.imageUrl);
-    expect(userProfileImage.nativeElement.getAttribute('alt'))
-      .withContext('user profile image alt text')
-      .toBe('Profile image');
+    const userProfileImageDebugElement = debugElement.query(
+      By.css('[data-testid=user-profile-image]')
+    );
+    expect(userProfileImageDebugElement).toBeTruthy();
+
+    const userProfileImageElement: HTMLImageElement = userProfileImageDebugElement.nativeElement;
+    expect(userProfileImageElement.getAttribute('src')).toBe(mockUser.imageUrl);
+    expect(userProfileImageElement.getAttribute('alt')).toBe('Profile image');
 
     currentUser.set({ ...mockUser, imageUrl: null });
     await fixture.whenStable();
 
-    expect(userProfileImage.nativeElement.getAttribute('src'))
-      .withContext('user profile image src (fallback)')
-      .toBe('person.jpg');
+    expect(userProfileImageElement.getAttribute('src')).toBe('person.jpg');
 
     const userMenuHarness = await getUserMenuHarness();
     await userMenuHarness.open();
 
-    const userMenuItems = await userMenuHarness.getItems();
-    expect(userMenuItems.length).withContext('user menu items').toBe(1);
+    const userMenuHarnessItems = await userMenuHarness.getItems();
+    expect(userMenuHarnessItems.length).toBe(1);
 
-    const userMenuName = debugElement.query(By.css('[data-testid=user-menu-name]'));
-    expect(userMenuName).toBeTruthy();
-    expect(userMenuName.nativeElement.textContent)
-      .withContext('user menu name')
-      .toContain(mockUser.name);
+    const userMenuNameDebugElement = debugElement.query(By.css('[data-testid=user-menu-name]'));
+    expect(userMenuNameDebugElement).toBeTruthy();
+    expect(userMenuNameDebugElement.nativeElement.textContent).toContain(mockUser.name);
 
-    const userMenuEmail = debugElement.query(By.css('[data-testid=user-menu-email]'));
-    expect(userMenuEmail).toBeTruthy();
-    expect(userMenuEmail.nativeElement.textContent)
-      .withContext('user menu email')
-      .toContain(mockUser.email);
+    const userMenuEmailDebugElement = debugElement.query(By.css('[data-testid=user-menu-email]'));
+    expect(userMenuEmailDebugElement).toBeTruthy();
+    expect(userMenuEmailDebugElement.nativeElement.textContent).toContain(mockUser.email);
   });
 
   it('should call MatDialog.open to open auth dialog', async () => {
@@ -189,9 +189,8 @@ describe(Navbar.name, () => {
   });
 
   it('should call AuthApiClient.logout and logout user', async () => {
-    const { fixture, getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = await setup();
+    const { getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = await setup();
     currentUser.set(mockUser);
-    fixture.detectChanges();
 
     const userMenuHarness = await getUserMenuHarness();
     await userMenuHarness.open();
