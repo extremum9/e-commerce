@@ -43,72 +43,58 @@ describe(ProductCard.name, () => {
 
   it('should display product image', async () => {
     const { debugElement, mockProduct } = await setup();
-    const image = debugElement.query(By.css('[data-testid=product-image]'));
-    expect(image).withContext('image').toBeTruthy();
-    const imageElement: HTMLImageElement = image.nativeElement;
-    expect(imageElement.getAttribute('src')).withContext('image src').toBe(mockProduct().imageUrl);
-    expect(imageElement.getAttribute('width')).withContext('image width').toBe('400');
-    expect(imageElement.getAttribute('height')).withContext('image height').toBe('400');
-    expect(imageElement.getAttribute('alt')).withContext('image alt text').toBe(mockProduct().name);
+    const imageDebugElement = debugElement.query(By.css('[data-testid=product-image]'));
+    expect(imageDebugElement).toBeTruthy();
+    const imageElement: HTMLImageElement = imageDebugElement.nativeElement;
+    expect(imageElement.getAttribute('src')).toBe(mockProduct().imageUrl);
+    expect(imageElement.getAttribute('width')).toBe('400');
+    expect(imageElement.getAttribute('height')).toBe('400');
+    expect(imageElement.getAttribute('alt')).toBe(mockProduct().name);
   });
 
   it('should display product name and description', async () => {
     const { debugElement, mockProduct } = await setup();
 
-    const name = debugElement.query(By.css('[data-testid=product-name]'));
-    expect(name).withContext('name').toBeTruthy();
-    expect(name.nativeElement.textContent).withContext('name text').toContain(mockProduct().name);
+    const nameDebugElement = debugElement.query(By.css('[data-testid=product-name]'));
+    expect(nameDebugElement).toBeTruthy();
+    expect(nameDebugElement.nativeElement.textContent).toContain(mockProduct().name);
 
-    const description = debugElement.query(By.css('[data-testid=product-description]'));
-    expect(description).withContext('description').toBeTruthy();
-    expect(description.nativeElement.textContent)
-      .withContext('description text')
-      .toContain(mockProduct().description);
+    const descriptionDebugElement = debugElement.query(By.css('[data-testid=product-description]'));
+    expect(descriptionDebugElement).toBeTruthy();
+    expect(descriptionDebugElement.nativeElement.textContent).toContain(mockProduct().description);
   });
 
   it('should display product availability', async () => {
     const { fixture, debugElement, mockProduct } = await setup();
-    const availability = debugElement.query(By.css('[data-testid=product-availability]'));
-    expect(availability).withContext('availability').toBeTruthy();
-    const availabilityElement: HTMLElement = availability.nativeElement;
-    expect(availabilityElement.textContent)
-      .withContext('availability text (in stock)')
-      .toContain('In Stock');
-    expect(availabilityElement.classList)
-      .withContext('availability (in stock)')
-      .toContain('text-green-600');
+    const availabilityDebugElement = debugElement.query(
+      By.css('[data-testid=product-availability]')
+    );
+    expect(availabilityDebugElement).toBeTruthy();
+    const availabilityElement: HTMLElement = availabilityDebugElement.nativeElement;
+    expect(availabilityElement.textContent).toContain('In Stock');
+    expect(availabilityElement.classList).toContain('text-green-600');
 
     mockProduct.update((product) => ({ ...product, inStock: false }));
     await fixture.whenStable();
 
-    expect(availability.nativeElement.textContent)
-      .withContext('availability text (out of stock)')
-      .toContain('Out of Stock');
-    expect(availability.nativeElement.classList)
-      .withContext('availability (out of stock)')
-      .toContain('text-red-700');
+    expect(availabilityElement.textContent).toContain('Out of Stock');
+    expect(availabilityElement.classList).toContain('text-red-700');
   });
 
   it('should display product price and add-to-cart button', async () => {
     const { loader, debugElement, mockProduct } = await setup();
 
-    const price = debugElement.query(By.css('[data-testid=product-price]'));
-    expect(price).withContext('price').toBeTruthy();
-    expect(price.nativeElement.textContent)
-      .withContext('price text')
-      .toContain(`$${mockProduct().price}`);
+    const priceDebugElement = debugElement.query(By.css('[data-testid=product-price]'));
+    expect(priceDebugElement).toBeTruthy();
+    expect(priceDebugElement.nativeElement.textContent).toContain(`$${mockProduct().price}`);
 
     const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({ selector: '[data-testid=product-add-to-cart-button]' })
     );
-    expect(await buttonHarness.getText())
-      .withContext('add-to-cart button text')
-      .toContain('Add to Cart');
+    expect(await buttonHarness.getText()).toContain('Add to Cart');
 
     const iconHarness = await buttonHarness.getHarness(MatIconHarness);
-    expect(await iconHarness.getName())
-      .withContext('add-to-cart button icon')
-      .toBe('shopping_cart');
+    expect(await iconHarness.getName()).toBe('shopping_cart');
   });
 
   it('should project content', async () => {

@@ -34,21 +34,21 @@ describe(App.name, () => {
     const loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
 
-    const hasSpinner = () =>
+    const hasSpinnerHarness = () =>
       loader.hasHarness(
         MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-app-spinner]' })
       );
 
-    return { debugElement, hasSpinner, currentUser };
+    return { debugElement, hasSpinnerHarness, currentUser };
   };
 
   it('should display spinner if user is undefined', async () => {
-    const { debugElement, hasSpinner, currentUser } = await setup();
+    const { debugElement, hasSpinnerHarness, currentUser } = await setup();
     currentUser.set(undefined);
 
-    const spinner = await hasSpinner();
-
-    expect(spinner).withContext('spinner').toBe(true);
+    expect(await hasSpinnerHarness())
+      .withContext('spinner')
+      .toBe(true);
     expect(debugElement.query(By.directive(Navbar)))
       .withContext('Navbar')
       .toBeFalsy();
@@ -58,11 +58,11 @@ describe(App.name, () => {
   });
 
   it('should display navbar along with router outlet if user is defined', async () => {
-    const { debugElement, hasSpinner } = await setup();
+    const { debugElement, hasSpinnerHarness } = await setup();
 
-    const spinner = await hasSpinner();
-
-    expect(spinner).withContext('spinner').toBe(false);
+    expect(await hasSpinnerHarness())
+      .withContext('spinner')
+      .toBe(false);
     expect(debugElement.query(By.directive(Navbar)))
       .withContext('Navbar')
       .toBeTruthy();
