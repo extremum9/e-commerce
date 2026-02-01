@@ -46,28 +46,16 @@ describe(App.name, () => {
     const { debugElement, hasSpinnerHarness, currentUser } = await setup();
     currentUser.set(undefined);
 
-    expect(await hasSpinnerHarness())
-      .withContext('spinner')
-      .toBe(true);
-    expect(debugElement.query(By.directive(Navbar)))
-      .withContext('Navbar')
-      .toBeFalsy();
-    expect(debugElement.query(By.directive(RouterOutlet)))
-      .withContext('RouterOutlet')
-      .toBeFalsy();
+    expect(await hasSpinnerHarness()).toBe(true);
+    expect(debugElement.query(By.directive(Navbar))).toBeFalsy();
+    expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
   });
 
   it('should display navbar along with router outlet if user is defined', async () => {
     const { debugElement, hasSpinnerHarness } = await setup();
 
-    expect(await hasSpinnerHarness())
-      .withContext('spinner')
-      .toBe(false);
-    expect(debugElement.query(By.directive(Navbar)))
-      .withContext('Navbar')
-      .toBeTruthy();
-    expect(debugElement.query(By.directive(RouterOutlet)))
-      .withContext('RouterOutlet')
-      .toBeTruthy();
+    expect(await hasSpinnerHarness()).toBe(false);
+    expect(debugElement.query(By.directive(Navbar))).toBeTruthy();
+    expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
   });
 });

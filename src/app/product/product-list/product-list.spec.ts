@@ -67,12 +67,12 @@ describe(ProductList.name, () => {
       config.listByCategoryReturn$ ?? of(mockProducts)
     );
 
-    const mockWishlistSet = signal(new Set(['2']));
+    const wishlistSet = signal(new Set(['2']));
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
       'WishlistApiClient',
       ['create', 'delete'],
       {
-        wishlistSet: mockWishlistSet
+        wishlistSet
       }
     );
     wishlistApiClientSpy.create.and.returnValue(of(undefined));
