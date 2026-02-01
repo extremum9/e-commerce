@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-back-button',
   template: `
-    <a class="-ms-2" matButton="text" [routerLink]="navigateTo()">
+    <a data-testid="back-button" class="-ms-2" matButton="text" [routerLink]="navigateTo()">
       <mat-icon>arrow_back</mat-icon>
       <ng-content />
     </a>
