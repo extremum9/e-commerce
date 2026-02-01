@@ -107,8 +107,9 @@ describe(AuthDialog.name, () => {
       await tabGroupHarness.selectTab({ label: 'Sign Up' });
     };
 
-    const getLoginFormStub = () => overlayContainerDebugElement.query(By.directive(LoginFormStub));
-    const getRegisterFormStub = () =>
+    const getLoginFormDebugElement = () =>
+      overlayContainerDebugElement.query(By.directive(LoginFormStub));
+    const getRegisterFormDebugElement = () =>
       overlayContainerDebugElement.query(By.directive(RegisterFormStub));
 
     return {
@@ -118,43 +119,44 @@ describe(AuthDialog.name, () => {
       dialogRefSpy,
       selectSignInTab,
       selectSignUpTab,
-      getLoginFormStub,
-      getRegisterFormStub
+      getLoginFormDebugElement,
+      getRegisterFormDebugElement
     };
   };
 
   it('should display tabs', async () => {
-    const { rootLoader, selectSignInTab, selectSignUpTab, getLoginFormStub, getRegisterFormStub } =
-      await setup();
+    const {
+      rootLoader,
+      selectSignInTab,
+      selectSignUpTab,
+      getLoginFormDebugElement,
+      getRegisterFormDebugElement
+    } = await setup();
+    const tabHarnesses = await rootLoader.getAllHarnesses(MatTabHarness);
 
-    const tabs = await rootLoader.getAllHarnesses(MatTabHarness);
-    expect(tabs.length).withContext('tabs').toBe(2);
-
+    expect(tabHarnesses.length).toBe(2);
     await selectSignInTab();
-
-    expect(getLoginFormStub()).withContext('login form (sign-in tab)').toBeTruthy();
-
+    expect(getLoginFormDebugElement()).toBeTruthy();
     await selectSignUpTab();
-
-    expect(getRegisterFormStub()).withContext('register form (sign-up tab)').toBeTruthy();
+    expect(getRegisterFormDebugElement()).toBeTruthy();
   });
 
   it('should close dialog on login success', async () => {
-    const { selectSignInTab, dialogRefSpy, getLoginFormStub } = await setup();
+    const { selectSignInTab, dialogRefSpy, getLoginFormDebugElement } = await setup();
     await selectSignInTab();
 
-    const loginFormStubComponent: LoginFormStub = getLoginFormStub().componentInstance;
-    loginFormStubComponent.dialogClosed.emit();
+    const loginFormComponent: LoginFormStub = getLoginFormDebugElement().componentInstance;
+    loginFormComponent.dialogClosed.emit();
 
     expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
   });
 
   it('should close dialog on registration success', async () => {
-    const { selectSignUpTab, dialogRefSpy, getRegisterFormStub } = await setup();
+    const { selectSignUpTab, dialogRefSpy, getRegisterFormDebugElement } = await setup();
     await selectSignUpTab();
 
-    const registerFormStubComponent: LoginFormStub = getRegisterFormStub().componentInstance;
-    registerFormStubComponent.dialogClosed.emit();
+    const registerFormComponent: LoginFormStub = getRegisterFormDebugElement().componentInstance;
+    registerFormComponent.dialogClosed.emit();
 
     expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
   });
@@ -168,14 +170,10 @@ describe(AuthDialog.name, () => {
         appearance: 'outlined'
       })
     );
-    expect(await buttonHarness.getText())
-      .withContext('login-with-google button text')
-      .toContain('Continue with Google');
+    expect(await buttonHarness.getText()).toContain('Continue with Google');
 
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
-    expect(await buttonIconHarness.getName())
-      .withContext('login-with-google button icon')
-      .toBe('google');
+    expect(await buttonIconHarness.getName()).toBe('google');
 
     await buttonHarness.click();
 

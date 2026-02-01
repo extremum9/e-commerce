@@ -92,37 +92,21 @@ describe(RegisterForm.name, () => {
     } = await setup();
 
     const nameInputHarness = await getNameInputHarness();
-    expect(await nameInputHarness.getType())
-      .withContext('name input type')
-      .toBe('text');
-    expect(await nameInputHarness.getPlaceholder())
-      .withContext('name input placeholder')
-      .toContain('Enter your name');
+    expect(await nameInputHarness.getType()).toBe('text');
+    expect(await nameInputHarness.getPlaceholder()).toContain('Enter your name');
 
     const emailInputHarness = await getEmailInputHarness();
-    expect(await emailInputHarness.getType())
-      .withContext('email input type')
-      .toBe('email');
-    expect(await emailInputHarness.getPlaceholder())
-      .withContext('email input placeholder')
-      .toContain('Enter your email');
+    expect(await emailInputHarness.getType()).toBe('email');
+    expect(await emailInputHarness.getPlaceholder()).toContain('Enter your email');
 
     const passwordInputHarness = await getPasswordInputHarness();
-    expect(await passwordInputHarness.getType())
-      .withContext('password input type')
-      .toBe('password');
-    expect(await passwordInputHarness.getPlaceholder())
-      .withContext('password input placeholder')
-      .toContain('Enter your password');
+    expect(await passwordInputHarness.getType()).toBe('password');
+    expect(await passwordInputHarness.getPlaceholder()).toContain('Enter your password');
 
     const submitButtonHarness = await getSubmitButtonHarness();
-    expect(await submitButtonHarness.getType())
-      .withContext('submit button type')
-      .toBe('submit');
-    expect(await submitButtonHarness.isDisabled()).withContext('submit button disabled state');
-    expect(await submitButtonHarness.getText())
-      .withContext('submit button text')
-      .toContain('Sign Up');
+    expect(await submitButtonHarness.getType()).toBe('submit');
+    expect(await submitButtonHarness.isDisabled()).toBe(false);
+    expect(await submitButtonHarness.getText()).toContain('Sign Up');
   });
 
   it('should display validation error messages if fields are invalid', async () => {
@@ -138,7 +122,7 @@ describe(RegisterForm.name, () => {
     await nameInputHarness.blur();
 
     const nameErrorMessages = await nameFieldHarness.getTextErrors();
-    expect(nameErrorMessages.length).withContext('name error messages (empty)').toBe(1);
+    expect(nameErrorMessages.length).toBe(1);
     expect(nameErrorMessages[0]).toContain('Name is required');
 
     const emailFieldHarness = await loader.getHarness(
@@ -150,13 +134,13 @@ describe(RegisterForm.name, () => {
     await emailInputHarness.blur();
 
     let emailErrorMessages = await emailFieldHarness.getTextErrors();
-    expect(emailErrorMessages.length).withContext('email error messages (empty)').toBe(1);
+    expect(emailErrorMessages.length).toBe(1);
     expect(emailErrorMessages[0]).toContain('Email is required');
 
     await emailInputHarness.setValue('test');
 
     emailErrorMessages = await emailFieldHarness.getTextErrors();
-    expect(emailErrorMessages.length).withContext('email error messages (invalid)').toBe(1);
+    expect(emailErrorMessages.length).toBe(1);
     expect(emailErrorMessages[0]).toContain('Email is invalid');
 
     const passwordFieldHarness = await loader.getHarness(
@@ -168,62 +152,43 @@ describe(RegisterForm.name, () => {
     await passwordInputHarness.blur();
 
     let passwordErrorMessages = await passwordFieldHarness.getTextErrors();
-    expect(passwordErrorMessages.length).withContext('password error messages (empty)').toBe(1);
+    expect(passwordErrorMessages.length).toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password is required');
 
     await passwordInputHarness.setValue('1234');
 
     passwordErrorMessages = await passwordFieldHarness.getTextErrors();
-    expect(passwordErrorMessages.length).withContext('password error messages (short)').toBe(1);
+    expect(passwordErrorMessages.length).toBe(1);
     expect(passwordErrorMessages[0]).toContain('Password must be at least 6 characters long');
   });
 
   it('should toggle password visibility', async () => {
     const { loader, getPasswordInputHarness } = await setup();
 
-    const passwordInputHarness = await getPasswordInputHarness();
-
     const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({
         selector: '[data-testid=register-password-toggle-button]'
       })
     );
-    const button = await buttonHarness.host();
-    expect(await button.getAttribute('aria-label'))
-      .withContext('toggle button aria-label')
-      .toBe('Toggle password visibility');
-    expect(await button.getAttribute('aria-pressed'))
-      .withContext('toggle button aria-pressed')
-      .toBe('false');
+    const buttonHost = await buttonHarness.host();
+    expect(await buttonHost.getAttribute('aria-label')).toBe('Toggle password visibility');
+    expect(await buttonHost.getAttribute('aria-pressed')).toBe('false');
 
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
-    expect(await buttonIconHarness.getName())
-      .withContext('toggle button default icon')
-      .toBe('visibility_off');
+    expect(await buttonIconHarness.getName()).toBe('visibility_off');
 
     await buttonHarness.click();
 
-    expect(await passwordInputHarness.getType())
-      .withContext('password input type (toggled once)')
-      .toBe('text');
-    expect(await button.getAttribute('aria-pressed'))
-      .withContext('toggle button aria-pressed (toggled once)')
-      .toBe('true');
-    expect(await buttonIconHarness.getName())
-      .withContext('toggle button icon (toggled once)')
-      .toBe('visibility');
+    const passwordInputHarness = await getPasswordInputHarness();
+    expect(await passwordInputHarness.getType()).toBe('text');
+    expect(await buttonHost.getAttribute('aria-pressed')).toBe('true');
+    expect(await buttonIconHarness.getName()).toBe('visibility');
 
     await buttonHarness.click();
 
-    expect(await passwordInputHarness.getType())
-      .withContext('password input type (toggled twice)')
-      .toBe('password');
-    expect(await button.getAttribute('aria-pressed'))
-      .withContext('toggle button aria-pressed (toggled twice)')
-      .toBe('false');
-    expect(await buttonIconHarness.getName())
-      .withContext('toggle button icon (toggled twice)')
-      .toBe('visibility_off');
+    expect(await passwordInputHarness.getType()).toBe('password');
+    expect(await buttonHost.getAttribute('aria-pressed')).toBe('false');
+    expect(await buttonIconHarness.getName()).toBe('visibility_off');
   });
 
   it('should NOT call AuthApiClient.register if form is invalid', async () => {
@@ -259,13 +224,8 @@ describe(RegisterForm.name, () => {
     const submitButtonHarness = await getSubmitButtonHarness();
     await submitButtonHarness.click();
 
-    expect(await submitButtonHarness.isDisabled())
-      .withContext('submit button disabled state (clicked)')
-      .toBe(true);
-    expect(await submitButtonHarness.getText())
-      .withContext('submit button text (clicked)')
-      .toContain('Signing Up...');
-
+    expect(await submitButtonHarness.isDisabled()).toBe(true);
+    expect(await submitButtonHarness.getText()).toContain('Signing Up...');
     expect(authApiClientSpy.register).toHaveBeenCalledOnceWith(mockCredentials);
 
     register$.next();
@@ -302,13 +262,8 @@ describe(RegisterForm.name, () => {
 
     register$.error(new Error());
 
-    expect(await submitButtonHarness.isDisabled())
-      .withContext('submit button disabled state (error)')
-      .toBe(false);
-    expect(await submitButtonHarness.getText())
-      .withContext('submit button text (error)')
-      .toContain('Sign Up');
-
+    expect(await submitButtonHarness.isDisabled()).toBe(false);
+    expect(await submitButtonHarness.getText()).toContain('Sign Up');
     expect(dialogClosedSpy).not.toHaveBeenCalled();
     expect(snackbarSpy.showError).toHaveBeenCalledOnceWith('Try again with another email');
   });
