@@ -74,6 +74,15 @@ mat-form-field {
   gap: 1rem;
 }
 
+.snackbar-success {
+  @include mat.snack-bar-overrides(
+    (
+      container-color: var(--color-green-600),
+      supporting-text-color: var(--color-white)
+    )
+  );
+}
+
 .snackbar-error {
   @include mat.snack-bar-overrides(
     (

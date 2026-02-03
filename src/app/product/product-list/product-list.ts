@@ -12,6 +12,7 @@ import { CategoryApiClient } from '../category-api-client';
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { Product } from '../../models/product';
 import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
+import { Snackbar } from '../../snackbar/snackbar';
 
 @Component({
   template: `
@@ -67,6 +68,7 @@ import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-
 })
 export default class ProductList {
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly snackbar = inject(Snackbar);
 
   protected readonly categories = signal(inject(CategoryApiClient).list());
 
@@ -97,9 +99,13 @@ export default class ProductList {
 
   protected toggleWishlist(product: Product): void {
     if (product.favorite) {
-      this.wishlistApiClient.delete(product.id).subscribe();
+      this.wishlistApiClient
+        .delete(product.id)
+        .subscribe(() => this.snackbar.showSuccess('Product removed from wishlist'));
     } else {
-      this.wishlistApiClient.create(product.id).subscribe();
+      this.wishlistApiClient
+        .create(product.id)
+        .subscribe(() => this.snackbar.showSuccess('Product added to wishlist'));
     }
   }
 }
