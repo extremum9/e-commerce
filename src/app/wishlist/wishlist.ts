@@ -9,6 +9,7 @@ import { Product } from '../models/product';
 import { ProductApiClient } from '../product/product-api-client';
 import { ProductCard } from '../product/product-card/product-card';
 import { BackButton } from '../back-button/back-button';
+import { Snackbar } from '../snackbar/snackbar';
 
 import { WishlistApiClient } from './wishlist-api-client';
 import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block';
@@ -70,6 +71,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
 })
 export default class Wishlist {
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly snackbar = inject(Snackbar);
 
   protected readonly products: Signal<Product[] | undefined>;
 
@@ -93,7 +95,9 @@ export default class Wishlist {
   }
 
   protected delete(productId: string): void {
-    this.wishlistApiClient.delete(productId).subscribe();
+    this.wishlistApiClient
+      .delete(productId)
+      .subscribe(() => this.snackbar.showSuccess('Product removed from wishlist'));
   }
 
   protected deleteAll(): void {
