@@ -38,15 +38,27 @@ describe(Snackbar.name, () => {
     });
   });
 
+  it('should call MatSnackbar.open to open success snackbar', () => {
+    const { snackbar, snackbarSpy } = setup();
+    const message = 'Success';
+
+    snackbar.showSuccess(message);
+
+    expect(snackbarSpy.open).toHaveBeenCalledOnceWith(message, '', {
+      panelClass: 'snackbar-success',
+      duration: 3000
+    });
+  });
+
   it('should call MatSnackbar.open to open error snackbar', () => {
     const { snackbar, snackbarSpy } = setup();
     const message = 'Error';
 
     snackbar.showError(message);
 
-    expect(snackbarSpy.open).toHaveBeenCalledOnceWith(message, '', {
+    expect(snackbarSpy.open).toHaveBeenCalledOnceWith(message, 'Close', {
       panelClass: 'snackbar-error',
-      duration: 3000
+      duration: 8000
     });
   });
 
