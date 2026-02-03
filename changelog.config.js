@@ -78,7 +78,8 @@ module.exports = {
     'layout',
     'products',
     'wishlist',
-    'back-button'
+    'back-button',
+    'confirm-dialog'
   ],
   types
 };
