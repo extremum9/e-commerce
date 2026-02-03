@@ -9,6 +9,10 @@ export class Snackbar {
     this.snackbar.open(message, 'Ok', { duration: 5000 });
   }
 
+  public showSuccess(message: string): void {
+    this.snackbar.open(message, '', { panelClass: 'snackbar-success', duration: 3000 });
+  }
+
   public showError(message: string): void {
     this.snackbar.open(message, '', { panelClass: 'snackbar-error', duration: 3000 });
   }

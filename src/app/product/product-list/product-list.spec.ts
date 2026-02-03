@@ -24,6 +24,7 @@ import { ProductApiClient } from '../product-api-client';
 import { createMockProduct } from '../../testing-utils';
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
+import { Snackbar } from '../../snackbar/snackbar';
 
 import ProductList from './product-list';
 
@@ -78,6 +79,8 @@ describe(ProductList.name, () => {
     wishlistApiClientSpy.create.and.returnValue(of(undefined));
     wishlistApiClientSpy.delete.and.returnValue(of(undefined));
 
+    const snackbarSpy = jasmine.createSpyObj<Snackbar>('Snackbar', ['showSuccess']);
+
     TestBed.overrideComponent(ProductList, {
       remove: {
         imports: [ProductCard, ToggleWishlistButton]
@@ -99,7 +102,8 @@ describe(ProductList.name, () => {
           useValue: { animationsDisabled: true }
         },
         { provide: ProductApiClient, useValue: productApiClientSpy },
-        { provide: WishlistApiClient, useValue: wishlistApiClientSpy }
+        { provide: WishlistApiClient, useValue: wishlistApiClientSpy },
+        { provide: Snackbar, useValue: snackbarSpy }
       ]
     });
     const harness = await RouterTestingHarness.create('/products');
@@ -119,7 +123,8 @@ describe(ProductList.name, () => {
       getToggleWishlistButtonDebugElement,
       productApiClientSpy,
       mockProducts,
-      wishlistApiClientSpy
+      wishlistApiClientSpy,
+      snackbarSpy
     };
   };
 
@@ -232,12 +237,13 @@ describe(ProductList.name, () => {
     );
   });
 
-  it('should call WishlistApiClient.create if not in wishlist yet', async () => {
+  it('should call WishlistApiClient.create if not in wishlist yet, and display success snackbar on success', async () => {
     const {
       getProductCardDebugElements,
       getToggleWishlistButtonDebugElement,
       mockProducts,
-      wishlistApiClientSpy
+      wishlistApiClientSpy,
+      snackbarSpy
     } = await setup();
 
     const productCardDebugElement = getProductCardDebugElements()[0];
@@ -247,14 +253,16 @@ describe(ProductList.name, () => {
     toggleWishlistButtonComponent.toggled.emit();
 
     expect(wishlistApiClientSpy.create).toHaveBeenCalledOnceWith(mockProducts[0].id);
+    expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product added to wishlist');
   });
 
-  it('should call WishlistApiClient.delete if already in wishlist', async () => {
+  it('should call WishlistApiClient.delete if already in wishlist, and display success snackbar on success', async () => {
     const {
       getProductCardDebugElements,
       getToggleWishlistButtonDebugElement,
       mockProducts,
-      wishlistApiClientSpy
+      wishlistApiClientSpy,
+      snackbarSpy
     } = await setup();
 
     const productCardDebugElement = getProductCardDebugElements()[1];
@@ -264,5 +272,6 @@ describe(ProductList.name, () => {
     toggleWishlistButtonComponent.toggled.emit();
 
     expect(wishlistApiClientSpy.delete).toHaveBeenCalledOnceWith(mockProducts[1].id);
+    expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product removed from wishlist');
   });
 });
