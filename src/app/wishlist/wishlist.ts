@@ -4,12 +4,14 @@ import { filter, map, of, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 
 import { Product } from '../models/product';
 import { ProductApiClient } from '../product/product-api-client';
 import { ProductCard } from '../product/product-card/product-card';
 import { BackButton } from '../back-button/back-button';
 import { Snackbar } from '../snackbar/snackbar';
+import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
 
 import { WishlistApiClient } from './wishlist-api-client';
 import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block';
@@ -71,6 +73,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
 })
 export default class Wishlist {
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly dialog = inject(MatDialog);
   private readonly snackbar = inject(Snackbar);
 
   protected readonly products: Signal<Product[] | undefined>;
@@ -101,6 +104,20 @@ export default class Wishlist {
   }
 
   protected deleteAll(): void {
-    this.wishlistApiClient.deleteAll().subscribe();
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Clear Wishlist',
+        message: 'Are you sure you want to delete all items?',
+        confirmText: 'Clear'
+      }
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.wishlistApiClient.deleteAll())
+      )
+      .subscribe();
   }
 }
