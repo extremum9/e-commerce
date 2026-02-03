@@ -16,13 +16,15 @@ export type ConfirmDialogData = {
 
 @Component({
   template: `
-    <h2 mat-dialog-title>{{ data.title }}</h2>
+    <h2 data-testid="confirm-dialog-title" mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
-      <p>{{ data.message }}</p>
+      <p data-testid="confirm-dialog-message">{{ data.message }}</p>
     </mat-dialog-content>
     <mat-dialog-actions>
-      <button matButton mat-dialog-close>Cancel</button>
-      <button matButton [mat-dialog-close]="true">{{ data.confirmText || 'Confirm' }}</button>
+      <button data-testid="confirm-dialog-cancel-button" matButton mat-dialog-close>Cancel</button>
+      <button data-testid="confirm-dialog-confirm-button" matButton [mat-dialog-close]="true">
+        {{ data.confirmText || 'Confirm' }}
+      </button>
     </mat-dialog-actions>
   `,
   imports: [MatDialogContent, MatDialogTitle, MatDialogActions, MatButton, MatDialogClose],
