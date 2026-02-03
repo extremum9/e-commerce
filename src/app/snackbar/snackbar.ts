@@ -14,7 +14,7 @@ export class Snackbar {
   }
 
   public showError(message: string): void {
-    this.snackbar.open(message, '', { panelClass: 'snackbar-error', duration: 3000 });
+    this.snackbar.open(message, 'Close', { panelClass: 'snackbar-error', duration: 8000 });
   }
 
   public dismiss(): void {
