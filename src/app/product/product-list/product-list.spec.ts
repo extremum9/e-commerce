@@ -6,7 +6,6 @@ import {
   Component,
   DebugElement,
   input,
-  output,
   provideZonelessChangeDetection,
   signal
 } from '@angular/core';
@@ -29,18 +28,9 @@ import { Snackbar } from '../../snackbar/snackbar';
 import ProductList from './product-list';
 
 type SetupConfig = {
-  listReturn$?: Observable<Product[]>;
-  listByCategoryReturn$?: Observable<Product[]>;
+  listReturn$: Observable<Product[]>;
+  listByCategoryReturn$: Observable<Product[]>;
 };
-
-@Component({
-  selector: 'app-toggle-wishlist-button',
-  template: ''
-})
-class ToggleWishlistButtonStub {
-  favorite = input.required<boolean>();
-  toggled = output();
-}
 
 @Component({
   selector: 'app-product-card',
@@ -54,19 +44,24 @@ class ProductCardStub {
 }
 
 describe(ProductList.name, () => {
-  const setup = async (config: SetupConfig = {}) => {
+  const setup = async (config: Partial<SetupConfig> = {}) => {
     const mockProducts = [
       createMockProduct({ name: 'Product 1' }),
       createMockProduct({ id: '2', name: 'Product 2' })
     ];
+
+    const { listReturn$, listByCategoryReturn$ }: SetupConfig = {
+      listReturn$: of(mockProducts),
+      listByCategoryReturn$: of(mockProducts),
+      ...config
+    };
+
     const productApiClientSpy = jasmine.createSpyObj<ProductApiClient>('ProductApiClient', [
       'list',
       'listByCategory'
     ]);
-    productApiClientSpy.list.and.returnValue(config.listReturn$ ?? of(mockProducts));
-    productApiClientSpy.listByCategory.and.returnValue(
-      config.listByCategoryReturn$ ?? of(mockProducts)
-    );
+    productApiClientSpy.list.and.returnValue(listReturn$);
+    productApiClientSpy.listByCategory.and.returnValue(listByCategoryReturn$);
 
     const wishlistSet = signal(new Set(['2']));
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
@@ -83,10 +78,10 @@ describe(ProductList.name, () => {
 
     TestBed.overrideComponent(ProductList, {
       remove: {
-        imports: [ProductCard, ToggleWishlistButton]
+        imports: [ProductCard]
       },
       add: {
-        imports: [ProductCardStub, ToggleWishlistButtonStub]
+        imports: [ProductCardStub]
       }
     });
     TestBed.configureTestingModule({
@@ -113,7 +108,7 @@ describe(ProductList.name, () => {
     const hasSpinnerHarness = () => loader.hasHarness(MatProgressSpinnerHarness);
     const getProductCardDebugElements = () => debugElement.queryAll(By.directive(ProductCardStub));
     const getToggleWishlistButtonDebugElement = (productCard: DebugElement) =>
-      productCard.query(By.directive(ToggleWishlistButtonStub));
+      productCard.query(By.directive(ToggleWishlistButton));
 
     return {
       debugElement,
@@ -158,7 +153,7 @@ describe(ProductList.name, () => {
     expect(await allLinkHost.getAttribute('aria-current')).toBeNull();
   });
 
-  it('should display spinner when data is loading', async () => {
+  it('should display spinner if data is loading', async () => {
     const loadingSubject = new Subject<Product[]>();
     const { hasSpinnerHarness, mockProducts } = await setup({ listReturn$: loadingSubject });
 
@@ -169,7 +164,7 @@ describe(ProductList.name, () => {
     expect(await hasSpinnerHarness()).toBe(false);
   });
 
-  it('should display all products by default when data is loaded', async () => {
+  it('should display all products by default if data is loaded', async () => {
     const {
       debugElement,
       getProductCardDebugElements,
@@ -195,7 +190,7 @@ describe(ProductList.name, () => {
     );
     expect(toggleWishlistButtonDebugElement).toBeTruthy();
     expect(
-      (toggleWishlistButtonDebugElement.componentInstance as ToggleWishlistButtonStub).favorite()
+      (toggleWishlistButtonDebugElement.componentInstance as ToggleWishlistButton).favorite()
     ).toBe(false);
 
     productCardComponent = productCardDebugElements[1].componentInstance;
@@ -207,7 +202,7 @@ describe(ProductList.name, () => {
     );
     expect(toggleWishlistButtonDebugElement).toBeTruthy();
     expect(
-      (toggleWishlistButtonDebugElement.componentInstance as ToggleWishlistButtonStub).favorite()
+      (toggleWishlistButtonDebugElement.componentInstance as ToggleWishlistButton).favorite()
     ).toBe(true);
   });
 
@@ -247,7 +242,7 @@ describe(ProductList.name, () => {
     } = await setup();
 
     const productCardDebugElement = getProductCardDebugElements()[0];
-    const toggleWishlistButtonComponent: ToggleWishlistButtonStub =
+    const toggleWishlistButtonComponent: ToggleWishlistButton =
       getToggleWishlistButtonDebugElement(productCardDebugElement).componentInstance;
 
     toggleWishlistButtonComponent.toggled.emit();
@@ -266,7 +261,7 @@ describe(ProductList.name, () => {
     } = await setup();
 
     const productCardDebugElement = getProductCardDebugElements()[1];
-    const toggleWishlistButtonComponent: ToggleWishlistButtonStub =
+    const toggleWishlistButtonComponent: ToggleWishlistButton =
       getToggleWishlistButtonDebugElement(productCardDebugElement).componentInstance;
 
     toggleWishlistButtonComponent.toggled.emit();
