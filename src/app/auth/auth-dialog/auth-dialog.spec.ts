@@ -1,18 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  Component,
-  DebugElement,
-  getDebugNode,
-  inject,
-  output,
-  provideZonelessChangeDetection
-} from '@angular/core';
+import { Component, output, provideZonelessChangeDetection } from '@angular/core';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatTabGroupHarness, MatTabHarness } from '@angular/material/tabs/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
@@ -22,17 +14,6 @@ import { LoginForm } from '../login-form/login-form';
 import { RegisterForm } from '../register-form/register-form';
 
 import { AuthDialog } from './auth-dialog';
-
-@Component({
-  template: `<button data-testid="open-dialog-button" (click)="open()">Open dialog</button>`
-})
-class AuthDialogTestHost {
-  dialog = inject(MatDialog);
-
-  open() {
-    this.dialog.open(AuthDialog);
-  }
-}
 
 @Component({
   selector: 'app-login-form',
@@ -62,17 +43,11 @@ describe(AuthDialog.name, () => {
     TestBed.overrideComponent(AuthDialog, {
       remove: { imports: [LoginForm, RegisterForm] },
       add: {
-        imports: [LoginFormStub, RegisterFormStub],
-        providers: [
-          {
-            provide: MatDialogRef,
-            useValue: dialogRefSpy
-          }
-        ]
+        imports: [LoginFormStub, RegisterFormStub]
       }
     });
     TestBed.configureTestingModule({
-      imports: [MatDialogModule, MatIconTestingModule],
+      imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
         {
@@ -82,39 +57,33 @@ describe(AuthDialog.name, () => {
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy
+        },
+        {
+          provide: MatDialogRef,
+          useValue: dialogRefSpy
         }
       ]
     });
-    const fixture = TestBed.createComponent(AuthDialogTestHost);
-    const rootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+    const fixture = TestBed.createComponent(AuthDialog);
+    const debugElement = fixture.debugElement;
+    const loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
 
-    const overlayContainer = TestBed.inject(OverlayContainer);
-    const overlayContainerDebugElement = getDebugNode(
-      overlayContainer.getContainerElement()
-    ) as DebugElement;
-
-    fixture.debugElement
-      .query(By.css('[data-testid=open-dialog-button]'))
-      .triggerEventHandler('click');
-
     const selectSignInTab = async () => {
-      const tabGroupHarness = await rootLoader.getHarness(MatTabGroupHarness);
+      const tabGroupHarness = await loader.getHarness(MatTabGroupHarness);
       await tabGroupHarness.selectTab({ label: 'Sign In' });
     };
     const selectSignUpTab = async () => {
-      const tabGroupHarness = await rootLoader.getHarness(MatTabGroupHarness);
+      const tabGroupHarness = await loader.getHarness(MatTabGroupHarness);
       await tabGroupHarness.selectTab({ label: 'Sign Up' });
     };
 
-    const getLoginFormDebugElement = () =>
-      overlayContainerDebugElement.query(By.directive(LoginFormStub));
-    const getRegisterFormDebugElement = () =>
-      overlayContainerDebugElement.query(By.directive(RegisterFormStub));
+    const getLoginFormDebugElement = () => debugElement.query(By.directive(LoginFormStub));
+    const getRegisterFormDebugElement = () => debugElement.query(By.directive(RegisterFormStub));
 
     return {
       fixture,
-      rootLoader,
+      loader,
       authApiClientSpy,
       dialogRefSpy,
       selectSignInTab,
@@ -124,27 +93,21 @@ describe(AuthDialog.name, () => {
     };
   };
 
-  it('should display tabs', async () => {
-    const {
-      rootLoader,
-      selectSignInTab,
-      selectSignUpTab,
-      getLoginFormDebugElement,
-      getRegisterFormDebugElement
-    } = await setup();
-    const tabHarnesses = await rootLoader.getAllHarnesses(MatTabHarness);
+  it('should display two tabs', async () => {
+    const { loader, selectSignUpTab, getLoginFormDebugElement, getRegisterFormDebugElement } =
+      await setup();
+    const tabHarnesses = await loader.getAllHarnesses(MatTabHarness);
 
     expect(tabHarnesses.length).toBe(2);
-    await selectSignInTab();
     expect(getLoginFormDebugElement()).toBeTruthy();
+    expect(getRegisterFormDebugElement()).toBeFalsy();
     await selectSignUpTab();
+    expect(getLoginFormDebugElement()).toBeFalsy();
     expect(getRegisterFormDebugElement()).toBeTruthy();
   });
 
   it('should close dialog on login success', async () => {
-    const { selectSignInTab, dialogRefSpy, getLoginFormDebugElement } = await setup();
-    await selectSignInTab();
-
+    const { dialogRefSpy, getLoginFormDebugElement } = await setup();
     const loginFormComponent: LoginFormStub = getLoginFormDebugElement().componentInstance;
     loginFormComponent.dialogClosed.emit();
 
@@ -162,9 +125,9 @@ describe(AuthDialog.name, () => {
   });
 
   it('should log in with google and close dialog on success', async () => {
-    const { rootLoader, authApiClientSpy, dialogRefSpy } = await setup();
+    const { loader, authApiClientSpy, dialogRefSpy } = await setup();
 
-    const buttonHarness = await rootLoader.getHarness(
+    const buttonHarness = await loader.getHarness(
       MatButtonHarness.with({
         selector: '[data-testid=login-with-google-button]',
         appearance: 'outlined'
