@@ -7,10 +7,9 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { MatMenuHarness } from '@angular/material/menu/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatBadgeHarness } from '@angular/material/badge/testing';
 
-import { createMockUser } from '../testing-utils';
+import { createMockUser, provideDisabledAnimations } from '../testing-utils';
 import { CurrentUser } from '../models/current-user';
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistApiClient } from '../wishlist/wishlist-api-client';
@@ -39,10 +38,7 @@ describe(Navbar.name, () => {
       providers: [
         provideZonelessChangeDetection(),
         provideRouter([]),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
+        provideDisabledAnimations(),
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy

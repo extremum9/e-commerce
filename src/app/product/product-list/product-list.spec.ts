@@ -8,13 +8,12 @@ import { By } from '@angular/platform-browser';
 import { Observable, of, Subject } from 'rxjs';
 import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 import { MatIconTestingModule } from '@angular/material/icon/testing';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { Product } from '../../models/product';
 import { ProductCard } from '../product-card/product-card';
 import { productCategoryMatcher } from '../../utils';
 import { ProductApiClient } from '../product-api-client';
-import { createMockProduct } from '../../testing-utils';
+import { createMockProduct, provideDisabledAnimations } from '../../testing-utils';
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
 import { Snackbar } from '../../snackbar/snackbar';
@@ -83,10 +82,7 @@ describe(ProductList.name, () => {
           [{ matcher: productCategoryMatcher, component: ProductList }],
           withComponentInputBinding()
         ),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
+        provideDisabledAnimations(),
         { provide: ProductApiClient, useValue: productApiClientSpy },
         { provide: WishlistApiClient, useValue: wishlistApiClientSpy },
         { provide: Snackbar, useValue: snackbarSpy }

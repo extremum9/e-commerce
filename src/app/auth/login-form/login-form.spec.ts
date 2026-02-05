@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { Subject } from 'rxjs';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
@@ -12,6 +11,7 @@ import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/te
 
 import { Snackbar } from '../../snackbar/snackbar';
 import { AuthApiClient } from '../auth-api-client';
+import { provideDisabledAnimations } from '../../testing-utils';
 
 import { LoginForm } from './login-form';
 
@@ -42,10 +42,7 @@ describe(LoginForm.name, () => {
       imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
+        provideDisabledAnimations(),
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy
