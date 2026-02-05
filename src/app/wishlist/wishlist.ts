@@ -24,8 +24,12 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
           <app-back-button class="mb-6" navigateTo="/products">Continue Shopping</app-back-button>
 
           <div class="flex items-center justify-between gap-x-2 mb-6">
-            <h1 class="text-xl sm:text-2xl font-medium">My Wishlist</h1>
-            <p class="text-lg sm:text-xl text-gray-500">{{ products.length }} items</p>
+            <h1 data-testid="wishlist-title" class="text-xl sm:text-2xl font-medium">
+              My Wishlist
+            </h1>
+            <p data-testid="wishlist-count" class="text-lg sm:text-xl text-gray-500">
+              {{ products.length }} items
+            </p>
           </div>
 
           <ul class="fluid-grid mb-8">
@@ -33,6 +37,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
               <li>
                 <app-product-card [product]="product">
                   <button
+                    data-testid="delete-from-wishlist-button"
                     class="absolute! top-3 right-3"
                     matMiniFab
                     type="button"
@@ -46,7 +51,13 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
           </ul>
 
           <div class="text-center">
-            <button class="danger" matButton="outlined" (click)="deleteAll()">
+            <button
+              data-testid="clear-wishlist-button"
+              class="danger"
+              matButton="outlined"
+              type="button"
+              (click)="deleteAll()"
+            >
               Clear Wishlist
             </button>
           </div>
@@ -55,7 +66,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
         }
       } @else {
         <div class="flex justify-center">
-          <mat-spinner [diameter]="50" />
+          <mat-spinner data-testid="loading-wishlist-spinner" [diameter]="50" />
         </div>
       }
     </div>
