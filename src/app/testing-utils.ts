@@ -1,5 +1,13 @@
+import { Provider } from '@angular/core';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+
 import { Product } from './models/product';
 import { CurrentUser } from './models/current-user';
+
+export const provideDisabledAnimations = (): Provider => ({
+  provide: MATERIAL_ANIMATIONS,
+  useValue: { animationsDisabled: true }
+});
 
 export const createMockUser = (user: Partial<CurrentUser> = {}): CurrentUser => ({
   uid: '1',

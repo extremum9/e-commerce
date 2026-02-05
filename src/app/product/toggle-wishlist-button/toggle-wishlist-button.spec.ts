@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
+
+import { provideDisabledAnimations } from '../../testing-utils';
 
 import { ToggleWishlistButton } from './toggle-wishlist-button';
 
@@ -11,13 +12,7 @@ describe(ToggleWishlistButton.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
       imports: [MatIconTestingModule],
-      providers: [
-        provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        }
-      ]
+      providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(ToggleWishlistButton);
     const loader = TestbedHarnessEnvironment.loader(fixture);

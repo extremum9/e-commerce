@@ -4,9 +4,8 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { By } from '@angular/platform-browser';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
-import { createMockProduct } from '../../testing-utils';
+import { createMockProduct, provideDisabledAnimations } from '../../testing-utils';
 
 import { ProductCard } from './product-card';
 
@@ -22,13 +21,7 @@ describe(ProductCard.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
       imports: [MatIconTestingModule],
-      providers: [
-        provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        }
-      ]
+      providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(ProductCardTestHost);
     const component = fixture.componentInstance;

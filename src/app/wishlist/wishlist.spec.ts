@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { Component, input, provideZonelessChangeDetection, signal } from '@angular/core';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,7 +10,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { Snackbar } from '../snackbar/snackbar';
 import { ProductApiClient } from '../product/product-api-client';
-import { createMockProduct } from '../testing-utils';
+import { createMockProduct, provideDisabledAnimations } from '../testing-utils';
 import { Product } from '../models/product';
 import { ProductCard } from '../product/product-card/product-card';
 import { BackButton } from '../back-button/back-button';
@@ -89,10 +88,7 @@ describe(Wishlist.name, () => {
       imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
+        provideDisabledAnimations(),
         {
           provide: WishlistApiClient,
           useValue: wishlistApiClientSpy

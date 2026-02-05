@@ -10,6 +10,7 @@ import { App } from './app';
 import { Navbar } from './navbar/navbar';
 import { AuthApiClient } from './auth/auth-api-client';
 import { CurrentUser } from './models/current-user';
+import { provideDisabledAnimations } from './testing-utils';
 
 @Component({
   selector: 'app-navbar',
@@ -37,6 +38,7 @@ describe(App.name, () => {
       providers: [
         provideZonelessChangeDetection(),
         provideRouter([]),
+        provideDisabledAnimations(),
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy
@@ -56,20 +58,28 @@ describe(App.name, () => {
     return { debugElement, hasSpinnerHarness, currentUser };
   };
 
-  it('should display spinner if user is undefined', async () => {
-    const { debugElement, hasSpinnerHarness, currentUser } = await setup();
-    currentUser.set(undefined);
+  describe('User is undefined', () => {
+    it('should display spinner', async () => {
+      const { debugElement, hasSpinnerHarness, currentUser } = await setup();
+      currentUser.set(undefined);
 
-    expect(await hasSpinnerHarness()).toBe(true);
-    expect(debugElement.query(By.directive(NavbarStub))).toBeFalsy();
-    expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
+      expect(await hasSpinnerHarness()).toBe(true);
+      expect(debugElement.query(By.directive(NavbarStub))).toBeFalsy();
+      expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
+      currentUser.set(null);
+      expect(await hasSpinnerHarness()).toBe(false);
+    });
   });
 
-  it('should display navbar along with router outlet if user is defined', async () => {
-    const { debugElement, hasSpinnerHarness } = await setup();
+  describe('User is defined', () => {
+    it('should display navbar', async () => {
+      const { debugElement } = await setup();
+      expect(debugElement.query(By.directive(NavbarStub))).toBeTruthy();
+    });
 
-    expect(await hasSpinnerHarness()).toBe(false);
-    expect(debugElement.query(By.directive(NavbarStub))).toBeTruthy();
-    expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
+    it('should have router outlet', async () => {
+      const { debugElement } = await setup();
+      expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
+    });
   });
 });

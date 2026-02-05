@@ -7,11 +7,11 @@ import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/tes
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatTabGroupHarness, MatTabHarness } from '@angular/material/tabs/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { AuthApiClient } from '../auth-api-client';
 import { LoginForm } from '../login-form/login-form';
 import { RegisterForm } from '../register-form/register-form';
+import { provideDisabledAnimations } from '../../testing-utils';
 
 import { AuthDialog } from './auth-dialog';
 
@@ -50,10 +50,7 @@ describe(AuthDialog.name, () => {
       imports: [MatIconTestingModule],
       providers: [
         provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
+        provideDisabledAnimations(),
         {
           provide: AuthApiClient,
           useValue: authApiClientSpy

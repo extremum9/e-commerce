@@ -2,9 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+
+import { provideDisabledAnimations } from '../testing-utils';
 
 import { BackButton } from './back-button';
 
@@ -19,14 +20,7 @@ class BackButtonTestHost {
 describe(BackButton.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
-      providers: [
-        provideZonelessChangeDetection(),
-        provideRouter([]),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        }
-      ]
+      providers: [provideZonelessChangeDetection(), provideRouter([]), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(BackButtonTestHost);
     const loader = TestbedHarnessEnvironment.loader(fixture);

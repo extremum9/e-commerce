@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideZonelessChangeDetection } from '@angular/core';
 
@@ -12,10 +11,6 @@ describe(Snackbar.name, () => {
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
         {
           provide: MatSnackBar,
           useValue: snackbarSpy

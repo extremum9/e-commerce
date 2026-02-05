@@ -1,10 +1,11 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TestBed } from '@angular/core/testing';
-import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { By } from '@angular/platform-browser';
 import { MatButtonHarness } from '@angular/material/button/testing';
+
+import { provideDisabledAnimations } from '../testing-utils';
 
 import { ConfirmDialog, ConfirmDialogData } from './confirm-dialog';
 
@@ -23,10 +24,7 @@ describe(ConfirmDialog.name, () => {
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        {
-          provide: MATERIAL_ANIMATIONS,
-          useValue: { animationsDisabled: true }
-        },
+        provideDisabledAnimations(),
         {
           provide: MAT_DIALOG_DATA,
           useValue: mockDialogData
