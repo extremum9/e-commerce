@@ -69,7 +69,6 @@ describe(Navbar.name, () => {
           appearance: 'filled'
         })
       );
-
     const getUserMenuHarness = () =>
       loader.getHarness(MatMenuHarness.with({ selector: '[data-testid=user-menu-button]' }));
 
@@ -122,7 +121,7 @@ describe(Navbar.name, () => {
     expect(await loginButtonHarness.getText()).toContain('Sign In');
   });
 
-  it('should display wishlist badge count if items exist', async () => {
+  it('should display wishlist badge count if not empty', async () => {
     const { loader, wishlistSet } = await setup();
     const badgeHarness = await loader.getHarness(
       MatBadgeHarness.with({ selector: '[data-testid=navbar-wishlist-link]' })
@@ -179,7 +178,7 @@ describe(Navbar.name, () => {
     expect(userMenuEmailDebugElement.nativeElement.textContent).toContain(mockUser.email);
   });
 
-  it('should call MatDialog.open to open auth dialog', async () => {
+  it('should call MatDialog.open and open auth dialog', async () => {
     const { getLoginButtonHarness, dialogSpy } = await setup();
     const loginButtonHarness = await getLoginButtonHarness();
 

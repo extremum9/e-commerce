@@ -2,13 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import {
-  Component,
-  DebugElement,
-  input,
-  provideZonelessChangeDetection,
-  signal
-} from '@angular/core';
+import { Component, input, provideZonelessChangeDetection, signal } from '@angular/core';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { By } from '@angular/platform-browser';
 import { Observable, of, Subject } from 'rxjs';
@@ -34,10 +28,7 @@ type SetupConfig = {
 
 @Component({
   selector: 'app-product-card',
-  template: `
-    <h3>{{ product().name }}</h3>
-    <ng-content />
-  `
+  template: `<ng-content />`
 })
 class ProductCardStub {
   product = input.required<Product>();
@@ -105,17 +96,20 @@ describe(ProductList.name, () => {
     const debugElement = harness.routeDebugElement!;
     const loader = TestbedHarnessEnvironment.loader(harness.fixture);
 
-    const hasSpinnerHarness = () => loader.hasHarness(MatProgressSpinnerHarness);
+    const hasSpinnerHarness = () =>
+      loader.hasHarness(
+        MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-product-list-spinner]' })
+      );
     const getProductCardDebugElements = () => debugElement.queryAll(By.directive(ProductCardStub));
-    const getToggleWishlistButtonDebugElement = (productCard: DebugElement) =>
-      productCard.query(By.directive(ToggleWishlistButton));
+    const getToggleWishlistButtonDebugElements = () =>
+      debugElement.queryAll(By.directive(ToggleWishlistButton));
 
     return {
       debugElement,
       loader,
       hasSpinnerHarness,
       getProductCardDebugElements,
-      getToggleWishlistButtonDebugElement,
+      getToggleWishlistButtonDebugElements,
       productApiClientSpy,
       mockProducts,
       wishlistApiClientSpy,
@@ -153,120 +147,109 @@ describe(ProductList.name, () => {
     expect(await allLinkHost.getAttribute('aria-current')).toBeNull();
   });
 
-  it('should display spinner if data is loading', async () => {
-    const loadingSubject = new Subject<Product[]>();
-    const { hasSpinnerHarness, mockProducts } = await setup({ listReturn$: loadingSubject });
+  describe('Loading state', () => {
+    it('should display spinner', async () => {
+      const products$ = new Subject<Product[]>();
+      const { hasSpinnerHarness, mockProducts } = await setup({ listReturn$: products$ });
 
-    expect(await hasSpinnerHarness()).toBe(true);
-
-    loadingSubject.next(mockProducts);
-
-    expect(await hasSpinnerHarness()).toBe(false);
+      expect(await hasSpinnerHarness()).toBe(true);
+      products$.next(mockProducts);
+      expect(await hasSpinnerHarness()).toBe(false);
+    });
   });
 
-  it('should display all products by default if data is loaded', async () => {
-    const {
-      debugElement,
-      getProductCardDebugElements,
-      getToggleWishlistButtonDebugElement,
-      mockProducts
-    } = await setup();
+  describe('Loaded state', () => {
+    it('should display all product cards by default with toggle-wishlist buttons', async () => {
+      const {
+        debugElement,
+        getProductCardDebugElements,
+        getToggleWishlistButtonDebugElements,
+        mockProducts
+      } = await setup();
 
-    const productCountDebugElement = debugElement.query(By.css('[data-testid=product-count]'));
-    expect(productCountDebugElement).toBeTruthy();
-    expect(productCountDebugElement.nativeElement.textContent).toContain(
-      `${mockProducts.length} products found`
-    );
+      const productCountDebugElement = debugElement.query(By.css('[data-testid=product-count]'));
+      expect(productCountDebugElement).toBeTruthy();
+      expect(productCountDebugElement.nativeElement.textContent).toContain('2 products found');
 
-    const productCardDebugElements = getProductCardDebugElements();
-    expect(productCardDebugElements.length).toBe(2);
+      const productCardDebugElements = getProductCardDebugElements();
+      expect(productCardDebugElements.length).toBe(2);
 
-    let productCardComponent: ProductCardStub = productCardDebugElements[0].componentInstance;
-    expect(productCardComponent.product().name).toBe(mockProducts[0].name);
-    expect(productCardComponent.product().favorite).toBe(false);
+      let productCardComponent: ProductCardStub = productCardDebugElements[0].componentInstance;
+      expect(productCardComponent.product().name).toBe(mockProducts[0].name);
+      expect(productCardComponent.product().favorite).toBe(false);
+      productCardComponent = productCardDebugElements[1].componentInstance;
+      expect(productCardComponent.product().name).toBe(mockProducts[1].name);
+      expect(productCardComponent.product().favorite).toBe(true);
 
-    let toggleWishlistButtonDebugElement = getToggleWishlistButtonDebugElement(
-      productCardDebugElements[0]
-    );
-    expect(toggleWishlistButtonDebugElement).toBeTruthy();
-    expect(
-      (toggleWishlistButtonDebugElement.componentInstance as ToggleWishlistButton).favorite()
-    ).toBe(false);
-
-    productCardComponent = productCardDebugElements[1].componentInstance;
-    expect(productCardComponent.product().name).toBe(mockProducts[1].name);
-    expect(productCardComponent.product().favorite).toBe(true);
-
-    toggleWishlistButtonDebugElement = getToggleWishlistButtonDebugElement(
-      productCardDebugElements[1]
-    );
-    expect(toggleWishlistButtonDebugElement).toBeTruthy();
-    expect(
-      (toggleWishlistButtonDebugElement.componentInstance as ToggleWishlistButton).favorite()
-    ).toBe(true);
-  });
-
-  it('should filter products when selecting different category', async () => {
-    const mockProducts = [
-      createMockProduct({ name: 'Filtered product 1' }),
-      createMockProduct({ id: '2', name: 'Filtered product 2' })
-    ];
-    const { loader, getProductCardDebugElements, productApiClientSpy } = await setup({
-      listByCategoryReturn$: of(mockProducts)
+      const toggleWishlistButtonDebugElements = getToggleWishlistButtonDebugElements();
+      expect(toggleWishlistButtonDebugElements.length).toBe(2);
+      expect(toggleWishlistButtonDebugElements[0]).toBeTruthy();
+      expect(
+        (toggleWishlistButtonDebugElements[0].componentInstance as ToggleWishlistButton).favorite()
+      ).toBe(false);
+      expect(
+        (toggleWishlistButtonDebugElements[1].componentInstance as ToggleWishlistButton).favorite()
+      ).toBe(true);
     });
 
-    const clothingLinkHarness = await loader.getHarness(
-      MatButtonHarness.with({ text: 'Clothing' })
-    );
-    await clothingLinkHarness.click();
+    it('should filter products when selecting different category', async () => {
+      const mockProducts = [
+        createMockProduct({ name: 'Filtered product 1' }),
+        createMockProduct({ id: '2', name: 'Filtered product 2' })
+      ];
+      const { loader, getProductCardDebugElements, productApiClientSpy } = await setup({
+        listByCategoryReturn$: of(mockProducts)
+      });
 
-    expect(productApiClientSpy.listByCategory).toHaveBeenCalledOnceWith('clothing');
+      const clothingLinkHarness = await loader.getHarness(
+        MatButtonHarness.with({ text: 'Clothing' })
+      );
+      await clothingLinkHarness.click();
 
-    const router = TestBed.inject(Router);
-    expect(router.url).toBe('/products/clothing');
+      expect(productApiClientSpy.listByCategory).toHaveBeenCalledOnceWith('clothing');
 
-    const productCardDebugElements = getProductCardDebugElements();
-    expect(productCardDebugElements.length).toBe(2);
-    expect((productCardDebugElements[0].componentInstance as ProductCardStub).product().name).toBe(
-      mockProducts[0].name
-    );
-  });
+      const router = TestBed.inject(Router);
+      expect(router.url).toBe('/products/clothing');
 
-  it('should call WishlistApiClient.create if not in wishlist yet, and display success snackbar on success', async () => {
-    const {
-      getProductCardDebugElements,
-      getToggleWishlistButtonDebugElement,
-      mockProducts,
-      wishlistApiClientSpy,
-      snackbarSpy
-    } = await setup();
+      const productCardDebugElements = getProductCardDebugElements();
+      expect(productCardDebugElements.length).toBe(2);
+      expect(
+        (productCardDebugElements[0].componentInstance as ProductCardStub).product().name
+      ).toBe(mockProducts[0].name);
+    });
 
-    const productCardDebugElement = getProductCardDebugElements()[0];
-    const toggleWishlistButtonComponent: ToggleWishlistButton =
-      getToggleWishlistButtonDebugElement(productCardDebugElement).componentInstance;
+    it('should call WishlistApiClient.create if not in wishlist yet, and display success snackbar on success', async () => {
+      const {
+        getToggleWishlistButtonDebugElements,
+        mockProducts,
+        wishlistApiClientSpy,
+        snackbarSpy
+      } = await setup();
 
-    toggleWishlistButtonComponent.toggled.emit();
+      const toggleWishlistButtonComponent: ToggleWishlistButton =
+        getToggleWishlistButtonDebugElements()[0].componentInstance;
 
-    expect(wishlistApiClientSpy.create).toHaveBeenCalledOnceWith(mockProducts[0].id);
-    expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product added to wishlist');
-  });
+      toggleWishlistButtonComponent.toggled.emit();
 
-  it('should call WishlistApiClient.delete if already in wishlist, and display success snackbar on success', async () => {
-    const {
-      getProductCardDebugElements,
-      getToggleWishlistButtonDebugElement,
-      mockProducts,
-      wishlistApiClientSpy,
-      snackbarSpy
-    } = await setup();
+      expect(wishlistApiClientSpy.create).toHaveBeenCalledOnceWith(mockProducts[0].id);
+      expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product added to wishlist');
+    });
 
-    const productCardDebugElement = getProductCardDebugElements()[1];
-    const toggleWishlistButtonComponent: ToggleWishlistButton =
-      getToggleWishlistButtonDebugElement(productCardDebugElement).componentInstance;
+    it('should call WishlistApiClient.delete if already in wishlist, and display success snackbar on success', async () => {
+      const {
+        getToggleWishlistButtonDebugElements,
+        mockProducts,
+        wishlistApiClientSpy,
+        snackbarSpy
+      } = await setup();
 
-    toggleWishlistButtonComponent.toggled.emit();
+      const toggleWishlistButtonComponent: ToggleWishlistButton =
+        getToggleWishlistButtonDebugElements()[1].componentInstance;
 
-    expect(wishlistApiClientSpy.delete).toHaveBeenCalledOnceWith(mockProducts[1].id);
-    expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product removed from wishlist');
+      toggleWishlistButtonComponent.toggled.emit();
+
+      expect(wishlistApiClientSpy.delete).toHaveBeenCalledOnceWith(mockProducts[1].id);
+      expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product removed from wishlist');
+    });
   });
 });
