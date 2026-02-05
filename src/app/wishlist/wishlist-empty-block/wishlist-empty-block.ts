@@ -12,7 +12,9 @@ import { RouterLink } from '@angular/router';
       </div>
       <h1 class="mb-3 text-2xl font-bold text-gray-900">Your wishlist is empty</h1>
       <p class="mb-8 text-gray-600">Save products by tapping the heart icon.</p>
-      <a matButton="filled" routerLink="/products">Start Shopping</a>
+      <a data-testid="wishlist-empty-cta-link" matButton="filled" routerLink="/products"
+        >Start Shopping</a
+      >
     </div>
   `,
   imports: [MatButton, MatIcon, RouterLink],
