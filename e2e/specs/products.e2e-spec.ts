@@ -2,6 +2,33 @@ import { expect, test } from '../fixtures';
 import { ProductCard } from '../components';
 
 test.describe('Products page', () => {
+  test.describe('Non-authenticated user', () => {
+    test('should add product to wishlist and persist it', async ({
+      page,
+      productsPage,
+      navbar
+    }) => {
+      await productsPage.goto();
+
+      const productCardLocator = productsPage.productCards.first();
+      const productCard = new ProductCard(productCardLocator);
+
+      await productCard.toggleWishlistButton.click();
+
+      await expect(navbar.wishlistLink).toContainText('1');
+      await expect(page.getByText('Product added to wishlist')).toBeVisible();
+
+      await page.reload();
+
+      await expect(navbar.wishlistLink).toContainText('1');
+
+      await productCard.toggleWishlistButton.click();
+
+      await expect(navbar.wishlistLink).toContainText('0');
+      await expect(page.getByText('Product removed from wishlist')).toBeVisible();
+    });
+  });
+
   test('should display categories and products', async ({ productsPage }) => {
     await productsPage.goto();
 
@@ -25,18 +52,19 @@ test.describe('Products page', () => {
     await expect(productsPage.productCount).toContainText('14 products found');
     await expect(productsPage.productCards).toHaveCount(14);
 
-    const lampCardContainer = productsPage.getProductCard(/Lamp/);
-    const lampCard = new ProductCard(lampCardContainer);
+    const lampCardLocator = productsPage.getProductCard('Lamp');
+    const lampCard = new ProductCard(lampCardLocator);
     await expect(lampCard.image).toBeVisible();
     await expect(lampCard.name).toBeVisible();
     await expect(lampCard.description).toBeVisible();
     await expect(lampCard.availability).toBeVisible();
     await expect(lampCard.availability).toContainText('In Stock');
     await expect(lampCard.price).toBeVisible();
+    await expect(lampCard.toggleWishlistButton).toBeVisible();
     await expect(lampCard.addToCartButton).toBeVisible();
 
-    const blenderCardContainer = productsPage.getProductCard(/Blender/);
-    const blenderCard = new ProductCard(blenderCardContainer);
+    const blenderCardLocator = productsPage.getProductCard('Blender');
+    const blenderCard = new ProductCard(blenderCardLocator);
     await expect(blenderCard.availability).toContainText('Out of Stock');
   });
 
@@ -47,13 +75,13 @@ test.describe('Products page', () => {
     await expect(page).toHaveURL('products/clothing');
     await expect(productsPage.productCount).toContainText('3 products found');
     await expect(productsPage.productCards).toHaveCount(3);
-    await expect(productsPage.getProductCard(/Jeans/)).toBeVisible();
+    await expect(productsPage.getProductCard('Jeans')).toBeVisible();
 
     await productsPage.selectCategory('Accessories');
 
     await expect(page).toHaveURL('products/accessories');
     await expect(productsPage.productCount).toContainText('2 products found');
     await expect(productsPage.productCards).toHaveCount(2);
-    await expect(productsPage.getProductCard(/Wallet/)).toBeVisible();
+    await expect(productsPage.getProductCard('Wallet')).toBeVisible();
   });
 });

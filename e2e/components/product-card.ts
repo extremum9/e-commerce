@@ -7,6 +7,7 @@ export class ProductCard {
   public readonly description: Locator;
   public readonly availability: Locator;
   public readonly price: Locator;
+  public readonly toggleWishlistButton: Locator;
   public readonly addToCartButton: Locator;
 
   constructor(parent: Page | Locator) {
@@ -16,6 +17,7 @@ export class ProductCard {
     this.description = parent.getByTestId('product-description');
     this.availability = parent.getByTestId('product-availability');
     this.price = parent.getByTestId('product-price');
+    this.toggleWishlistButton = parent.getByTestId('toggle-wishlist-button');
     this.addToCartButton = parent
       .getByTestId('product-add-to-cart-button')
       .filter({ hasText: 'Add to Cart' });
