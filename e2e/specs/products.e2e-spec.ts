@@ -2,33 +2,6 @@ import { expect, test } from '../fixtures';
 import { ProductCard } from '../components';
 
 test.describe('Products page', () => {
-  test.describe('Non-authenticated user', () => {
-    test('should add product to wishlist and persist it', async ({
-      page,
-      productsPage,
-      navbar
-    }) => {
-      await productsPage.goto();
-
-      const productCardLocator = productsPage.productCards.first();
-      const productCard = new ProductCard(productCardLocator);
-
-      await productCard.toggleWishlistButton.click();
-
-      await expect(navbar.wishlistLink).toContainText('1');
-      await expect(page.getByText('Product added to wishlist')).toBeVisible();
-
-      await page.reload();
-
-      await expect(navbar.wishlistLink).toContainText('1');
-
-      await productCard.toggleWishlistButton.click();
-
-      await expect(navbar.wishlistLink).toContainText('0');
-      await expect(page.getByText('Product removed from wishlist')).toBeVisible();
-    });
-  });
-
   test('should display categories and products', async ({ productsPage }) => {
     await productsPage.goto();
 
@@ -52,8 +25,7 @@ test.describe('Products page', () => {
     await expect(productsPage.productCount).toContainText('14 products found');
     await expect(productsPage.productCards).toHaveCount(14);
 
-    const lampCardLocator = productsPage.getProductCard('Lamp');
-    const lampCard = new ProductCard(lampCardLocator);
+    const lampCard = new ProductCard(productsPage.getProductCard('Lamp'));
     await expect(lampCard.image).toBeVisible();
     await expect(lampCard.name).toBeVisible();
     await expect(lampCard.description).toBeVisible();
@@ -63,8 +35,7 @@ test.describe('Products page', () => {
     await expect(lampCard.toggleWishlistButton).toBeVisible();
     await expect(lampCard.addToCartButton).toBeVisible();
 
-    const blenderCardLocator = productsPage.getProductCard('Blender');
-    const blenderCard = new ProductCard(blenderCardLocator);
+    const blenderCard = new ProductCard(productsPage.getProductCard('Blender'));
     await expect(blenderCard.availability).toContainText('Out of Stock');
   });
 
@@ -83,5 +54,62 @@ test.describe('Products page', () => {
     await expect(productsPage.productCount).toContainText('2 products found');
     await expect(productsPage.productCards).toHaveCount(2);
     await expect(productsPage.getProductCard('Wallet')).toBeVisible();
+  });
+
+  test.describe('Add to wishlist', () => {
+    test('should persist wishlist items in local storage if not authenticated', async ({
+      page,
+      productsPage,
+      navbar
+    }) => {
+      await productsPage.goto();
+
+      const productCard = new ProductCard(productsPage.productCards.first());
+      await productCard.toggleWishlistButton.click();
+
+      await expect(navbar.wishlistLink).toContainText('1');
+      await expect(page.getByText('Product added to wishlist')).toBeVisible();
+
+      await page.reload();
+
+      await expect(navbar.wishlistLink).toContainText('1');
+
+      await productCard.toggleWishlistButton.click();
+
+      await expect(navbar.wishlistLink).toContainText('0');
+      await expect(page.getByText('Product removed from wishlist')).toBeVisible();
+
+      await page.reload();
+
+      await expect(navbar.wishlistLink).toContainText('0');
+    });
+
+    test('should persist wishlist items in Firestore if authenticated', async ({
+      page,
+      register,
+      productsPage,
+      navbar
+    }) => {
+      await register();
+
+      const productCard = new ProductCard(productsPage.productCards.first());
+      await productCard.toggleWishlistButton.click();
+
+      await expect(navbar.wishlistLink).toContainText('1');
+      await expect(page.getByText('Product added to wishlist')).toBeVisible();
+
+      await page.reload();
+
+      await expect(navbar.wishlistLink).toContainText('1');
+
+      await productCard.toggleWishlistButton.click();
+
+      await expect(navbar.wishlistLink).toContainText('0');
+      await expect(page.getByText('Product removed from wishlist')).toBeVisible();
+
+      await page.reload();
+
+      await expect(navbar.wishlistLink).toContainText('0');
+    });
   });
 });
