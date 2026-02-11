@@ -111,7 +111,7 @@ describe(AuthDialog.name, () => {
     expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
   });
 
-  it('should close dialog on registration success', async () => {
+  it('should close dialog on register success', async () => {
     const { selectSignUpTab, dialogRefSpy, getRegisterFormDebugElement } = await setup();
     await selectSignUpTab();
 

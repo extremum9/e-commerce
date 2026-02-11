@@ -57,7 +57,7 @@ test.describe('Products page', () => {
   });
 
   test.describe('Add to wishlist', () => {
-    test('should persist wishlist items in local storage if not authenticated', async ({
+    test('should persist wishlist in local storage if not authenticated', async ({
       page,
       productsPage,
       navbar
@@ -84,7 +84,7 @@ test.describe('Products page', () => {
       await expect(navbar.wishlistLink).toContainText('0');
     });
 
-    test('should persist wishlist items in Firestore if authenticated', async ({
+    test('should persist wishlist in database if authenticated', async ({
       page,
       register,
       productsPage,
