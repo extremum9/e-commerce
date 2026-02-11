@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures';
 import { getRandomString } from '../utils';
+import { ProductCard } from '../components';
 
 test.describe('Authentication', () => {
   test.beforeEach(async ({ page, navbar }) => {
@@ -154,5 +155,48 @@ test.describe('Authentication', () => {
     await popup.waitForEvent('close');
 
     await expect(authDialog.loginWithGoogleButton).toBeHidden();
+  });
+
+  test('should sync local wishlist on login', async ({ page, productsPage, login, navbar }) => {
+    await productsPage.goto();
+
+    const productCard = new ProductCard(productsPage.productCards.first());
+    await productCard.toggleWishlistButton.click();
+
+    await login();
+
+    await expect(navbar.userMenuButton).toBeVisible();
+    await expect(navbar.wishlistLink).toContainText('1');
+    await expect
+      .poll(async () => page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist')))
+      .toBeNull();
+
+    await page.reload();
+
+    await expect(navbar.wishlistLink).toContainText('1');
+  });
+
+  test('should sync local wishlist on register', async ({
+    page,
+    productsPage,
+    register,
+    navbar
+  }) => {
+    await productsPage.goto();
+
+    const productCard = new ProductCard(productsPage.productCards.first());
+    await productCard.toggleWishlistButton.click();
+
+    await register();
+
+    await expect(navbar.userMenuButton).toBeVisible();
+    await expect(navbar.wishlistLink).toContainText('1');
+    await expect
+      .poll(async () => page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist')))
+      .toBeNull();
+
+    await page.reload();
+
+    await expect(navbar.wishlistLink).toContainText('1');
   });
 });
