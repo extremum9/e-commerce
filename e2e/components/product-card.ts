@@ -8,6 +8,7 @@ export class ProductCard {
   public readonly availability: Locator;
   public readonly price: Locator;
   public readonly toggleWishlistButton: Locator;
+  public readonly deleteFromWishlistButton: Locator;
   public readonly addToCartButton: Locator;
 
   constructor(parent: Page | Locator) {
@@ -18,6 +19,7 @@ export class ProductCard {
     this.availability = parent.getByTestId('product-availability');
     this.price = parent.getByTestId('product-price');
     this.toggleWishlistButton = parent.getByTestId('toggle-wishlist-button');
+    this.deleteFromWishlistButton = parent.getByTestId('delete-from-wishlist-button');
     this.addToCartButton = parent
       .getByTestId('product-add-to-cart-button')
       .filter({ hasText: 'Add to Cart' });
