@@ -20,11 +20,10 @@ test.describe('Navbar', () => {
     await expect(navbar.userMenuButton).toBeHidden();
   });
 
-  test('should display logged in user', async ({ navbar, login }) => {
+  test('should display logged in user and logout', async ({ navbar, login }) => {
     await login();
 
     await expect(navbar.loginButton).toBeHidden();
-
     await expect(navbar.userMenuButton).toBeVisible();
     await expect(navbar.userProfileImage).toBeVisible();
 

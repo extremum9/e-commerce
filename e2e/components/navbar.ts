@@ -24,4 +24,9 @@ export class Navbar {
     this.userMenuEmail = page.getByTestId('user-menu-email');
     this.logoutButton = page.getByTestId('logout-button');
   }
+
+  public async logout(): Promise<void> {
+    await this.userMenuButton.click();
+    await this.logoutButton.click();
+  }
 }

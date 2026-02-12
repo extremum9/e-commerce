@@ -3,12 +3,10 @@ import { getRandomString } from '../utils';
 import { ProductCard } from '../components';
 
 test.describe('Authentication', () => {
-  test.beforeEach(async ({ page, navbar }) => {
+  test('should display login tab', async ({ page, navbar, authDialog }) => {
     await page.goto('/');
     await navbar.loginButton.click();
-  });
 
-  test('should display a login tab', async ({ authDialog }) => {
     await expect(authDialog.loginSubmitButton).toBeVisible();
     await expect(authDialog.loginSubmitButton).toBeEnabled();
 
@@ -56,16 +54,17 @@ test.describe('Authentication', () => {
     await expect(authDialog.loginSubmitButton).toBeHidden();
   });
 
-  test('should display a snackbar on login failure', async ({ page, authDialog }) => {
-    await authDialog.login({ email: `${getRandomString()}@mail.com` });
+  test('should display snackbar on login failure', async ({ page, login, authDialog }) => {
+    await login({ email: `${getRandomString()}@mail.com` });
 
     await expect(page.getByText('The email or password is incorrect')).toBeVisible();
-
     await expect(authDialog.loginSubmitButton).toBeEnabled();
     await expect(authDialog.loginSubmitButton).toContainText('Sign In');
   });
 
-  test('should display a register tab', async ({ authDialog }) => {
+  test('should display register tab', async ({ page, navbar, authDialog }) => {
+    await page.goto('/');
+    await navbar.loginButton.click();
     await authDialog.signUpTab.click();
 
     await expect(authDialog.registerSubmitButton).toBeVisible();
@@ -76,8 +75,8 @@ test.describe('Authentication', () => {
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Name is required');
 
-    const name = getRandomString();
-    await authDialog.registerNameInput.fill(name);
+    const mockName = getRandomString();
+    await authDialog.registerNameInput.fill(mockName);
     await expect(authDialog.errorMessage).toBeHidden();
 
     await authDialog.registerEmailInput.fill('');
@@ -89,8 +88,8 @@ test.describe('Authentication', () => {
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Email is invalid');
 
-    const email = `${getRandomString()}@mail.com`;
-    await authDialog.registerEmailInput.fill(email);
+    const mockEmail = `${getRandomString()}@mail.com`;
+    await authDialog.registerEmailInput.fill(mockEmail);
     await expect(authDialog.errorMessage).toBeHidden();
 
     await authDialog.registerPasswordInput.fill('');
@@ -120,17 +119,18 @@ test.describe('Authentication', () => {
     await expect(authDialog.registerSubmitButton).toBeHidden();
   });
 
-  test('should display a snackbar on register failure', async ({ page, authDialog }) => {
-    await authDialog.signUpTab.click();
-    await authDialog.register({ email: 'john.doe@mail.com' });
+  test('should display snackbar on register failure', async ({ page, register, authDialog }) => {
+    await register({ email: 'john.doe@mail.com' });
 
     await expect(page.getByText('Try again with another email')).toBeVisible();
-
     await expect(authDialog.registerSubmitButton).toBeEnabled();
     await expect(authDialog.registerSubmitButton).toContainText('Sign Up');
   });
 
-  test('should send password reset link', async ({ page, authDialog }) => {
+  test('should send password reset link', async ({ page, navbar, authDialog }) => {
+    await page.goto('/');
+    await navbar.loginButton.click();
+
     await authDialog.resetPasswordButton.click();
     await expect(page.getByText('Please enter your email address')).toBeVisible();
 
@@ -142,11 +142,12 @@ test.describe('Authentication', () => {
     await expect(authDialog.resetPasswordButton).toBeVisible();
   });
 
-  test('should login with google', async ({ page, authDialog }) => {
+  test('should login with google', async ({ page, navbar, authDialog }) => {
+    await page.goto('/');
+    await navbar.loginButton.click();
+
     const popupPromise = page.waitForEvent('popup');
-
     await authDialog.loginWithGoogleButton.click();
-
     const popup = await popupPromise;
     await popup.waitForLoadState('domcontentloaded');
     await popup.getByRole('button', { name: 'Add new account' }).click();
@@ -157,31 +158,40 @@ test.describe('Authentication', () => {
     await expect(authDialog.loginWithGoogleButton).toBeHidden();
   });
 
-  test('should sync local wishlist on login', async ({ page, productsPage, login, navbar }) => {
-    await productsPage.goto();
+  test('should sync and merge wishlist on login', async ({
+    page,
+    productsPage,
+    register,
+    login,
+    navbar
+  }) => {
+    const mockEmail = `${getRandomString()}@mail.com`;
 
-    const productCard = new ProductCard(productsPage.productCards.first());
+    await register({ email: mockEmail });
+
+    let productCard = new ProductCard(productsPage.productCards.first());
     await productCard.toggleWishlistButton.click();
 
-    await login();
+    await navbar.logout();
+    await productsPage.goto();
+
+    productCard = new ProductCard(productsPage.productCards.nth(1));
+    await productCard.toggleWishlistButton.click();
+
+    await login({ email: mockEmail });
 
     await expect(navbar.userMenuButton).toBeVisible();
-    await expect(navbar.wishlistLink).toContainText('1');
+    await expect(navbar.wishlistLink).toContainText('2');
     await expect
       .poll(async () => page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist')))
       .toBeNull();
 
     await page.reload();
 
-    await expect(navbar.wishlistLink).toContainText('1');
+    await expect(navbar.wishlistLink).toContainText('2');
   });
 
-  test('should sync local wishlist on register', async ({
-    page,
-    productsPage,
-    register,
-    navbar
-  }) => {
+  test('should sync wishlist on register', async ({ page, productsPage, register, navbar }) => {
     await productsPage.goto();
 
     const productCard = new ProductCard(productsPage.productCards.first());
