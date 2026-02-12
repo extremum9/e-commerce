@@ -184,7 +184,7 @@ describe(Wishlist.name, () => {
         );
       });
 
-      it('should display title with wishlist count', async () => {
+      it('should display title and count', async () => {
         const { debugElement } = await setup();
 
         const titleDebugElement = debugElement.query(By.css('[data-testid=wishlist-title]'));
@@ -198,7 +198,7 @@ describe(Wishlist.name, () => {
         expect(wishlistCountDebugElement.nativeElement.textContent).toContain('2 items');
       });
 
-      it('should display product cards with delete-from-wishlist buttons', async () => {
+      it('should display product cards', async () => {
         const { debugElement, getDeleteFromWishlistButtonHarnesses, mockProducts } = await setup();
         const productCardDebugElements = debugElement.queryAll(By.directive(ProductCardStub));
 
