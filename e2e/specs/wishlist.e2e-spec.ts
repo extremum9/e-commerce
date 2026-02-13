@@ -50,6 +50,33 @@ test.describe('Wishlist page', () => {
         await expect(wishlistPage.count).toContainText('1 items');
         await expect(wishlistPage.items).toHaveCount(1);
       });
+
+      test('should clear list', async ({ wishlistPage, confirmDialog }) => {
+        await wishlistPage.clearButton.click();
+
+        await expect(confirmDialog.title).toBeVisible();
+        await expect(confirmDialog.title).toContainText('Clear Wishlist');
+        await expect(confirmDialog.message).toBeVisible();
+        await expect(confirmDialog.message).toContainText(
+          'Are you sure you want to delete all items?'
+        );
+        await expect(confirmDialog.cancelButton).toBeVisible();
+        await expect(confirmDialog.cancelButton).toContainText('Cancel');
+        await expect(confirmDialog.confirmButton).toBeVisible();
+        await expect(confirmDialog.confirmButton).toContainText('Clear');
+
+        await confirmDialog.cancelButton.click();
+
+        await expect(confirmDialog.title).toBeHidden();
+        await expect(wishlistPage.items).toHaveCount(2);
+
+        await wishlistPage.clearButton.click();
+        await confirmDialog.confirmButton.click();
+
+        await expect(confirmDialog.title).toBeHidden();
+        await expect(wishlistPage.title).toBeHidden();
+        await expect(wishlistPage.emptyTitle).toBeVisible();
+      });
     });
   });
 
@@ -69,6 +96,7 @@ test.describe('Wishlist page', () => {
 
     test.describe('Wishlist has items', () => {
       test.beforeEach(async ({ productsPage, wishlistPage }) => {
+        await productsPage.goto();
         await new ProductCard(productsPage.productCards.first()).toggleWishlistButton.click();
         await new ProductCard(productsPage.productCards.nth(1)).toggleWishlistButton.click();
         await wishlistPage.goto();
@@ -88,6 +116,14 @@ test.describe('Wishlist page', () => {
         await expect(navbar.wishlistLink).toContainText('1');
         await expect(wishlistPage.count).toContainText('1 items');
         await expect(wishlistPage.items).toHaveCount(1);
+      });
+
+      test('should clear list', async ({ wishlistPage, confirmDialog }) => {
+        await wishlistPage.clearButton.click();
+        await confirmDialog.confirmButton.click();
+
+        await expect(wishlistPage.title).toBeHidden();
+        await expect(wishlistPage.emptyTitle).toBeVisible();
       });
     });
   });
