@@ -37,6 +37,18 @@ test.describe('Wishlist page', () => {
 
         await expect(wishlistPage.count).toBeVisible();
         await expect(wishlistPage.count).toContainText('2 items');
+
+        await expect(wishlistPage.items).toHaveCount(2);
+      });
+
+      test('should remove item from list', async ({ wishlistPage, page, navbar }) => {
+        const productCard = new ProductCard(wishlistPage.items.first());
+        await productCard.deleteFromWishlistButton.click();
+
+        await expect(page.getByText('Product removed from wishlist')).toBeVisible();
+        await expect(navbar.wishlistLink).toContainText('1');
+        await expect(wishlistPage.count).toContainText('1 items');
+        await expect(wishlistPage.items).toHaveCount(1);
       });
     });
   });
@@ -66,6 +78,16 @@ test.describe('Wishlist page', () => {
         await expect(wishlistPage.backButton).toBeVisible();
         await expect(wishlistPage.title).toBeVisible();
         await expect(wishlistPage.count).toBeVisible();
+        await expect(wishlistPage.items).toHaveCount(2);
+      });
+
+      test('should remove item from list', async ({ wishlistPage, navbar }) => {
+        const productCard = new ProductCard(wishlistPage.items.first());
+        await productCard.deleteFromWishlistButton.click();
+
+        await expect(navbar.wishlistLink).toContainText('1');
+        await expect(wishlistPage.count).toContainText('1 items');
+        await expect(wishlistPage.items).toHaveCount(1);
       });
     });
   });
