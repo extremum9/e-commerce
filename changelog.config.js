@@ -73,6 +73,7 @@ module.exports = {
     'linter',
     'styles',
     'e2e',
+    'firestore-rules',
     'snackbar',
     'auth',
     'layout',
