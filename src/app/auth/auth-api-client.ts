@@ -25,7 +25,7 @@ import { WishlistLocalStorage } from '../wishlist/wishlist-local-storage';
 export class AuthApiClient {
   private readonly auth = inject(Auth);
 
-  private readonly user$: Observable<CurrentUser | null> = user(this.auth).pipe(
+  public readonly currentUser$: Observable<CurrentUser | null> = user(this.auth).pipe(
     map((user) =>
       user
         ? {
@@ -37,14 +37,14 @@ export class AuthApiClient {
         : null
     )
   );
-  public readonly currentUser = toSignal<CurrentUser | null | undefined>(this.user$, {
+  public readonly currentUser = toSignal<CurrentUser | null | undefined>(this.currentUser$, {
     initialValue: undefined
   });
 
   constructor() {
     const wishlistLocalStorage = inject(WishlistLocalStorage);
 
-    this.user$
+    this.currentUser$
       .pipe(
         filter(Boolean),
         concatMap((user) => wishlistLocalStorage.syncToFirestore(user.uid))

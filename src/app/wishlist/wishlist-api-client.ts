@@ -10,7 +10,7 @@ import {
   writeBatch
 } from '@angular/fire/firestore';
 import { defer, from, map, Observable, of, startWith, switchMap } from 'rxjs';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistItem } from '../models/wishlist-item';
@@ -22,10 +22,10 @@ import { WishlistLocalStorage } from './wishlist-local-storage';
 })
 export class WishlistApiClient {
   private readonly firestore = inject(Firestore);
+  private readonly authApiClient = inject(AuthApiClient);
   private readonly wishlistLocalStorage = inject(WishlistLocalStorage);
 
-  private readonly user = inject(AuthApiClient).currentUser;
-  private readonly user$ = toObservable(this.user);
+  private readonly user = this.authApiClient.currentUser;
 
   public readonly wishlistSet = toSignal(
     this.wishlistLocalStorage.change$.pipe(
@@ -39,7 +39,7 @@ export class WishlistApiClient {
   );
 
   public list(): Observable<WishlistItem[]> {
-    return this.user$.pipe(
+    return this.authApiClient.currentUser$.pipe(
       switchMap((user) => {
         if (!user) {
           return of(this.wishlistLocalStorage.get());

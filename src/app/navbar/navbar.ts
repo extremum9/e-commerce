@@ -10,6 +10,7 @@ import { MatBadge } from '@angular/material/badge';
 
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistApiClient } from '../wishlist/wishlist-api-client';
+import { CartApiClient } from '../cart/cart-api-client';
 
 @Component({
   selector: 'app-navbar',
@@ -30,7 +31,14 @@ import { WishlistApiClient } from '../wishlist/wishlist-api-client';
           >
             <mat-icon>favorite</mat-icon>
           </a>
-          <a data-testid="navbar-cart-link" routerLink="/cart" matIconButton aria-label="Cart">
+          <a
+            data-testid="navbar-cart-link"
+            routerLink="/cart"
+            matIconButton
+            [matBadge]="cartCount()"
+            [matBadgeHidden]="cartCount() === 0"
+            aria-label="Cart"
+          >
             <mat-icon>shopping_cart</mat-icon>
           </a>
           @if (user(); as user) {
@@ -95,6 +103,7 @@ export class Navbar {
   private readonly pendingTasks = inject(PendingTasks);
   private readonly authApiClient = inject(AuthApiClient);
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly cartApiClient = inject(CartApiClient);
   private readonly dialog = inject(MatDialog);
 
   protected readonly user = this.authApiClient.currentUser;
@@ -102,6 +111,7 @@ export class Navbar {
   protected readonly wishlistCount = computed(
     () => this.wishlistApiClient.wishlistSet()?.size ?? 0
   );
+  protected readonly cartCount = this.cartApiClient.cartCount;
 
   protected openAuthDialog(): void {
     this.pendingTasks.run(async () => {
