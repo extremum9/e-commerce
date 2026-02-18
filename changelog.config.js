@@ -79,6 +79,7 @@ module.exports = {
     'layout',
     'products',
     'wishlist',
+    'cart',
     'back-button',
     'confirm-dialog'
   ],

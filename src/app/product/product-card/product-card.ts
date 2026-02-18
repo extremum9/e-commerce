@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
@@ -43,7 +43,13 @@ import { Product } from '../../models/product';
           <span data-testid="product-price" class="text-2xl font-bold break-all text-gray-900"
             >\${{ product().price }}</span
           >
-          <button data-testid="product-add-to-cart-button" matButton="filled" class="shrink-0">
+          <button
+            data-testid="product-add-to-cart-button"
+            class="shrink-0"
+            matButton="filled"
+            type="button"
+            (click)="addedToCart.emit()"
+          >
             <mat-icon>shopping_cart</mat-icon>
             Add to Cart
           </button>
@@ -56,4 +62,5 @@ import { Product } from '../../models/product';
 })
 export class ProductCard {
   public readonly product = input.required<Product>();
+  public readonly addedToCart = output();
 }

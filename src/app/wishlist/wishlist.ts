@@ -12,6 +12,7 @@ import { ProductCard } from '../product/product-card/product-card';
 import { BackButton } from '../back-button/back-button';
 import { Snackbar } from '../snackbar/snackbar';
 import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
+import { CartApiClient } from '../cart/cart-api-client';
 
 import { WishlistApiClient } from './wishlist-api-client';
 import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block';
@@ -35,7 +36,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
           <ul class="fluid-grid mb-8">
             @for (product of products; track product.id) {
               <li>
-                <app-product-card [product]="product">
+                <app-product-card [product]="product" (addedToCart)="addToCart(product.id)">
                   <button
                     data-testid="delete-from-wishlist-button"
                     class="absolute! top-3 right-3"
@@ -84,6 +85,7 @@ import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block'
 })
 export default class Wishlist {
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly cartApiClient = inject(CartApiClient);
   private readonly dialog = inject(MatDialog);
   private readonly snackbar = inject(Snackbar);
 
@@ -130,5 +132,11 @@ export default class Wishlist {
         switchMap(() => this.wishlistApiClient.deleteAll())
       )
       .subscribe();
+  }
+
+  protected addToCart(productId: string): void {
+    this.cartApiClient
+      .create(productId)
+      .subscribe(() => this.snackbar.showSuccess('Product added to cart'));
   }
 }
