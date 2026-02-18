@@ -13,6 +13,7 @@ import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { Product } from '../../models/product';
 import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
 import { Snackbar } from '../../snackbar/snackbar';
+import { CartApiClient } from '../../cart/cart-api-client';
 
 @Component({
   template: `
@@ -39,7 +40,7 @@ import { Snackbar } from '../../snackbar/snackbar';
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
             <li>
-              <app-product-card [product]="product">
+              <app-product-card [product]="product" (addedToCart)="addToCart(product.id)">
                 <app-toggle-wishlist-button
                   class="absolute! top-3 right-3"
                   [favorite]="product.favorite"
@@ -68,6 +69,7 @@ import { Snackbar } from '../../snackbar/snackbar';
 })
 export default class ProductList {
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly cartApiClient = inject(CartApiClient);
   private readonly snackbar = inject(Snackbar);
 
   protected readonly categories = signal(inject(CategoryApiClient).list());
@@ -107,5 +109,11 @@ export default class ProductList {
         .create(product.id)
         .subscribe(() => this.snackbar.showSuccess('Product added to wishlist'));
     }
+  }
+
+  protected addToCart(productId: string): void {
+    this.cartApiClient
+      .create(productId)
+      .subscribe(() => this.snackbar.showSuccess('Product added to cart'));
   }
 }
