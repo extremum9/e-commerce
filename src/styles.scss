@@ -59,6 +59,15 @@ button[matButton='outlined'].danger {
   );
 }
 
+button[matIconButton].danger {
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(--mat-sys-error),
+      state-layer-color: var(--mat-sys-error)
+    )
+  );
+}
+
 mat-form-field {
   @include mat.theme(
     (
@@ -72,6 +81,10 @@ mat-form-field {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
   gap: 1rem;
+}
+
+.surface-box {
+  @apply p-6 border border-gray-200 rounded-xl bg-white;
 }
 
 .snackbar-success {
