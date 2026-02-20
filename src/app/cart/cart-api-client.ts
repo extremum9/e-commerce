@@ -22,25 +22,12 @@ export class CartApiClient {
 
   private readonly user = this.authApiClient.currentUser;
 
-  public readonly cart = toSignal(this.list());
+  public readonly cart$ = this.authApiClient.currentUser$.pipe(switchMap(() => this.list()));
+  public readonly cart = toSignal(this.cart$);
 
-  public readonly cartCount = computed(
-    () => this.cart()?.reduce((total, item) => ((total += item.quantity), total), 0) ?? 0
+  public readonly count = computed(() =>
+    this.cart()?.reduce((acc, item) => acc + item.quantity, 0)
   );
-
-  public list(): Observable<CartItem[]> {
-    return this.authApiClient.currentUser$.pipe(
-      switchMap((user) => {
-        if (!user) {
-          return of([]);
-        }
-
-        const cartCollection = collection(this.firestore, `users/${user.uid}/cart`);
-
-        return collectionData(cartCollection, { idField: 'productId' }) as Observable<CartItem[]>;
-      })
-    );
-  }
 
   public create(productId: string): Observable<void> {
     const user = this.user();
@@ -51,5 +38,16 @@ export class CartApiClient {
     const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
 
     return defer(() => setDoc(docRef, { quantity: increment(1) }, { merge: true }));
+  }
+
+  private list(): Observable<CartItem[]> {
+    const user = this.user();
+    if (!user) {
+      return of([]);
+    }
+
+    const cartCollection = collection(this.firestore, `users/${user.uid}/cart`);
+
+    return collectionData(cartCollection, { idField: 'productId' }) as Observable<CartItem[]>;
   }
 }

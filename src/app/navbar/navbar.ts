@@ -111,7 +111,7 @@ export class Navbar {
   protected readonly wishlistCount = computed(
     () => this.wishlistApiClient.wishlistSet()?.size ?? 0
   );
-  protected readonly cartCount = this.cartApiClient.cartCount;
+  protected readonly cartCount = this.cartApiClient.count;
 
   protected openAuthDialog(): void {
     this.pendingTasks.run(async () => {
