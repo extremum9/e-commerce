@@ -9,6 +9,7 @@ import { ProductApiClient } from '../product/product-api-client';
 
 import { CartApiClient } from './cart-api-client';
 import { CartProductRow } from './cart-product-row/cart-product-row';
+import { CartQuantity } from './cart-quantity/cart-quantity';
 
 type ViewModel = {
   products: CartProduct[];
@@ -31,7 +32,12 @@ type ViewModel = {
               <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
               <div class="grid gap-y-6">
                 @for (product of vm.products; track product.id) {
-                  <app-cart-product-row [product]="product" />
+                  <app-cart-product-row [product]="product">
+                    <app-cart-quantity
+                      [quantity]="product.quantity"
+                      (updated)="updateQuantity({ productId: product.id, quantity: $event })"
+                    />
+                  </app-cart-product-row>
                 }
               </div>
             </div>
@@ -48,7 +54,7 @@ type ViewModel = {
       }
     </div>
   `,
-  imports: [BackButton, MatProgressSpinner, CartProductRow],
+  imports: [BackButton, MatProgressSpinner, CartProductRow, CartQuantity],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Cart {
@@ -92,4 +98,8 @@ export default class Cart {
 
     return { products, count, subtotal, tax, total };
   });
+
+  protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
+    this.cartApiClient.create(productId, quantity).subscribe();
+  }
 }
