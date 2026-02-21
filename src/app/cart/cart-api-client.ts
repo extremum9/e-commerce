@@ -29,7 +29,7 @@ export class CartApiClient {
     this.cart()?.reduce((acc, item) => acc + item.quantity, 0)
   );
 
-  public create(productId: string): Observable<void> {
+  public create(productId: string, quantity?: number): Observable<void> {
     const user = this.user();
     if (!user) {
       return of(undefined);
@@ -37,7 +37,7 @@ export class CartApiClient {
 
     const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
 
-    return defer(() => setDoc(docRef, { quantity: increment(1) }, { merge: true }));
+    return defer(() => setDoc(docRef, { quantity: quantity ?? increment(1) }, { merge: true }));
   }
 
   private list(): Observable<CartItem[]> {

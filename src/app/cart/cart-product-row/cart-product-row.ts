@@ -3,7 +3,6 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 import { CartProduct } from '../../models/cart-product';
-import { CartQuantity } from '../cart-quantity/cart-quantity';
 
 @Component({
   selector: 'app-cart-product-row',
@@ -25,7 +24,7 @@ import { CartQuantity } from '../cart-quantity/cart-quantity';
         </div>
       </div>
 
-      <app-cart-quantity [quantity]="product().quantity" />
+      <ng-content select="app-cart-quantity" />
 
       <div class="flex flex-col items-end">
         <data class="text-lg font-medium text-right" [value]="total()">\${{ total() }}</data>
@@ -40,7 +39,7 @@ import { CartQuantity } from '../cart-quantity/cart-quantity';
       </div>
     </div>
   `,
-  imports: [CartQuantity, MatIconButton, MatIcon, MatIconButton, MatIcon],
+  imports: [MatIconButton, MatIcon, MatIconButton, MatIcon],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartProductRow {
