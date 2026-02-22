@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import {
   collection,
   collectionData,
@@ -37,6 +37,8 @@ export class WishlistApiClient {
       )
     )
   );
+
+  public readonly count = computed(() => this.wishlistSet()?.size);
 
   public list(): Observable<WishlistItem[]> {
     return this.authApiClient.currentUser$.pipe(
