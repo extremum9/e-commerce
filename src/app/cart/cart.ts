@@ -7,6 +7,7 @@ import { BackButton } from '../back-button/back-button';
 import { CartProduct } from '../models/cart-product';
 import { ProductApiClient } from '../product/product-api-client';
 import { Snackbar } from '../snackbar/snackbar';
+import { WishlistApiClient } from '../wishlist/wishlist-api-client';
 
 import { CartApiClient } from './cart-api-client';
 import { CartProductRow } from './cart-product-row/cart-product-row';
@@ -33,7 +34,11 @@ type ViewModel = {
               <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
               <div class="grid gap-y-6">
                 @for (product of vm.products; track product.id) {
-                  <app-cart-product-row [product]="product" (deleted)="delete(product.id)">
+                  <app-cart-product-row
+                    [product]="product"
+                    (favorited)="moveToWishlist(product.id)"
+                    (deleted)="delete(product.id)"
+                  >
                     <app-cart-quantity
                       [quantity]="product.quantity"
                       (updated)="updateQuantity({ productId: product.id, quantity: $event })"
@@ -61,6 +66,7 @@ type ViewModel = {
 export default class Cart {
   private readonly cartApiClient = inject(CartApiClient);
   private readonly productApiClient = inject(ProductApiClient);
+  private readonly wishlistApiClient = inject(WishlistApiClient);
   private readonly snackbar = inject(Snackbar);
 
   private readonly products = toSignal(
@@ -103,6 +109,13 @@ export default class Cart {
 
   protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
     this.cartApiClient.create(productId, quantity).subscribe();
+  }
+
+  protected moveToWishlist(productId: string): void {
+    this.cartApiClient
+      .delete(productId)
+      .pipe(switchMap(() => this.wishlistApiClient.create(productId)))
+      .subscribe(() => this.snackbar.showSuccess('Product moved to wishlist'));
   }
 
   protected delete(productId: string): void {
