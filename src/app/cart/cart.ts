@@ -8,19 +8,19 @@ import { CartProduct } from '../models/cart-product';
 import { ProductApiClient } from '../product/product-api-client';
 import { Snackbar } from '../snackbar/snackbar';
 import { WishlistApiClient } from '../wishlist/wishlist-api-client';
+import { OrderSummary } from '../models/order-summary';
 
 import { CartApiClient } from './cart-api-client';
 import { CartProductRow } from './cart-product-row/cart-product-row';
 import { CartQuantity } from './cart-quantity/cart-quantity';
 import { CartWishlistPreview } from './cart-wishlist-preview/cart-wishlist-preview';
+import { CartOrderSummary } from './cart-order-summary/cart-order-summary';
 
 type ViewModel = {
   products: CartProduct[];
   count: number;
   wishlistCount: number;
-  subtotal: number;
-  tax: number;
-  total: number;
+  summary: OrderSummary;
 };
 
 @Component({
@@ -56,7 +56,7 @@ type ViewModel = {
               </div>
             </div>
 
-            <div class="surface-box">ORDER SUMMARY</div>
+            <app-cart-order-summary [summary]="vm.summary" />
           </div>
         } @else {
           <div>EMPTY BLOCK</div>
@@ -68,7 +68,14 @@ type ViewModel = {
       }
     </div>
   `,
-  imports: [BackButton, MatProgressSpinner, CartProductRow, CartQuantity, CartWishlistPreview],
+  imports: [
+    BackButton,
+    MatProgressSpinner,
+    CartProductRow,
+    CartQuantity,
+    CartWishlistPreview,
+    CartOrderSummary
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Cart {
@@ -109,7 +116,7 @@ export default class Cart {
     const tax = subtotal * 0.05;
     const total = subtotal + tax;
 
-    return { products, count, wishlistCount, subtotal, tax, total };
+    return { products, count, wishlistCount, summary: { subtotal, tax, total } };
   });
 
   protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
