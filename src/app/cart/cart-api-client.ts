@@ -2,6 +2,7 @@ import { computed, inject, Injectable } from '@angular/core';
 import {
   collection,
   collectionData,
+  deleteDoc,
   doc,
   Firestore,
   increment,
@@ -38,6 +39,17 @@ export class CartApiClient {
     const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
 
     return defer(() => setDoc(docRef, { quantity: quantity ?? increment(1) }, { merge: true }));
+  }
+
+  public delete(productId: string): Observable<void> {
+    const user = this.user();
+    if (!user) {
+      return of(undefined);
+    }
+
+    const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+
+    return defer(() => deleteDoc(docRef));
   }
 
   private list(): Observable<CartItem[]> {

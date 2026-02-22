@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { BackButton } from '../back-button/back-button';
 import { CartProduct } from '../models/cart-product';
 import { ProductApiClient } from '../product/product-api-client';
+import { Snackbar } from '../snackbar/snackbar';
 
 import { CartApiClient } from './cart-api-client';
 import { CartProductRow } from './cart-product-row/cart-product-row';
@@ -32,7 +33,7 @@ type ViewModel = {
               <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
               <div class="grid gap-y-6">
                 @for (product of vm.products; track product.id) {
-                  <app-cart-product-row [product]="product">
+                  <app-cart-product-row [product]="product" (deleted)="delete(product.id)">
                     <app-cart-quantity
                       [quantity]="product.quantity"
                       (updated)="updateQuantity({ productId: product.id, quantity: $event })"
@@ -60,6 +61,7 @@ type ViewModel = {
 export default class Cart {
   private readonly cartApiClient = inject(CartApiClient);
   private readonly productApiClient = inject(ProductApiClient);
+  private readonly snackbar = inject(Snackbar);
 
   private readonly products = toSignal(
     this.cartApiClient.cart$.pipe(
@@ -101,5 +103,11 @@ export default class Cart {
 
   protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
     this.cartApiClient.create(productId, quantity).subscribe();
+  }
+
+  protected delete(productId: string): void {
+    this.cartApiClient
+      .delete(productId)
+      .subscribe(() => this.snackbar.showSuccess('Product removed from cart'));
   }
 }
