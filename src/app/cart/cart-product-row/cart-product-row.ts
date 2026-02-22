@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
@@ -32,7 +32,7 @@ import { CartProduct } from '../../models/cart-product';
           <button matIconButton type="button">
             <mat-icon>favorite_border</mat-icon>
           </button>
-          <button class="danger" matIconButton type="button">
+          <button class="danger" matIconButton type="button" (click)="deleted.emit()">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -44,6 +44,8 @@ import { CartProduct } from '../../models/cart-product';
 })
 export class CartProductRow {
   public readonly product = input.required<CartProduct>();
+
+  public readonly deleted = output();
 
   protected readonly total = computed(() => {
     const { price, quantity } = this.product();
