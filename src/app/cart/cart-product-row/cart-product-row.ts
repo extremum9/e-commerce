@@ -29,7 +29,7 @@ import { CartProduct } from '../../models/cart-product';
       <div class="flex flex-col items-end">
         <data class="text-lg font-medium text-right" [value]="total()">\${{ total() }}</data>
         <div class="flex -me-3">
-          <button matIconButton type="button">
+          <button matIconButton type="button" (click)="favorited.emit()">
             <mat-icon>favorite_border</mat-icon>
           </button>
           <button class="danger" matIconButton type="button" (click)="deleted.emit()">
@@ -45,6 +45,7 @@ import { CartProduct } from '../../models/cart-product';
 export class CartProductRow {
   public readonly product = input.required<CartProduct>();
 
+  public readonly favorited = output();
   public readonly deleted = output();
 
   protected readonly total = computed(() => {
