@@ -10,7 +10,7 @@ import { MatButton } from '@angular/material/button';
       <div class="flex items-center gap-3">
         <mat-icon class="text-red-500!">favorite_border</mat-icon>
         <div>
-          <h2 class="text-xl font-bold">Wishlist ({{ count() }})</h2>
+          <h2 class="text-xl font-medium">Wishlist ({{ count() }})</h2>
           <p class="text-sm text-gray-500">You have {{ count() }} items saved for later</p>
         </div>
       </div>
