@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { MatButton } from '@angular/material/button';
@@ -17,7 +17,12 @@ import { MatButton } from '@angular/material/button';
 
       <div class="flex items-center gap-3">
         <a matButton routerLink="/wishlist">View All</a>
-        <button class="flex items-center gap-2" matButton="filled">
+        <button
+          class="flex items-center gap-2"
+          matButton="filled"
+          type="button"
+          (click)="allAdded.emit()"
+        >
           <mat-icon>shopping_cart</mat-icon>
           Add All to Cart
         </button>
@@ -29,4 +34,6 @@ import { MatButton } from '@angular/material/button';
 })
 export class CartWishlistPreview {
   public readonly count = input.required<number>();
+
+  public readonly allAdded = output();
 }

@@ -27,12 +27,16 @@ type ViewModel = {
   template: `
     <div class="container">
       @if (viewModel(); as vm) {
+        <app-back-button class="mb-6" navigateTo="/products">Continue Shopping</app-back-button>
+        <h1 class="mb-4 text-3xl font-bold">Shopping Cart</h1>
+
+        <app-cart-wishlist-preview
+          class="block mb-6"
+          [count]="vm.wishlistCount"
+          (allAdded)="moveAllFromWishlist()"
+        />
+
         @if (vm.products.length) {
-          <app-back-button class="mb-6" navigateTo="/products">Continue Shopping</app-back-button>
-          <h1 class="mb-4 text-3xl font-bold">Shopping Cart</h1>
-
-          <app-cart-wishlist-preview class="block mb-6" [count]="vm.wishlistCount" />
-
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
             <div class="surface-box">
               <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
@@ -55,7 +59,7 @@ type ViewModel = {
             <div class="surface-box">ORDER SUMMARY</div>
           </div>
         } @else {
-          <div>EMPTY CART</div>
+          <div>EMPTY BLOCK</div>
         }
       } @else {
         <div class="flex justify-center">
@@ -77,21 +81,17 @@ export default class Cart {
     this.cartApiClient.cart$.pipe(
       filter(Boolean),
       switchMap((cart) => {
-        if (!cart.length) {
+        if (!cart.size) {
           return of([]);
         }
 
-        const productIds = cart.map((item) => item.productId);
-
-        return this.productApiClient.listByIds(productIds).pipe(
-          map((products) => {
-            const cartMap = new Map(cart.map(({ productId, quantity }) => [productId, quantity]));
-
-            return products.map((product) => ({
+        return this.productApiClient.listByIds([...cart.keys()]).pipe(
+          map((products) =>
+            products.map((product) => ({
               ...product,
-              quantity: cartMap.get(product.id)!
-            }));
-          })
+              quantity: cart.get(product.id)!
+            }))
+          )
         );
       })
     )
@@ -121,6 +121,19 @@ export default class Cart {
       .delete(productId)
       .pipe(switchMap(() => this.wishlistApiClient.create(productId)))
       .subscribe(() => this.snackbar.showSuccess('Product moved to wishlist'));
+  }
+
+  protected moveAllFromWishlist(): void {
+    const wishlist = this.wishlistApiClient.wishlistSet();
+    const cart = this.cartApiClient.cart();
+    if (wishlist && cart) {
+      const newProductIds = [...wishlist].filter((productId) => !cart.has(productId));
+
+      this.wishlistApiClient
+        .deleteAll()
+        .pipe(switchMap(() => this.cartApiClient.createMany(newProductIds)))
+        .subscribe();
+    }
   }
 
   protected delete(productId: string): void {
