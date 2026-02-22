@@ -6,9 +6,10 @@ import {
   doc,
   Firestore,
   increment,
-  setDoc
+  setDoc,
+  writeBatch
 } from '@angular/fire/firestore';
-import { defer, Observable, of, switchMap } from 'rxjs';
+import { defer, from, map, Observable, of, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
@@ -23,11 +24,17 @@ export class CartApiClient {
 
   private readonly user = this.authApiClient.currentUser;
 
-  public readonly cart$ = this.authApiClient.currentUser$.pipe(switchMap(() => this.list()));
+  public readonly cart$: Observable<ReadonlyMap<string, number>> =
+    this.authApiClient.currentUser$.pipe(
+      switchMap(() => this.list()),
+      map((items) => new Map(items.map(({ productId, quantity }) => [productId, quantity])))
+    );
   public readonly cart = toSignal(this.cart$);
 
-  public readonly count = computed(() =>
-    this.cart()?.reduce((acc, item) => acc + item.quantity, 0)
+  public readonly count = computed(
+    () =>
+      this.cart() &&
+      [...this.cart()!.values()].reduce((accumulator, quantity) => accumulator + quantity, 0)
   );
 
   public create(productId: string, quantity?: number): Observable<void> {
@@ -39,6 +46,21 @@ export class CartApiClient {
     const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
 
     return defer(() => setDoc(docRef, { quantity: quantity ?? increment(1) }, { merge: true }));
+  }
+
+  public createMany(productIds: string[]): Observable<void> {
+    const user = this.user();
+    if (!user) {
+      return of(undefined);
+    }
+
+    const batch = writeBatch(this.firestore);
+    productIds.forEach((productId) => {
+      const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+      batch.set(docRef, { productId, quantity: 1 }, { merge: true });
+    });
+
+    return from(batch.commit());
   }
 
   public delete(productId: string): Observable<void> {
