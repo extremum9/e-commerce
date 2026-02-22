@@ -12,10 +12,12 @@ import { WishlistApiClient } from '../wishlist/wishlist-api-client';
 import { CartApiClient } from './cart-api-client';
 import { CartProductRow } from './cart-product-row/cart-product-row';
 import { CartQuantity } from './cart-quantity/cart-quantity';
+import { CartWishlistPreview } from './cart-wishlist-preview/cart-wishlist-preview';
 
 type ViewModel = {
   products: CartProduct[];
   count: number;
+  wishlistCount: number;
   subtotal: number;
   tax: number;
   total: number;
@@ -28,6 +30,8 @@ type ViewModel = {
         @if (vm.products.length) {
           <app-back-button class="mb-6" navigateTo="/products">Continue Shopping</app-back-button>
           <h1 class="mb-4 text-3xl font-bold">Shopping Cart</h1>
+
+          <app-cart-wishlist-preview class="block mb-6" [count]="vm.wishlistCount" />
 
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
             <div class="surface-box">
@@ -60,7 +64,7 @@ type ViewModel = {
       }
     </div>
   `,
-  imports: [BackButton, MatProgressSpinner, CartProductRow, CartQuantity],
+  imports: [BackButton, MatProgressSpinner, CartProductRow, CartQuantity, CartWishlistPreview],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class Cart {
@@ -96,7 +100,8 @@ export default class Cart {
   protected readonly viewModel: Signal<ViewModel | undefined> = computed(() => {
     const products = this.products();
     const count = this.cartApiClient.count();
-    if (!products || count === undefined) {
+    const wishlistCount = this.wishlistApiClient.count();
+    if (!products || count === undefined || wishlistCount === undefined) {
       return;
     }
 
@@ -104,7 +109,7 @@ export default class Cart {
     const tax = subtotal * 0.05;
     const total = subtotal + tax;
 
-    return { products, count, subtotal, tax, total };
+    return { products, count, wishlistCount, subtotal, tax, total };
   });
 
   protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
