@@ -20,7 +20,7 @@ import { CartProduct } from '../../models/cart-product';
         <div>
           <h3 class="text-lg font-medium text-gray-900">{{ product().name }}</h3>
           <data class="text-lg text-gray-600" [value]="product().price"
-            >\${{ product().price }}
+            >{{ product().price | currency: 'USD' : 'symbol' : '1.0-2' }}
           </data>
         </div>
       </div>
