@@ -23,6 +23,8 @@ type ViewModel = {
   summary: OrderSummary;
 };
 
+const TAX_RATE = 0.05;
+
 @Component({
   template: `
     <div class="container">
@@ -112,9 +114,16 @@ export default class Cart {
       return;
     }
 
-    const subtotal = products.reduce((acc, { price, quantity }) => acc + price * quantity, 0);
-    const tax = subtotal * 0.05;
-    const total = subtotal + tax;
+    const subtotalCents = products.reduce(
+      (acc, { price, quantity }) => acc + Math.round(price * 100) * quantity,
+      0
+    );
+    const taxCents = Math.round(subtotalCents * TAX_RATE);
+    const totalCents = subtotalCents + taxCents;
+
+    const subtotal = subtotalCents / 100;
+    const tax = taxCents / 100;
+    const total = totalCents / 100;
 
     return { products, count, wishlistCount, summary: { subtotal, tax, total } };
   });

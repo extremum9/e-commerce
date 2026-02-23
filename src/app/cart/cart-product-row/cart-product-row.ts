@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { CurrencyPipe } from '@angular/common';
 
 import { CartProduct } from '../../models/cart-product';
 
@@ -27,7 +28,9 @@ import { CartProduct } from '../../models/cart-product';
       <ng-content select="app-cart-quantity" />
 
       <div class="flex flex-col items-end">
-        <data class="text-lg font-medium text-right" [value]="total()">\${{ total() }}</data>
+        <data class="text-lg font-medium text-right" [value]="total()">{{
+          total() | currency
+        }}</data>
         <div class="flex -me-3">
           <button matIconButton type="button" (click)="favorited.emit()">
             <mat-icon>favorite_border</mat-icon>
@@ -39,7 +42,7 @@ import { CartProduct } from '../../models/cart-product';
       </div>
     </div>
   `,
-  imports: [MatIconButton, MatIcon, MatIconButton, MatIcon],
+  imports: [MatIconButton, MatIcon, MatIconButton, MatIcon, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartProductRow {
@@ -48,9 +51,5 @@ export class CartProductRow {
   public readonly favorited = output();
   public readonly deleted = output();
 
-  protected readonly total = computed(() => {
-    const { price, quantity } = this.product();
-
-    return (price * quantity).toFixed(2);
-  });
+  protected readonly total = computed(() => this.product().price * this.product().quantity);
 }
