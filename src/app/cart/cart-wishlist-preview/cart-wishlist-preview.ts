@@ -6,16 +6,16 @@ import { MatButton } from '@angular/material/button';
 @Component({
   selector: 'app-cart-wishlist-preview',
   template: `
-    <div class="surface-box flex items-center justify-between">
+    <div class="surface-box flex flex-wrap items-start justify-between gap-4">
       <div class="flex items-center gap-3">
-        <mat-icon class="text-red-500!">favorite_border</mat-icon>
+        <mat-icon class="shrink-0 text-red-500!">favorite_border</mat-icon>
         <div>
           <h2 class="text-xl font-medium">Wishlist ({{ count() }})</h2>
           <p class="text-sm text-gray-500">You have {{ count() }} items saved for later</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <a matButton routerLink="/wishlist">View All</a>
         <button
           class="flex items-center gap-2"
