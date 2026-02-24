@@ -43,7 +43,7 @@ const TAX_RATE = 0.05;
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] items-start gap-6">
             <div class="surface-box">
               <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
-              <div class="grid gap-y-6">
+              <div class="grid gap-y-6 pb-5 overflow-x-auto md:overflow-x-visible">
                 @for (product of vm.products; track product.id) {
                   <app-cart-product-row
                     [product]="product"
