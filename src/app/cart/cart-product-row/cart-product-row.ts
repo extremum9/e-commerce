@@ -8,7 +8,7 @@ import { CartProduct } from '../../models/cart-product';
 @Component({
   selector: 'app-cart-product-row',
   template: `
-    <div class="grid grid-cols-[3fr_1fr_1fr] items-center">
+    <div class="grid grid-cols-[3fr_1fr_1fr] items-center gap-x-4 min-w-[40rem]">
       <div class="flex items-center gap-4">
         <img
           class="w-24 h-24 object-cover rounded-lg"
@@ -31,7 +31,7 @@ import { CartProduct } from '../../models/cart-product';
         <data class="text-lg font-medium text-right" [value]="total()">{{
           total() | currency
         }}</data>
-        <div class="flex -me-3">
+        <div class="flex items-center -me-3">
           <button matIconButton type="button" (click)="favorited.emit()">
             <mat-icon>favorite_border</mat-icon>
           </button>
