@@ -15,6 +15,7 @@ import { CartProductRow } from './cart-product-row/cart-product-row';
 import { CartQuantity } from './cart-quantity/cart-quantity';
 import { CartWishlistPreview } from './cart-wishlist-preview/cart-wishlist-preview';
 import { CartOrderSummary } from './cart-order-summary/cart-order-summary';
+import { CartEmptyBlock } from './cart-empty-block/cart-empty-block';
 
 type ViewModel = {
   products: CartProduct[];
@@ -39,7 +40,7 @@ const TAX_RATE = 0.05;
         />
 
         @if (vm.products.length) {
-          <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] items-start gap-6">
             <div class="surface-box">
               <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
               <div class="grid gap-y-6">
@@ -61,7 +62,7 @@ const TAX_RATE = 0.05;
             <app-cart-order-summary [summary]="vm.summary" />
           </div>
         } @else {
-          <div>EMPTY BLOCK</div>
+          <app-cart-empty-block />
         }
       } @else {
         <div class="flex justify-center">
@@ -76,7 +77,8 @@ const TAX_RATE = 0.05;
     CartProductRow,
     CartQuantity,
     CartWishlistPreview,
-    CartOrderSummary
+    CartOrderSummary,
+    CartEmptyBlock
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
