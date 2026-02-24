@@ -17,15 +17,18 @@ import { MatButton } from '@angular/material/button';
 
       <div class="flex flex-wrap items-center gap-3">
         <a matButton routerLink="/wishlist">View All</a>
-        <button
-          class="flex items-center gap-2"
-          matButton="filled"
-          type="button"
-          (click)="allAdded.emit()"
-        >
-          <mat-icon>shopping_cart</mat-icon>
-          Add All to Cart
-        </button>
+
+        @if (count()) {
+          <button
+            class="flex items-center gap-2"
+            matButton="filled"
+            type="button"
+            (click)="allAdded.emit()"
+          >
+            <mat-icon>shopping_cart</mat-icon>
+            Add All to Cart
+          </button>
+        }
       </div>
     </div>
   `,
