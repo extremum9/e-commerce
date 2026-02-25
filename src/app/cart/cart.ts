@@ -116,18 +116,7 @@ export default class Cart {
       return;
     }
 
-    const subtotalCents = products.reduce(
-      (acc, { price, quantity }) => acc + Math.round(price * 100) * quantity,
-      0
-    );
-    const taxCents = Math.round(subtotalCents * TAX_RATE);
-    const totalCents = subtotalCents + taxCents;
-
-    const subtotal = subtotalCents / 100;
-    const tax = taxCents / 100;
-    const total = totalCents / 100;
-
-    return { products, count, wishlistCount, summary: { subtotal, tax, total } };
+    return { products, count, wishlistCount, summary: this.getOrderSummary(products) };
   });
 
   protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
@@ -158,5 +147,20 @@ export default class Cart {
     this.cartApiClient
       .delete(productId)
       .subscribe(() => this.snackbar.showSuccess('Product removed from cart'));
+  }
+
+  private getOrderSummary(products: CartProduct[]): OrderSummary {
+    const subtotalCents = products.reduce(
+      (acc, { price, quantity }) => acc + Math.round(price * 100) * quantity,
+      0
+    );
+    const taxCents = Math.round(subtotalCents * TAX_RATE);
+    const totalCents = subtotalCents + taxCents;
+
+    const subtotal = subtotalCents / 100;
+    const tax = taxCents / 100;
+    const total = totalCents / 100;
+
+    return { subtotal, tax, total };
   }
 }
