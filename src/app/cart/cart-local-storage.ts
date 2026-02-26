@@ -30,6 +30,13 @@ export class CartLocalStorage {
     this.save(cart);
   }
 
+  public remove(productId: string): void {
+    const cart = this.get();
+    const filtered = cart.filter((item) => item.productId !== productId);
+
+    this.save(filtered);
+  }
+
   private save(cart: CartItem[]): void {
     try {
       window.localStorage.setItem(CART_KEY_STORAGE, JSON.stringify(cart));
