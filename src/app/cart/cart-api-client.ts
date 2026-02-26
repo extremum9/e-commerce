@@ -82,13 +82,17 @@ export class CartApiClient {
   }
 
   public delete(productId: string): Observable<void> {
-    const user = this.user();
-    if (!user) {
-      return of(undefined);
-    }
+    return defer(() => {
+      const user = this.user();
+      if (!user) {
+        this.cartLocalStorage.remove(productId);
 
-    const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+        return of(undefined);
+      }
 
-    return defer(() => deleteDoc(docRef));
+      const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+
+      return deleteDoc(docRef);
+    });
   }
 }
