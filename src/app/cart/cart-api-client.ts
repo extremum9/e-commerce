@@ -9,11 +9,13 @@ import {
   setDoc,
   writeBatch
 } from '@angular/fire/firestore';
-import { defer, from, map, Observable, of, switchMap } from 'rxjs';
+import { defer, from, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
 import { CartItem } from '../models/cart-item';
+
+import { CartLocalStorage } from './cart-local-storage';
 
 @Injectable({
   providedIn: 'root'
@@ -21,12 +23,24 @@ import { CartItem } from '../models/cart-item';
 export class CartApiClient {
   private readonly firestore = inject(Firestore);
   private readonly authApiClient = inject(AuthApiClient);
+  private readonly cartLocalStorage = inject(CartLocalStorage);
 
   private readonly user = this.authApiClient.currentUser;
 
   public readonly cart$: Observable<ReadonlyMap<string, number>> =
     this.authApiClient.currentUser$.pipe(
-      switchMap(() => this.list()),
+      switchMap((user) => {
+        if (!user) {
+          return this.cartLocalStorage.change$.pipe(
+            startWith(undefined),
+            map(() => this.cartLocalStorage.get())
+          );
+        }
+
+        const cartCollection = collection(this.firestore, `users/${user.uid}/cart`);
+
+        return collectionData(cartCollection, { idField: 'productId' }) as Observable<CartItem[]>;
+      }),
       map((items) => new Map(items.map(({ productId, quantity }) => [productId, quantity])))
     );
   public readonly cart = toSignal(this.cart$);
@@ -38,14 +52,18 @@ export class CartApiClient {
   );
 
   public create(productId: string, quantity?: number): Observable<void> {
-    const user = this.user();
-    if (!user) {
-      return of(undefined);
-    }
+    return defer(() => {
+      const user = this.user();
+      if (!user) {
+        this.cartLocalStorage.add(productId, quantity);
 
-    const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+        return of(undefined);
+      }
 
-    return defer(() => setDoc(docRef, { quantity: quantity ?? increment(1) }, { merge: true }));
+      const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+
+      return setDoc(docRef, { quantity: quantity ?? increment(1) }, { merge: true });
+    });
   }
 
   public createMany(productIds: string[]): Observable<void> {
@@ -72,16 +90,5 @@ export class CartApiClient {
     const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
 
     return defer(() => deleteDoc(docRef));
-  }
-
-  private list(): Observable<CartItem[]> {
-    const user = this.user();
-    if (!user) {
-      return of([]);
-    }
-
-    const cartCollection = collection(this.firestore, `users/${user.uid}/cart`);
-
-    return collectionData(cartCollection, { idField: 'productId' }) as Observable<CartItem[]>;
   }
 }
