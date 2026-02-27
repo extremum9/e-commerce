@@ -30,6 +30,16 @@ export class CartLocalStorage {
     this.save(cart);
   }
 
+  public addMany(productIds: string[]): void {
+    const cart = this.get();
+    productIds.forEach((productId) => {
+      if (!cart.some((item) => item.productId === productId)) {
+        cart.push({ productId, quantity: 1 });
+      }
+    });
+    this.save(cart);
+  }
+
   public remove(productId: string): void {
     const cart = this.get();
     const filtered = cart.filter((item) => item.productId !== productId);

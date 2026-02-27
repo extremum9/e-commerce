@@ -9,7 +9,7 @@ import {
   setDoc,
   writeBatch
 } from '@angular/fire/firestore';
-import { defer, from, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { defer, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
@@ -67,18 +67,22 @@ export class CartApiClient {
   }
 
   public createMany(productIds: string[]): Observable<void> {
-    const user = this.user();
-    if (!user) {
-      return of(undefined);
-    }
+    return defer(() => {
+      const user = this.user();
+      if (!user) {
+        this.cartLocalStorage.addMany(productIds);
 
-    const batch = writeBatch(this.firestore);
-    productIds.forEach((productId) => {
-      const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
-      batch.set(docRef, { productId, quantity: 1 }, { merge: true });
+        return of(undefined);
+      }
+
+      const batch = writeBatch(this.firestore);
+      productIds.forEach((productId) => {
+        const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
+        batch.set(docRef, { productId, quantity: 1 }, { merge: true });
+      });
+
+      return batch.commit();
     });
-
-    return from(batch.commit());
   }
 
   public delete(productId: string): Observable<void> {
