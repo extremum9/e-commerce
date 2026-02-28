@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { concatMap, filter, from, map, Observable, switchMap } from 'rxjs';
+import { filter, forkJoin, from, map, Observable, switchMap } from 'rxjs';
 import {
   Auth,
   browserLocalPersistence,
@@ -18,6 +18,7 @@ import { LoginCredentials } from '../models/login-credentials';
 import { RegisterCredentials } from '../models/register-credentials';
 import { CurrentUser } from '../models/current-user';
 import { WishlistLocalStorage } from '../wishlist/wishlist-local-storage';
+import { CartLocalStorage } from '../cart/cart-local-storage';
 
 @Injectable({
   providedIn: 'root'
@@ -43,11 +44,17 @@ export class AuthApiClient {
 
   constructor() {
     const wishlistLocalStorage = inject(WishlistLocalStorage);
+    const cartLocalStorage = inject(CartLocalStorage);
 
     this.currentUser$
       .pipe(
         filter(Boolean),
-        concatMap((user) => wishlistLocalStorage.syncToFirestore(user.uid))
+        switchMap(({ uid }) =>
+          forkJoin([
+            wishlistLocalStorage.syncToFirestore(uid),
+            cartLocalStorage.syncToFirestore(uid)
+          ])
+        )
       )
       .subscribe();
   }

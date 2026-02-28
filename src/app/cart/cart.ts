@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { filter, map, of, switchMap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { BackButton } from '../back-button/back-button';
@@ -19,7 +19,7 @@ import { CartEmptyBlock } from './cart-empty-block/cart-empty-block';
 
 type ViewModel = {
   products: CartProduct[];
-  count: number;
+  cartCount: number;
   wishlistCount: number;
   summary: OrderSummary;
 };
@@ -42,7 +42,7 @@ const TAX_RATE = 0.05;
         @if (vm.products.length) {
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] items-start gap-6">
             <div class="surface-box">
-              <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.count }})</h2>
+              <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.cartCount }})</h2>
               <div class="grid gap-y-6 pb-5 overflow-x-auto md:overflow-x-visible">
                 @for (product of vm.products; track product.id) {
                   <app-cart-product-row
@@ -90,7 +90,6 @@ export default class Cart {
 
   private readonly products = toSignal(
     this.cartApiClient.cart$.pipe(
-      filter(Boolean),
       switchMap((cart) => {
         if (!cart.size) {
           return of([]);
@@ -110,13 +109,13 @@ export default class Cart {
 
   protected readonly viewModel: Signal<ViewModel | undefined> = computed(() => {
     const products = this.products();
-    const count = this.cartApiClient.count();
+    const cartCount = this.cartApiClient.count();
     const wishlistCount = this.wishlistApiClient.count();
-    if (!products || count === undefined || wishlistCount === undefined) {
+    if (!products || cartCount === undefined || wishlistCount === undefined) {
       return;
     }
 
-    return { products, count, wishlistCount, summary: this.getOrderSummary(products) };
+    return { products, cartCount, wishlistCount, summary: this.getOrderSummary(products) };
   });
 
   protected updateQuantity({ productId, quantity }: { productId: string; quantity: number }): void {
