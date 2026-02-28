@@ -78,7 +78,7 @@ export class CartApiClient {
       const batch = writeBatch(this.firestore);
       productIds.forEach((productId) => {
         const docRef = doc(this.firestore, `users/${user.uid}/cart/${productId}`);
-        batch.set(docRef, { productId, quantity: 1 }, { merge: true });
+        batch.set(docRef, { quantity: 1 });
       });
 
       return batch.commit();

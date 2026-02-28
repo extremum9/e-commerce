@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, PendingTasks } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, PendingTasks } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -108,9 +108,7 @@ export class Navbar {
 
   protected readonly user = this.authApiClient.currentUser;
 
-  protected readonly wishlistCount = computed(
-    () => this.wishlistApiClient.wishlistSet()?.size ?? 0
-  );
+  protected readonly wishlistCount = this.wishlistApiClient.count;
   protected readonly cartCount = this.cartApiClient.count;
 
   protected openAuthDialog(): void {
