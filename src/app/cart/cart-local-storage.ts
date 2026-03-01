@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { defer, from, Observable, of, Subject, tap } from 'rxjs';
-import { doc, Firestore, writeBatch } from '@angular/fire/firestore';
+import { doc, Firestore, increment, writeBatch } from '@angular/fire/firestore';
 
 import { CartItem } from '../models/cart-item';
 
@@ -12,7 +12,7 @@ const CART_KEY_STORAGE = 'e-commerce-cart';
 export class CartLocalStorage {
   private readonly firestore = inject(Firestore);
 
-  public readonly change$ = new Subject<void>();
+  public readonly refresh$ = new Subject<void>();
 
   public get(): CartItem[] {
     try {
@@ -54,13 +54,15 @@ export class CartLocalStorage {
     return defer(() => {
       const cart = this.get();
       if (!cart.length) {
+        this.clear();
+
         return of(undefined);
       }
 
       const batch = writeBatch(this.firestore);
       cart.forEach(({ productId, quantity }) => {
         const docRef = doc(this.firestore, `users/${userId}/cart/${productId}`);
-        batch.set(docRef, { quantity });
+        batch.set(docRef, { quantity: increment(quantity) }, { merge: true });
       });
 
       return from(batch.commit()).pipe(tap(() => this.clear()));
@@ -70,7 +72,7 @@ export class CartLocalStorage {
   private save(cart: CartItem[]): void {
     try {
       window.localStorage.setItem(CART_KEY_STORAGE, JSON.stringify(cart));
-      this.change$.next();
+      this.refresh$.next();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error saving cart items to local storage:', error);
