@@ -9,7 +9,7 @@ import {
   setDoc,
   writeBatch
 } from '@angular/fire/firestore';
-import { defer, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { defer, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
@@ -31,7 +31,7 @@ export class CartApiClient {
     this.authApiClient.currentUser$.pipe(
       switchMap((user) => {
         if (!user) {
-          return this.cartLocalStorage.change$.pipe(
+          return this.cartLocalStorage.refresh$.pipe(
             startWith(undefined),
             map(() => this.cartLocalStorage.get())
           );
@@ -41,7 +41,8 @@ export class CartApiClient {
 
         return collectionData(cartCollection, { idField: 'productId' }) as Observable<CartItem[]>;
       }),
-      map((items) => new Map(items.map(({ productId, quantity }) => [productId, quantity])))
+      map((items) => new Map(items.map(({ productId, quantity }) => [productId, quantity]))),
+      shareReplay(1)
     );
   public readonly cart = toSignal(this.cart$);
 
