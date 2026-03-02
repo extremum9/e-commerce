@@ -3,6 +3,7 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { Product } from './models/product';
 import { CurrentUser } from './models/current-user';
+import { OrderSummary } from './models/order-summary';
 
 export const provideDisabledAnimations = (): Provider => ({
   provide: MATERIAL_ANIMATIONS,
@@ -29,4 +30,11 @@ export const createMockProduct = (product: Partial<Product> = {}): Product => ({
   inStock: true,
   favorite: false,
   ...product
+});
+
+export const createMockOrderSummary = (summary: Partial<OrderSummary> = {}): OrderSummary => ({
+  subtotal: 1000,
+  tax: 100.5,
+  total: 1100.5,
+  ...summary
 });
