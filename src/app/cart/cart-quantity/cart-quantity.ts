@@ -7,6 +7,7 @@ import { MatIcon } from '@angular/material/icon';
   template: `
     <div class="flex items-center gap-3">
       <button
+        data-testid="cart-quantity-decrement-button"
         matIconButton
         type="button"
         [disabled]="quantity() === 1"
@@ -14,8 +15,15 @@ import { MatIcon } from '@angular/material/icon';
       >
         <mat-icon>remove</mat-icon>
       </button>
-      <span class="px-3">{{ quantity() }}</span>
-      <button matIconButton type="button" (click)="updated.emit(quantity() + 1)">
+
+      <span data-testid="cart-quantity" class="px-3">{{ quantity() }}</span>
+
+      <button
+        data-testid="cart-quantity-increment-button"
+        matIconButton
+        type="button"
+        (click)="updated.emit(quantity() + 1)"
+      >
         <mat-icon>add</mat-icon>
       </button>
     </div>
