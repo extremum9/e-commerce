@@ -53,7 +53,7 @@ describe(CartQuantity.name, () => {
     expect(await buttonIconHarness.getName()).toBe('add');
   });
 
-  it('should  display quantity', async () => {
+  it('should display quantity', async () => {
     const { debugElement } = await setup();
     const quantityDebugElement = debugElement.query(By.css('[data-testid=cart-quantity]'));
 
