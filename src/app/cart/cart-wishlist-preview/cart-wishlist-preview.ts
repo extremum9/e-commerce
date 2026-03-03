@@ -10,16 +10,23 @@ import { MatButton } from '@angular/material/button';
       <div class="flex items-center gap-3">
         <mat-icon class="shrink-0 text-red-500!">favorite_border</mat-icon>
         <div>
-          <h2 class="text-xl font-medium">Wishlist ({{ count() }})</h2>
-          <p class="text-sm text-gray-500">You have {{ count() }} items saved for later</p>
+          <h2 data-testid="cart-wishlist-preview-title" class="text-xl font-medium">
+            Wishlist ({{ count() }})
+          </h2>
+          <p data-testid="cart-wishlist-preview-description" class="text-sm text-gray-500">
+            You have {{ count() }} items saved for later
+          </p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <a matButton routerLink="/wishlist">View All</a>
+        <a data-testid="cart-wishlist-preview-view-all-link" matButton routerLink="/wishlist"
+          >View All</a
+        >
 
         @if (count()) {
           <button
+            data-testid="cart-wishlist-preview-add-all-button"
             class="flex items-center gap-2"
             matButton="filled"
             type="button"
