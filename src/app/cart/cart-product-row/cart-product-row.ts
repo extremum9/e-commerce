@@ -11,6 +11,7 @@ import { CartProduct } from '../../models/cart-product';
     <div class="grid grid-cols-[3fr_1fr_1fr] items-center gap-x-4 min-w-[40rem]">
       <div class="flex items-center gap-4">
         <img
+          data-testid="cart-product-image"
           class="w-24 h-24 object-cover rounded-lg"
           [src]="product().imageUrl"
           width="24"
@@ -18,8 +19,13 @@ import { CartProduct } from '../../models/cart-product';
           [alt]="product().name"
         />
         <div>
-          <h3 class="text-lg font-medium text-gray-900">{{ product().name }}</h3>
-          <data class="text-lg text-gray-600" [value]="product().price"
+          <h3 data-testid="cart-product-name" class="text-lg font-medium text-gray-900">
+            {{ product().name }}
+          </h3>
+          <data
+            data-testid="cart-product-price"
+            class="text-lg text-gray-600"
+            [value]="product().price"
             >{{ product().price | currency: 'USD' : 'symbol' : '1.0-2' }}
           </data>
         </div>
@@ -28,14 +34,28 @@ import { CartProduct } from '../../models/cart-product';
       <ng-content select="app-cart-quantity" />
 
       <div class="flex flex-col items-end">
-        <data class="text-lg font-medium text-right" [value]="total()">{{
-          total() | currency
-        }}</data>
+        <data
+          data-testid="cart-product-total"
+          class="text-lg font-medium text-right"
+          [value]="total()"
+          >{{ total() | currency }}</data
+        >
         <div class="flex items-center -me-3">
-          <button matIconButton type="button" (click)="favorited.emit()">
+          <button
+            data-testid="cart-product-move-to-wishlist-buttton"
+            matIconButton
+            type="button"
+            (click)="favorited.emit()"
+          >
             <mat-icon>favorite_border</mat-icon>
           </button>
-          <button class="danger" matIconButton type="button" (click)="deleted.emit()">
+          <button
+            data-testid="cart-product-delete-button"
+            class="danger"
+            matIconButton
+            type="button"
+            (click)="deleted.emit()"
+          >
             <mat-icon>delete</mat-icon>
           </button>
         </div>
