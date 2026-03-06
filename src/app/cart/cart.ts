@@ -31,7 +31,7 @@ const TAX_RATE = 0.05;
     <div class="container">
       @if (viewModel(); as vm) {
         <app-back-button class="mb-6" navigateTo="/products">Continue Shopping</app-back-button>
-        <h1 class="mb-4 text-3xl font-bold">Shopping Cart</h1>
+        <h1 data-testid="cart-title" class="mb-4 text-3xl font-bold">Shopping Cart</h1>
 
         <app-cart-wishlist-preview
           class="block mb-6"
@@ -42,7 +42,9 @@ const TAX_RATE = 0.05;
         @if (vm.products.length) {
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] items-start gap-6">
             <div class="surface-box">
-              <h2 class="mb-4 text-2xl font-medium">Cart Items ({{ vm.cartCount }})</h2>
+              <h2 data-testid="cart-count" class="mb-4 text-2xl font-medium">
+                Cart Items ({{ vm.cartCount }})
+              </h2>
               <div class="grid gap-y-6 pb-5 overflow-x-auto md:overflow-x-visible">
                 @for (product of vm.products; track product.id) {
                   <app-cart-product-row
@@ -66,7 +68,7 @@ const TAX_RATE = 0.05;
         }
       } @else {
         <div class="flex justify-center">
-          <mat-spinner [diameter]="50" />
+          <mat-spinner data-testid="loading-cart-spinner" [diameter]="50" />
         </div>
       }
     </div>

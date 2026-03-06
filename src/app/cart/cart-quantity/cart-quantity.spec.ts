@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { By } from '@angular/platform-browser';
 
 import { provideDisabledAnimations } from '../../testing-utils';
@@ -12,6 +12,7 @@ import { CartQuantity } from './cart-quantity';
 describe(CartQuantity.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(CartQuantity);

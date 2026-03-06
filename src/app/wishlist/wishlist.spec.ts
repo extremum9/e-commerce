@@ -26,14 +26,15 @@ type SetupConfig = {
 
 @Component({
   selector: 'app-product-card',
-  template: `<ng-content />`
+  template: '<ng-content />'
 })
 class ProductCardStub {
   product = input.required<Product>();
 }
+
 @Component({
   selector: 'app-back-button',
-  template: `<ng-content />`
+  template: '<ng-content />'
 })
 class BackButtonStub {
   navigateTo = input.required<string>();
@@ -112,10 +113,6 @@ describe(Wishlist.name, () => {
     const loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
 
-    const hasSpinnerHarness = () =>
-      loader.hasHarness(
-        MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-wishlist-spinner]' })
-      );
     const getDeleteFromWishlistButtonHarnesses = () =>
       loader.getAllHarnesses(
         MatButtonHarness.with({
@@ -135,7 +132,6 @@ describe(Wishlist.name, () => {
       fixture,
       debugElement,
       loader,
-      hasSpinnerHarness,
       getDeleteFromWishlistButtonHarnesses,
       getClearWishlistButtonHarness,
       wishlistSet,
@@ -150,7 +146,11 @@ describe(Wishlist.name, () => {
 
   describe('Loading state', () => {
     it('should display spinner', async () => {
-      const { hasSpinnerHarness, wishlistSet } = await setup({ initialWishlistSet: undefined });
+      const { loader, wishlistSet } = await setup({ initialWishlistSet: undefined });
+      const hasSpinnerHarness = () =>
+        loader.hasHarness(
+          MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-wishlist-spinner]' })
+        );
 
       expect(await hasSpinnerHarness()).toBe(true);
       wishlistSet.set(new Set([]));
@@ -200,8 +200,8 @@ describe(Wishlist.name, () => {
 
       it('should display product cards', async () => {
         const { debugElement, getDeleteFromWishlistButtonHarnesses, mockProducts } = await setup();
-        const productCardDebugElements = debugElement.queryAll(By.directive(ProductCardStub));
 
+        const productCardDebugElements = debugElement.queryAll(By.directive(ProductCardStub));
         expect(productCardDebugElements.length).toBe(2);
         expect(
           (productCardDebugElements[0].componentInstance as ProductCardStub).product().name
