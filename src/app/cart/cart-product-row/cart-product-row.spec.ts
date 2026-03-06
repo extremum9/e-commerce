@@ -4,7 +4,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { By } from '@angular/platform-browser';
 import { CurrencyPipe } from '@angular/common';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { createMockProduct, provideDisabledAnimations } from '../../testing-utils';
 
@@ -37,6 +37,7 @@ class CartProductRowTestHost {
 describe(CartProductRow.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(CartProductRowTestHost);

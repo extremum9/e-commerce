@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { By } from '@angular/platform-browser';
+import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { provideDisabledAnimations } from '../../testing-utils';
 
@@ -9,6 +10,8 @@ import { CartEmptyBlock } from './cart-empty-block';
 describe(CartEmptyBlock.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
+
       providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(CartEmptyBlock);

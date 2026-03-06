@@ -4,7 +4,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { provideDisabledAnimations } from '../../testing-utils';
 
@@ -13,6 +13,7 @@ import { CartWishlistPreview } from './cart-wishlist-preview';
 describe(CartWishlistPreview.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
+      imports: [MatIconTestingModule],
       providers: [provideZonelessChangeDetection(), provideDisabledAnimations(), provideRouter([])]
     });
     const fixture = TestBed.createComponent(CartWishlistPreview);
