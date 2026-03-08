@@ -58,6 +58,7 @@ class CartProductRowStub {
 })
 class CartQuantityStub {
   quantity = input.required<number>();
+  updated = output<number>();
 }
 
 @Component({
@@ -88,6 +89,7 @@ describe(Cart.name, () => {
         count: signal(2)
       }
     );
+    cartApiClientSpy.create.and.returnValue(of(undefined));
     cartApiClientSpy.createMany.and.returnValue(of(undefined));
     cartApiClientSpy.delete.and.returnValue(of(undefined));
 
@@ -293,5 +295,14 @@ describe(Cart.name, () => {
 
     expect(cartApiClientSpy.delete).toHaveBeenCalledWith('1');
     expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product removed from cart');
+  });
+
+  it('should update quantity', async () => {
+    const { getQuantityDebugElements, cartApiClientSpy } = await setup();
+    const quantity = getQuantityDebugElements()[0].componentInstance as CartQuantityStub;
+
+    quantity.updated.emit(2);
+
+    expect(cartApiClientSpy.create).toHaveBeenCalledWith('1', 2);
   });
 });
