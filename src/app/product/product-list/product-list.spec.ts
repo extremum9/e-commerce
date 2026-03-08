@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { Component, input, provideZonelessChangeDetection, signal } from '@angular/core';
+import { Component, input, output, provideZonelessChangeDetection, signal } from '@angular/core';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { By } from '@angular/platform-browser';
 import { Observable, of, Subject } from 'rxjs';
@@ -17,6 +17,7 @@ import { createMockProduct, provideDisabledAnimations } from '../../testing-util
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
 import { Snackbar } from '../../snackbar/snackbar';
+import { CartApiClient } from '../../cart/cart-api-client';
 
 import ProductList from './product-list';
 
@@ -31,6 +32,7 @@ type SetupConfig = {
 })
 class ProductCardStub {
   product = input.required<Product>();
+  addedToCart = output();
 }
 
 describe(ProductList.name, () => {
@@ -64,6 +66,9 @@ describe(ProductList.name, () => {
     wishlistApiClientSpy.create.and.returnValue(of(undefined));
     wishlistApiClientSpy.delete.and.returnValue(of(undefined));
 
+    const cartApiClientSpy = jasmine.createSpyObj<CartApiClient>('CartApiClient', ['create']);
+    cartApiClientSpy.create.and.returnValue(of(undefined));
+
     const snackbarSpy = jasmine.createSpyObj<Snackbar>('Snackbar', ['showSuccess']);
 
     TestBed.overrideComponent(ProductList, {
@@ -85,6 +90,7 @@ describe(ProductList.name, () => {
         provideDisabledAnimations(),
         { provide: ProductApiClient, useValue: productApiClientSpy },
         { provide: WishlistApiClient, useValue: wishlistApiClientSpy },
+        { provide: CartApiClient, useValue: cartApiClientSpy },
         { provide: Snackbar, useValue: snackbarSpy }
       ]
     });
@@ -109,6 +115,7 @@ describe(ProductList.name, () => {
       productApiClientSpy,
       mockProducts,
       wishlistApiClientSpy,
+      cartApiClientSpy,
       snackbarSpy
     };
   };
@@ -155,7 +162,7 @@ describe(ProductList.name, () => {
   });
 
   describe('Loaded state', () => {
-    it('should display all product cards by default with toggle-wishlist buttons', async () => {
+    it('should display all products by default with its toggle-wishlist buttons', async () => {
       const {
         debugElement,
         getProductCardDebugElements,
@@ -214,7 +221,7 @@ describe(ProductList.name, () => {
       ).toBe(mockProducts[0].name);
     });
 
-    it('should call WishlistApiClient.create if not in wishlist yet, and display success snackbar on success', async () => {
+    it('should add product to wishlist and display snackbar on success', async () => {
       const {
         getToggleWishlistButtonDebugElements,
         mockProducts,
@@ -231,7 +238,7 @@ describe(ProductList.name, () => {
       expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product added to wishlist');
     });
 
-    it('should call WishlistApiClient.delete if already in wishlist, and display success snackbar on success', async () => {
+    it('should remove product from wishlist and display snackbar on success', async () => {
       const {
         getToggleWishlistButtonDebugElements,
         mockProducts,
@@ -246,6 +253,16 @@ describe(ProductList.name, () => {
 
       expect(wishlistApiClientSpy.delete).toHaveBeenCalledOnceWith(mockProducts[1].id);
       expect(snackbarSpy.showSuccess).toHaveBeenCalledOnceWith('Product removed from wishlist');
+    });
+
+    it('should add product to cart and display snackbar on success', async () => {
+      const { getProductCardDebugElements, cartApiClientSpy, snackbarSpy } = await setup();
+      const productCard = getProductCardDebugElements()[0].componentInstance as ProductCardStub;
+
+      productCard.addedToCart.emit();
+
+      expect(cartApiClientSpy.create).toHaveBeenCalledWith('1');
+      expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product added to cart');
     });
   });
 });
