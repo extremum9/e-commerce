@@ -14,6 +14,7 @@ import { CurrentUser } from '../models/current-user';
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistApiClient } from '../wishlist/wishlist-api-client';
 import { AuthDialog } from '../auth/auth-dialog/auth-dialog';
+import { CartApiClient } from '../cart/cart-api-client';
 
 import { Navbar } from './navbar';
 
@@ -26,9 +27,14 @@ describe(Navbar.name, () => {
       currentUser
     });
 
-    const wishlistSet = signal(new Set<string>([]));
+    const wishlistCount = signal(0);
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>('WishlistApiClient', [], {
-      wishlistSet
+      count: wishlistCount
+    });
+
+    const cartCount = signal(0);
+    const cartApiClientSpy = jasmine.createSpyObj<CartApiClient>('CartApiClient', [], {
+      count: cartCount
     });
 
     const dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
@@ -46,6 +52,10 @@ describe(Navbar.name, () => {
         {
           provide: WishlistApiClient,
           useValue: wishlistApiClientSpy
+        },
+        {
+          provide: CartApiClient,
+          useValue: cartApiClientSpy
         },
         {
           provide: MatDialog,
@@ -77,7 +87,8 @@ describe(Navbar.name, () => {
       mockUser,
       currentUser,
       authApiClientSpy,
-      wishlistSet,
+      wishlistCount,
+      cartCount,
       dialogSpy
     };
   };
@@ -117,16 +128,28 @@ describe(Navbar.name, () => {
     expect(await loginButtonHarness.getText()).toContain('Sign In');
   });
 
-  it('should display wishlist badge count if not empty', async () => {
-    const { loader, wishlistSet } = await setup();
+  it('should display wishlist count if not empty', async () => {
+    const { loader, wishlistCount } = await setup();
     const badgeHarness = await loader.getHarness(
       MatBadgeHarness.with({ selector: '[data-testid=navbar-wishlist-link]' })
     );
 
     expect(await badgeHarness.isHidden()).toBe(true);
-    wishlistSet.set(new Set(['1', '2', '3']));
+    wishlistCount.set(1);
     expect(await badgeHarness.isHidden()).toBe(false);
-    expect(await badgeHarness.getText()).toBe('3');
+    expect(await badgeHarness.getText()).toBe('1');
+  });
+
+  it('should display cart count if not empty', async () => {
+    const { loader, cartCount } = await setup();
+    const badgeHarness = await loader.getHarness(
+      MatBadgeHarness.with({ selector: '[data-testid=navbar-cart-link]' })
+    );
+
+    expect(await badgeHarness.isHidden()).toBe(true);
+    cartCount.set(1);
+    expect(await badgeHarness.isHidden()).toBe(false);
+    expect(await badgeHarness.getText()).toBe('1');
   });
 
   it('should display user profile if logged in', async () => {
@@ -174,7 +197,7 @@ describe(Navbar.name, () => {
     expect(userMenuEmailDebugElement.nativeElement.textContent).toContain(mockUser.email);
   });
 
-  it('should call MatDialog.open and open auth dialog', async () => {
+  it('should open auth dialog when clicking login button', async () => {
     const { getLoginButtonHarness, dialogSpy } = await setup();
     const loginButtonHarness = await getLoginButtonHarness();
 
@@ -183,7 +206,7 @@ describe(Navbar.name, () => {
     expect(dialogSpy.open).toHaveBeenCalledOnceWith(AuthDialog, { width: '400px' });
   });
 
-  it('should call AuthApiClient.logout and logout user', async () => {
+  it('should logout user', async () => {
     const { getUserMenuHarness, mockUser, currentUser, authApiClientSpy } = await setup();
     currentUser.set(mockUser);
 
