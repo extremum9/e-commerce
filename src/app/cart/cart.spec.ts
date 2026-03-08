@@ -272,4 +272,16 @@ describe(Cart.name, () => {
     expect(wishlistApiClientSpy.deleteAll).toHaveBeenCalled();
     expect(cartApiClientSpy.createMany).toHaveBeenCalledWith(['3', '4']);
   });
+
+  it('should move item to wishlist and display snackbar on success', async () => {
+    const { getProductRowDebugElements, cartApiClientSpy, wishlistApiClientSpy, snackbarSpy } =
+      await setup();
+    const productRow = getProductRowDebugElements()[0].componentInstance as CartProductRowStub;
+
+    productRow.favorited.emit();
+
+    expect(cartApiClientSpy.delete).toHaveBeenCalledWith('1');
+    expect(wishlistApiClientSpy.create).toHaveBeenCalledWith('1');
+    expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product moved to wishlist');
+  });
 });
