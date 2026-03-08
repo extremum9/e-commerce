@@ -70,13 +70,12 @@ class CartOrderSummaryStub {
 
 describe(Cart.name, () => {
   const setup = async (config: Partial<SetupConfig> = {}) => {
+    const mockCart = new Map([
+      ['1', 1],
+      ['2', 2]
+    ]);
     const { cart$ }: SetupConfig = {
-      cart$: of(
-        new Map([
-          ['1', 1],
-          ['2', 2]
-        ])
-      ),
+      cart$: of(mockCart),
       ...config
     };
 
@@ -85,19 +84,24 @@ describe(Cart.name, () => {
       ['create', 'createMany', 'delete'],
       {
         cart$,
+        cart: signal(mockCart),
         count: signal(2)
       }
     );
+    cartApiClientSpy.createMany.and.returnValue(of(undefined));
+    cartApiClientSpy.delete.and.returnValue(of(undefined));
 
-    const wishlistSet = signal(new Set(['1']));
+    const wishlistSet = signal(new Set(['1', '2', '3', '4']));
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
       'WishlistApiClient',
-      ['create'],
+      ['create', 'deleteAll'],
       {
         wishlistSet,
-        count: signal(2)
+        count: signal(4)
       }
     );
+    wishlistApiClientSpy.create.and.returnValue(of(undefined));
+    wishlistApiClientSpy.deleteAll.and.returnValue(of(undefined));
 
     const mockProducts = [
       createMockProduct({ price: 10 }),
@@ -151,10 +155,19 @@ describe(Cart.name, () => {
     const loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
 
+    const getWishlistPreviewDebugElement = () =>
+      debugElement.query(By.directive(CartWishlistPreviewStub));
+    const getProductRowDebugElements = () =>
+      debugElement.queryAll(By.directive(CartProductRowStub));
+    const getQuantityDebugElements = () => debugElement.queryAll(By.directive(CartQuantityStub));
+
     return {
       fixture,
       debugElement,
       loader,
+      getWishlistPreviewDebugElement,
+      getProductRowDebugElements,
+      getQuantityDebugElements,
       mockProducts,
       cartApiClientSpy,
       wishlistApiClientSpy,
@@ -205,12 +218,12 @@ describe(Cart.name, () => {
   });
 
   it('should display wishlist preview', async () => {
-    const { debugElement } = await setup();
-    const wishlistPreviewDebugElement = debugElement.query(By.directive(CartWishlistPreviewStub));
+    const { getWishlistPreviewDebugElement } = await setup();
+    const wishlistPreviewDebugElement = getWishlistPreviewDebugElement();
 
     expect(wishlistPreviewDebugElement).toBeTruthy();
     expect((wishlistPreviewDebugElement.componentInstance as CartWishlistPreviewStub).count()).toBe(
-      2
+      4
     );
   });
 
@@ -223,14 +236,14 @@ describe(Cart.name, () => {
   });
 
   it('should display products and its quantities', async () => {
-    const { debugElement, mockProducts } = await setup();
+    const { getProductRowDebugElements, getQuantityDebugElements, mockProducts } = await setup();
 
-    const productRowDebugElements = debugElement.queryAll(By.directive(CartProductRowStub));
+    const productRowDebugElements = getProductRowDebugElements();
     expect(productRowDebugElements.length).toBe(2);
     const productRow = productRowDebugElements[0].componentInstance as CartProductRowStub;
     expect(productRow.product()).toEqual({ ...mockProducts[0], quantity: 1 });
 
-    const quantityDebugElements = debugElement.queryAll(By.directive(CartQuantityStub));
+    const quantityDebugElements = getQuantityDebugElements();
     expect(quantityDebugElements.length).toBe(2);
     const quantity = quantityDebugElements[0].componentInstance as CartQuantityStub;
     expect(quantity.quantity()).toBe(1);
@@ -246,5 +259,17 @@ describe(Cart.name, () => {
       tax: 2.5,
       total: 52.5
     });
+  });
+
+  it('should move all items from wishlist', async () => {
+    const { getWishlistPreviewDebugElement, wishlistApiClientSpy, cartApiClientSpy } =
+      await setup();
+    const wishlistPreview = getWishlistPreviewDebugElement()
+      .componentInstance as CartWishlistPreviewStub;
+
+    wishlistPreview.allAdded.emit();
+
+    expect(wishlistApiClientSpy.deleteAll).toHaveBeenCalled();
+    expect(cartApiClientSpy.createMany).toHaveBeenCalledWith(['3', '4']);
   });
 });
