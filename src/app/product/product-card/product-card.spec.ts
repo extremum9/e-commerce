@@ -10,11 +10,14 @@ import { createMockProduct, provideDisabledAnimations } from '../../testing-util
 import { ProductCard } from './product-card';
 
 @Component({
-  template: `<app-product-card [product]="mockProduct()">test content</app-product-card>`,
+  template: `<app-product-card [product]="mockProduct()" (addedToCart)="addedToCart.set(true)"
+    >test content</app-product-card
+  >`,
   imports: [ProductCard]
 })
 class ProductCardTestHost {
   mockProduct = signal(createMockProduct());
+  addedToCart = signal(false);
 }
 
 describe(ProductCard.name, () => {
@@ -31,7 +34,12 @@ describe(ProductCard.name, () => {
 
     const mockProduct = component.mockProduct;
 
-    return { fixture, debugElement, loader, mockProduct };
+    const getAddToCartButtonHarness = () =>
+      loader.getHarness(
+        MatButtonHarness.with({ selector: '[data-testid=product-add-to-cart-button]' })
+      );
+
+    return { fixture, debugElement, loader, getAddToCartButtonHarness, mockProduct };
   };
 
   it('should display product image', async () => {
@@ -75,15 +83,13 @@ describe(ProductCard.name, () => {
   });
 
   it('should display product price and add-to-cart button', async () => {
-    const { loader, debugElement, mockProduct } = await setup();
+    const { debugElement, getAddToCartButtonHarness, mockProduct } = await setup();
 
     const priceDebugElement = debugElement.query(By.css('[data-testid=product-price]'));
     expect(priceDebugElement).toBeTruthy();
     expect(priceDebugElement.nativeElement.textContent).toContain(`$${mockProduct().price}`);
 
-    const buttonHarness = await loader.getHarness(
-      MatButtonHarness.with({ selector: '[data-testid=product-add-to-cart-button]' })
-    );
+    const buttonHarness = await getAddToCartButtonHarness();
     expect(await buttonHarness.getText()).toContain('Add to Cart');
 
     const iconHarness = await buttonHarness.getHarness(MatIconHarness);
@@ -94,5 +100,14 @@ describe(ProductCard.name, () => {
     const { debugElement } = await setup();
 
     expect(debugElement.nativeElement.textContent).toContain('test content');
+  });
+
+  it('should emit output event when clicking add-to-cart button', async () => {
+    const { fixture, getAddToCartButtonHarness } = await setup();
+    const buttonHarness = await getAddToCartButtonHarness();
+
+    await buttonHarness.click();
+
+    expect(fixture.componentInstance.addedToCart()).toBe(true);
   });
 });
