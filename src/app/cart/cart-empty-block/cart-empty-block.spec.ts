@@ -11,7 +11,6 @@ describe(CartEmptyBlock.name, () => {
   const setup = async () => {
     TestBed.configureTestingModule({
       imports: [MatIconTestingModule],
-
       providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(CartEmptyBlock);
@@ -22,9 +21,9 @@ describe(CartEmptyBlock.name, () => {
 
   it('should display title', async () => {
     const { fixture } = await setup();
-    const title = fixture.debugElement.query(By.css('[data-testid=cart-empty-title]'));
+    const titleDebugElement = fixture.debugElement.query(By.css('[data-testid=cart-empty-title]'));
 
-    expect(title).toBeTruthy();
-    expect(title.nativeElement.textContent).toContain('Your cart is empty');
+    expect(titleDebugElement).toBeTruthy();
+    expect(titleDebugElement.nativeElement.textContent).toContain('Your cart is empty');
   });
 });

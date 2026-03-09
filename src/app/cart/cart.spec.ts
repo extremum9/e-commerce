@@ -39,7 +39,7 @@ class BackButtonStub {
 })
 class CartWishlistPreviewStub {
   count = input.required<number>();
-  allAdded = output();
+  allMoved = output();
 }
 
 @Component({
@@ -48,7 +48,7 @@ class CartWishlistPreviewStub {
 })
 class CartProductRowStub {
   product = input.required<CartProduct>();
-  favorited = output();
+  movedToWishlist = output();
   deleted = output();
 }
 
@@ -86,7 +86,7 @@ describe(Cart.name, () => {
       {
         cart$,
         cart: signal(mockCart),
-        count: signal(2)
+        count: signal(mockCart.size)
       }
     );
     cartApiClientSpy.create.and.returnValue(of(undefined));
@@ -99,7 +99,7 @@ describe(Cart.name, () => {
       ['create', 'deleteAll'],
       {
         wishlistSet,
-        count: signal(4)
+        count: signal(wishlistSet().size)
       }
     );
     wishlistApiClientSpy.create.and.returnValue(of(undefined));
@@ -237,7 +237,7 @@ describe(Cart.name, () => {
     expect(countDebugElement.nativeElement.textContent).toContain('2');
   });
 
-  it('should display products and its quantities', async () => {
+  it('should display products with quantities', async () => {
     const { getProductRowDebugElements, getQuantityDebugElements, mockProducts } = await setup();
 
     const productRowDebugElements = getProductRowDebugElements();
@@ -263,46 +263,52 @@ describe(Cart.name, () => {
     });
   });
 
-  it('should move all items from wishlist', async () => {
+  it('should move all items from wishlist to cart', async () => {
     const { getWishlistPreviewDebugElement, wishlistApiClientSpy, cartApiClientSpy } =
       await setup();
     const wishlistPreview = getWishlistPreviewDebugElement()
       .componentInstance as CartWishlistPreviewStub;
 
-    wishlistPreview.allAdded.emit();
+    wishlistPreview.allMoved.emit();
 
     expect(wishlistApiClientSpy.deleteAll).toHaveBeenCalled();
     expect(cartApiClientSpy.createMany).toHaveBeenCalledWith(['3', '4']);
   });
 
   it('should move item to wishlist and display snackbar on success', async () => {
-    const { getProductRowDebugElements, cartApiClientSpy, wishlistApiClientSpy, snackbarSpy } =
-      await setup();
+    const {
+      getProductRowDebugElements,
+      mockProducts,
+      cartApiClientSpy,
+      wishlistApiClientSpy,
+      snackbarSpy
+    } = await setup();
     const productRow = getProductRowDebugElements()[0].componentInstance as CartProductRowStub;
 
-    productRow.favorited.emit();
+    productRow.movedToWishlist.emit();
 
-    expect(cartApiClientSpy.delete).toHaveBeenCalledWith('1');
-    expect(wishlistApiClientSpy.create).toHaveBeenCalledWith('1');
+    expect(cartApiClientSpy.delete).toHaveBeenCalledWith(mockProducts[0].id);
+    expect(wishlistApiClientSpy.create).toHaveBeenCalledWith(mockProducts[0].id);
     expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product moved to wishlist');
   });
 
   it('should delete item and display snackbar on success', async () => {
-    const { getProductRowDebugElements, cartApiClientSpy, snackbarSpy } = await setup();
+    const { getProductRowDebugElements, mockProducts, cartApiClientSpy, snackbarSpy } =
+      await setup();
     const productRow = getProductRowDebugElements()[0].componentInstance as CartProductRowStub;
 
     productRow.deleted.emit();
 
-    expect(cartApiClientSpy.delete).toHaveBeenCalledWith('1');
+    expect(cartApiClientSpy.delete).toHaveBeenCalledWith(mockProducts[0].id);
     expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product removed from cart');
   });
 
   it('should update quantity', async () => {
-    const { getQuantityDebugElements, cartApiClientSpy } = await setup();
+    const { getQuantityDebugElements, mockProducts, cartApiClientSpy } = await setup();
     const quantity = getQuantityDebugElements()[0].componentInstance as CartQuantityStub;
 
     quantity.updated.emit(2);
 
-    expect(cartApiClientSpy.create).toHaveBeenCalledWith('1', 2);
+    expect(cartApiClientSpy.create).toHaveBeenCalledWith(mockProducts[0].id, 2);
   });
 });

@@ -40,9 +40,7 @@ describe(CartQuantity.name, () => {
 
     expect(await buttonHarness.isDisabled()).toBe(false);
     expect(await buttonIconHarness.getName()).toBe('remove');
-
     fixture.componentRef.setInput('quantity', 1);
-
     expect(await buttonHarness.isDisabled()).toBe(true);
   });
 

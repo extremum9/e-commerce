@@ -20,7 +20,7 @@ class CartQuantityStub {}
   template: `
     <app-cart-product-row
       [product]="mockProduct()"
-      (favorited)="favorited.set(true)"
+      (movedToWishlist)="movedToWishlist.set(true)"
       (deleted)="deleted.set(true)"
     >
       <app-cart-quantity />
@@ -30,7 +30,7 @@ class CartQuantityStub {}
 })
 class CartProductRowTestHost {
   mockProduct = signal({ ...createMockProduct(), quantity: 2 });
-  favorited = signal(false);
+  movedToWishlist = signal(false);
   deleted = signal(false);
 }
 
@@ -47,11 +47,12 @@ describe(CartProductRow.name, () => {
     await fixture.whenStable();
 
     const mockProduct = component.mockProduct;
+
     const currencyPipe = new CurrencyPipe('en-US');
 
     const getMoveToWishlistButtonHarness = () =>
       loader.getHarness(
-        MatButtonHarness.with({ selector: '[data-testid=cart-product-move-to-wishlist-buttton]' })
+        MatButtonHarness.with({ selector: '[data-testid=cart-product-move-to-wishlist-button]' })
       );
     const getDeleteButtonHarness = () =>
       loader.getHarness(
@@ -92,20 +93,20 @@ describe(CartProductRow.name, () => {
     );
   });
 
+  it('should display product total', async () => {
+    const { debugElement, currencyPipe, mockProduct } = await setup();
+    const total = mockProduct().price * mockProduct().quantity;
+    const totalDebugElement = debugElement.query(By.css('[data-testid=cart-product-total]'));
+
+    expect(totalDebugElement).toBeTruthy();
+    expect(totalDebugElement.nativeElement.getAttribute('value')).toBe(`${total}`);
+    expect(totalDebugElement.nativeElement.textContent).toContain(currencyPipe.transform(total));
+  });
+
   it('should project content', async () => {
     const { debugElement } = await setup();
 
     expect(debugElement.query(By.directive(CartQuantityStub))).toBeTruthy();
-  });
-
-  it('should display product total', async () => {
-    const { debugElement, currencyPipe, mockProduct } = await setup();
-    const total = mockProduct().price * mockProduct().quantity;
-
-    const totalDebugElement = debugElement.query(By.css('[data-testid=cart-product-total]'));
-    expect(totalDebugElement).toBeTruthy();
-    expect(totalDebugElement.nativeElement.getAttribute('value')).toBe(`${total}`);
-    expect(totalDebugElement.nativeElement.textContent).toContain(currencyPipe.transform(total));
   });
 
   it('should display move-to-wishlist button and emit output event on click', async () => {
@@ -115,7 +116,7 @@ describe(CartProductRow.name, () => {
 
     expect(await buttonIconHarness.getName()).toBe('favorite_border');
     await buttonHarness.click();
-    expect(component.favorited()).toBe(true);
+    expect(component.movedToWishlist()).toBe(true);
   });
 
   it('should display delete button and emit output event on click', async () => {
