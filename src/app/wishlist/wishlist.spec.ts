@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Component, input, provideZonelessChangeDetection, signal } from '@angular/core';
+import { Component, input, output, provideZonelessChangeDetection, signal } from '@angular/core';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,6 +15,7 @@ import { Product } from '../models/product';
 import { ProductCard } from '../product/product-card/product-card';
 import { BackButton } from '../back-button/back-button';
 import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
+import { CartApiClient } from '../cart/cart-api-client';
 
 import Wishlist from './wishlist';
 import { WishlistApiClient } from './wishlist-api-client';
@@ -30,6 +31,7 @@ type SetupConfig = {
 })
 class ProductCardStub {
   product = input.required<Product>();
+  addedToCart = output();
 }
 
 @Component({
@@ -64,10 +66,10 @@ describe(Wishlist.name, () => {
     wishlistApiClientSpy.delete.and.returnValue(of(undefined));
     wishlistApiClientSpy.deleteAll.and.returnValue(of(undefined));
 
-    const mockProducts = [
-      createMockProduct({ name: 'test product 1' }),
-      createMockProduct({ id: '2', name: 'test product 2' })
-    ];
+    const cartApiClientSpy = jasmine.createSpyObj<CartApiClient>('CartApiClient', ['create']);
+    cartApiClientSpy.create.and.returnValue(of(undefined));
+
+    const mockProducts = [createMockProduct(), createMockProduct({ id: '2' })];
     const productApiClientSpy = jasmine.createSpyObj<ProductApiClient>('ProductApiClient', [
       'listByIds'
     ]);
@@ -95,6 +97,10 @@ describe(Wishlist.name, () => {
           useValue: wishlistApiClientSpy
         },
         {
+          provide: CartApiClient,
+          useValue: cartApiClientSpy
+        },
+        {
           provide: ProductApiClient,
           useValue: productApiClientSpy
         },
@@ -112,6 +118,8 @@ describe(Wishlist.name, () => {
     const debugElement = fixture.debugElement;
     const loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
+
+    const getProductCardDebugElements = () => debugElement.queryAll(By.directive(ProductCardStub));
 
     const getDeleteFromWishlistButtonHarnesses = () =>
       loader.getAllHarnesses(
@@ -132,11 +140,13 @@ describe(Wishlist.name, () => {
       fixture,
       debugElement,
       loader,
+      getProductCardDebugElements,
       getDeleteFromWishlistButtonHarnesses,
       getClearWishlistButtonHarness,
       wishlistSet,
-      wishlistApiClientSpy,
       mockProducts,
+      wishlistApiClientSpy,
+      cartApiClientSpy,
       productApiClientSpy,
       dialogSpy,
       dialogRefSpy,
@@ -144,139 +154,140 @@ describe(Wishlist.name, () => {
     };
   };
 
-  describe('Loading state', () => {
-    it('should display spinner', async () => {
-      const { loader, wishlistSet } = await setup({ initialWishlistSet: undefined });
-      const hasSpinnerHarness = () =>
-        loader.hasHarness(
-          MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-wishlist-spinner]' })
-        );
+  it('should display loading spinner if wishlist is loading', async () => {
+    const { loader, wishlistSet } = await setup({ initialWishlistSet: undefined });
+    const hasSpinnerHarness = () =>
+      loader.hasHarness(
+        MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-wishlist-spinner]' })
+      );
 
-      expect(await hasSpinnerHarness()).toBe(true);
-      wishlistSet.set(new Set([]));
-      expect(await hasSpinnerHarness()).toBe(false);
+    expect(await hasSpinnerHarness()).toBe(true);
+    wishlistSet.set(new Set([]));
+    expect(await hasSpinnerHarness()).toBe(false);
+  });
+
+  it('should display empty block if wishlist is empty', async () => {
+    const { fixture, debugElement, wishlistSet } = await setup({
+      initialWishlistSet: new Set([])
+    });
+
+    expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeTruthy();
+    wishlistSet.set(new Set(['1']));
+    await fixture.whenStable();
+    expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeFalsy();
+  });
+
+  it('should display back button', async () => {
+    const { debugElement } = await setup();
+    const backButtonDebugElement = debugElement.query(By.directive(BackButtonStub));
+
+    expect(backButtonDebugElement).toBeTruthy();
+    expect(backButtonDebugElement.nativeElement.textContent).toContain('Continue Shopping');
+    expect((backButtonDebugElement.componentInstance as BackButtonStub).navigateTo()).toBe(
+      '/products'
+    );
+  });
+
+  it('should display title and count', async () => {
+    const { debugElement } = await setup();
+
+    const titleDebugElement = debugElement.query(By.css('[data-testid=wishlist-title]'));
+    expect(titleDebugElement).toBeTruthy();
+    expect(titleDebugElement.nativeElement.textContent).toContain('My Wishlist');
+
+    const countDebugElement = debugElement.query(By.css('[data-testid=wishlist-count]'));
+    expect(countDebugElement).toBeTruthy();
+    expect(countDebugElement.nativeElement.textContent).toContain('2 items');
+  });
+
+  it('should display products with delete-from-wishlist buttons', async () => {
+    const { getProductCardDebugElements, getDeleteFromWishlistButtonHarnesses, mockProducts } =
+      await setup();
+
+    const productCardDebugElements = getProductCardDebugElements();
+    expect(productCardDebugElements.length).toBe(2);
+    expect((productCardDebugElements[0].componentInstance as ProductCardStub).product().name).toBe(
+      mockProducts[0].name
+    );
+
+    const deleteFromWishlistButtonHarnesses = await getDeleteFromWishlistButtonHarnesses();
+    expect(deleteFromWishlistButtonHarnesses.length).toBe(2);
+
+    const deleteFromWishlistButtonIconHarness =
+      await deleteFromWishlistButtonHarnesses[0].getHarness(MatIconHarness);
+    expect(await deleteFromWishlistButtonIconHarness.getName()).toBe('delete');
+  });
+
+  it('should delete item from wishlist and display snackbar on success', async () => {
+    const {
+      getDeleteFromWishlistButtonHarnesses,
+      wishlistApiClientSpy,
+      mockProducts,
+      snackbarSpy
+    } = await setup();
+    const deleteButtonHarness = await getDeleteFromWishlistButtonHarnesses();
+    await deleteButtonHarness[0].click();
+
+    expect(wishlistApiClientSpy.delete).toHaveBeenCalledWith(mockProducts[0].id);
+    expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product removed from wishlist');
+  });
+
+  it('should add product to cart and display snackbar on success', async () => {
+    const { getProductCardDebugElements, mockProducts, cartApiClientSpy, snackbarSpy } =
+      await setup();
+    const productCard = getProductCardDebugElements()[0].componentInstance as ProductCardStub;
+
+    productCard.addedToCart.emit();
+
+    expect(cartApiClientSpy.create).toHaveBeenCalledWith(mockProducts[0].id);
+    expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product added to cart');
+  });
+
+  it('should display button to clear wishlist', async () => {
+    const { getClearWishlistButtonHarness } = await setup();
+    const clearButtonHarness = await getClearWishlistButtonHarness();
+
+    expect(await clearButtonHarness.getText()).toContain('Clear Wishlist');
+  });
+
+  it('should open confirmation dialog when trying to clear wishlist', async () => {
+    const { getClearWishlistButtonHarness, dialogSpy, dialogRefSpy } = await setup();
+    dialogRefSpy.afterClosed.and.returnValue(of(true));
+    dialogSpy.open.and.returnValue(dialogRefSpy);
+
+    const clearButtonHarness = await getClearWishlistButtonHarness();
+    await clearButtonHarness.click();
+
+    expect(dialogSpy.open).toHaveBeenCalledWith(ConfirmDialog, {
+      data: {
+        title: 'Clear Wishlist',
+        message: 'Are you sure you want to delete all items?',
+        confirmText: 'Clear'
+      }
     });
   });
 
-  describe('Loaded state', () => {
-    describe('Wishlist is empty', () => {
-      it('should display empty block', async () => {
-        const { fixture, debugElement, wishlistSet } = await setup({
-          initialWishlistSet: new Set([])
-        });
+  it('should NOT clear wishlist if not confirmed', async () => {
+    const { getClearWishlistButtonHarness, wishlistApiClientSpy, dialogSpy, dialogRefSpy } =
+      await setup();
+    dialogRefSpy.afterClosed.and.returnValue(of(undefined));
+    dialogSpy.open.and.returnValue(dialogRefSpy);
 
-        expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeTruthy();
-        wishlistSet.set(new Set(['1']));
-        await fixture.whenStable();
-        expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeFalsy();
-      });
-    });
+    const clearButtonHarness = await getClearWishlistButtonHarness();
+    await clearButtonHarness.click();
 
-    describe('Wishlist has items', () => {
-      it('should display back button', async () => {
-        const { debugElement } = await setup();
-        const backButtonDebugElement = debugElement.query(By.directive(BackButtonStub));
+    expect(wishlistApiClientSpy.deleteAll).not.toHaveBeenCalled();
+  });
 
-        expect(backButtonDebugElement).toBeTruthy();
-        expect(backButtonDebugElement.nativeElement.textContent).toContain('Continue Shopping');
-        expect((backButtonDebugElement.componentInstance as BackButtonStub).navigateTo()).toBe(
-          '/products'
-        );
-      });
+  it('should clear wishlist if confirmed', async () => {
+    const { getClearWishlistButtonHarness, wishlistApiClientSpy, dialogSpy, dialogRefSpy } =
+      await setup();
+    dialogRefSpy.afterClosed.and.returnValue(of(true));
+    dialogSpy.open.and.returnValue(dialogRefSpy);
 
-      it('should display title and count', async () => {
-        const { debugElement } = await setup();
+    const clearButtonHarness = await getClearWishlistButtonHarness();
+    await clearButtonHarness.click();
 
-        const titleDebugElement = debugElement.query(By.css('[data-testid=wishlist-title]'));
-        expect(titleDebugElement).toBeTruthy();
-        expect(titleDebugElement.nativeElement.textContent).toContain('My Wishlist');
-
-        const wishlistCountDebugElement = debugElement.query(
-          By.css('[data-testid=wishlist-count]')
-        );
-        expect(wishlistCountDebugElement).toBeTruthy();
-        expect(wishlistCountDebugElement.nativeElement.textContent).toContain('2 items');
-      });
-
-      it('should display product cards', async () => {
-        const { debugElement, getDeleteFromWishlistButtonHarnesses, mockProducts } = await setup();
-
-        const productCardDebugElements = debugElement.queryAll(By.directive(ProductCardStub));
-        expect(productCardDebugElements.length).toBe(2);
-        expect(
-          (productCardDebugElements[0].componentInstance as ProductCardStub).product().name
-        ).toBe(mockProducts[0].name);
-
-        const deleteFromWishlistButtonHarnesses = await getDeleteFromWishlistButtonHarnesses();
-        expect(deleteFromWishlistButtonHarnesses.length).toBe(2);
-
-        const deleteFromWishlistButtonIconHarness =
-          await deleteFromWishlistButtonHarnesses[0].getHarness(MatIconHarness);
-        expect(await deleteFromWishlistButtonIconHarness.getName()).toBe('delete');
-      });
-
-      it('should call WishlistApiClient.delete and display success snackbar on success', async () => {
-        const {
-          getDeleteFromWishlistButtonHarnesses,
-          wishlistApiClientSpy,
-          mockProducts,
-          snackbarSpy
-        } = await setup();
-
-        const deleteButtonHarness = await getDeleteFromWishlistButtonHarnesses();
-        await deleteButtonHarness[0].click();
-
-        expect(wishlistApiClientSpy.delete).toHaveBeenCalledWith(mockProducts[0].id);
-        expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product removed from wishlist');
-      });
-
-      it('should display button to clear wishlist', async () => {
-        const { getClearWishlistButtonHarness } = await setup();
-        const clearButtonHarness = await getClearWishlistButtonHarness();
-
-        expect(await clearButtonHarness.getText()).toContain('Clear Wishlist');
-      });
-
-      it('should call MatDialog.open and open confirmation dialog', async () => {
-        const { getClearWishlistButtonHarness, dialogSpy, dialogRefSpy } = await setup();
-        dialogRefSpy.afterClosed.and.returnValue(of(true));
-        dialogSpy.open.and.returnValue(dialogRefSpy);
-
-        const clearButtonHarness = await getClearWishlistButtonHarness();
-        await clearButtonHarness.click();
-
-        expect(dialogSpy.open).toHaveBeenCalledWith(ConfirmDialog, {
-          data: {
-            title: 'Clear Wishlist',
-            message: 'Are you sure you want to delete all items?',
-            confirmText: 'Clear'
-          }
-        });
-      });
-
-      it('should NOT call WishlistApiClient.deleteAll if not confirmed', async () => {
-        const { getClearWishlistButtonHarness, wishlistApiClientSpy, dialogSpy, dialogRefSpy } =
-          await setup();
-        dialogRefSpy.afterClosed.and.returnValue(of(undefined));
-        dialogSpy.open.and.returnValue(dialogRefSpy);
-
-        const clearButtonHarness = await getClearWishlistButtonHarness();
-        await clearButtonHarness.click();
-
-        expect(wishlistApiClientSpy.deleteAll).not.toHaveBeenCalled();
-      });
-
-      it('should call WishlistApiClient.deleteAll if confirmed', async () => {
-        const { getClearWishlistButtonHarness, wishlistApiClientSpy, dialogSpy, dialogRefSpy } =
-          await setup();
-        dialogRefSpy.afterClosed.and.returnValue(of(true));
-        dialogSpy.open.and.returnValue(dialogRefSpy);
-
-        const clearButtonHarness = await getClearWishlistButtonHarness();
-        await clearButtonHarness.click();
-
-        expect(wishlistApiClientSpy.deleteAll).toHaveBeenCalled();
-      });
-    });
+    expect(wishlistApiClientSpy.deleteAll).toHaveBeenCalled();
   });
 });
