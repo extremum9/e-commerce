@@ -20,20 +20,18 @@ import { MatButton } from '@angular/material/button';
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <a data-testid="cart-wishlist-preview-view-all-link" matButton routerLink="/wishlist"
-          >View All</a
-        >
+        <a data-testid="cart-wishlist-preview-link" matButton routerLink="/wishlist">View All</a>
 
         @if (count()) {
           <button
-            data-testid="cart-wishlist-preview-add-all-button"
+            data-testid="cart-wishlist-preview-move-all-button"
             class="flex items-center gap-2"
             matButton="filled"
             type="button"
-            (click)="allAdded.emit()"
+            (click)="allMoved.emit()"
           >
             <mat-icon>shopping_cart</mat-icon>
-            Add All to Cart
+            Move All to Cart
           </button>
         }
       </div>
@@ -45,5 +43,5 @@ import { MatButton } from '@angular/material/button';
 export class CartWishlistPreview {
   public readonly count = input.required<number>();
 
-  public readonly allAdded = output();
+  public readonly allMoved = output();
 }

@@ -36,7 +36,7 @@ const TAX_RATE = 0.05;
         <app-cart-wishlist-preview
           class="block mb-6"
           [count]="vm.wishlistCount"
-          (allAdded)="moveAllFromWishlist()"
+          (allMoved)="moveAllFromWishlist()"
         />
 
         @if (vm.products.length) {
@@ -49,7 +49,7 @@ const TAX_RATE = 0.05;
                 @for (product of vm.products; track product.id) {
                   <app-cart-product-row
                     [product]="product"
-                    (favorited)="moveToWishlist(product.id)"
+                    (movedToWishlist)="moveToWishlist(product.id)"
                     (deleted)="delete(product.id)"
                   >
                     <app-cart-quantity

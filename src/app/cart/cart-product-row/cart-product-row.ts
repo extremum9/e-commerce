@@ -18,6 +18,7 @@ import { CartProduct } from '../../models/cart-product';
           height="24"
           [alt]="product().name"
         />
+
         <div>
           <h3 data-testid="cart-product-name" class="text-lg font-medium text-gray-900">
             {{ product().name }}
@@ -40,12 +41,13 @@ import { CartProduct } from '../../models/cart-product';
           [value]="total()"
           >{{ total() | currency }}</data
         >
+
         <div class="flex items-center -me-3">
           <button
-            data-testid="cart-product-move-to-wishlist-buttton"
+            data-testid="cart-product-move-to-wishlist-button"
             matIconButton
             type="button"
-            (click)="favorited.emit()"
+            (click)="movedToWishlist.emit()"
           >
             <mat-icon>favorite_border</mat-icon>
           </button>
@@ -68,7 +70,7 @@ import { CartProduct } from '../../models/cart-product';
 export class CartProductRow {
   public readonly product = input.required<CartProduct>();
 
-  public readonly favorited = output();
+  public readonly movedToWishlist = output();
   public readonly deleted = output();
 
   protected readonly total = computed(() => this.product().price * this.product().quantity);
