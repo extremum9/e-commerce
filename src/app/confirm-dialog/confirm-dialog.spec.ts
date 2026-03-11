@@ -58,17 +58,24 @@ describe(ConfirmDialog.name, () => {
     };
   };
 
-  it('should display title, message and actions', async () => {
-    const { debugElement, getCancelButtonHarness, getConfirmButtonHarness, mockDialogData } =
-      await setup();
-
+  it('should display title', async () => {
+    const { debugElement, mockDialogData } = await setup();
     const titleDebugElement = debugElement.query(By.css('[data-testid=confirm-dialog-title]'));
+
     expect(titleDebugElement).toBeTruthy();
     expect(titleDebugElement.nativeElement.textContent).toContain(mockDialogData.title);
+  });
 
+  it('should display message', async () => {
+    const { debugElement, mockDialogData } = await setup();
     const messageDebugElement = debugElement.query(By.css('[data-testid=confirm-dialog-message]'));
+
     expect(messageDebugElement).toBeTruthy();
     expect(messageDebugElement.nativeElement.textContent).toContain(mockDialogData.message);
+  });
+
+  it('should display actions', async () => {
+    const { getCancelButtonHarness, getConfirmButtonHarness } = await setup();
 
     const cancelButtonHarness = await getCancelButtonHarness();
     expect(await cancelButtonHarness.getText()).toContain('Cancel');

@@ -93,9 +93,10 @@ describe(Navbar.name, () => {
     };
   };
 
-  it('should display brand', async () => {
+  it('should display brand link', async () => {
     const { debugElement } = await setup();
     const brandLinkDebugElement = debugElement.query(By.css('[data-testid=navbar-brand]'));
+
     expect(brandLinkDebugElement).toBeTruthy();
     expect(brandLinkDebugElement.nativeElement.getAttribute('href')).toBe('/');
     expect(brandLinkDebugElement.nativeElement.textContent).toContain('MiniStore');
@@ -135,7 +136,9 @@ describe(Navbar.name, () => {
     );
 
     expect(await badgeHarness.isHidden()).toBe(true);
+
     wishlistCount.set(1);
+
     expect(await badgeHarness.isHidden()).toBe(false);
     expect(await badgeHarness.getText()).toBe('1');
   });
@@ -147,7 +150,9 @@ describe(Navbar.name, () => {
     );
 
     expect(await badgeHarness.isHidden()).toBe(true);
+
     cartCount.set(1);
+
     expect(await badgeHarness.isHidden()).toBe(false);
     expect(await badgeHarness.getText()).toBe('1');
   });

@@ -162,7 +162,9 @@ describe(Wishlist.name, () => {
       );
 
     expect(await hasSpinnerHarness()).toBe(true);
+
     wishlistSet.set(new Set([]));
+
     expect(await hasSpinnerHarness()).toBe(false);
   });
 
@@ -172,8 +174,10 @@ describe(Wishlist.name, () => {
     });
 
     expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeTruthy();
+
     wishlistSet.set(new Set(['1']));
     await fixture.whenStable();
+
     expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeFalsy();
   });
 
@@ -235,9 +239,10 @@ describe(Wishlist.name, () => {
   it('should add product to cart and display snackbar on success', async () => {
     const { getProductCardDebugElements, mockProducts, cartApiClientSpy, snackbarSpy } =
       await setup();
-    const productCard = getProductCardDebugElements()[0].componentInstance as ProductCardStub;
+    const productCardComponent = getProductCardDebugElements()[0]
+      .componentInstance as ProductCardStub;
 
-    productCard.addedToCart.emit();
+    productCardComponent.addedToCart.emit();
 
     expect(cartApiClientSpy.create).toHaveBeenCalledWith(mockProducts[0].id);
     expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product added to cart');
