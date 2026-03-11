@@ -186,7 +186,9 @@ describe(Cart.name, () => {
       );
 
     expect(await hasSpinnerHarness()).toBe(true);
+
     cart$.next(new Map());
+
     expect(await hasSpinnerHarness()).toBe(false);
   });
 
@@ -195,8 +197,10 @@ describe(Cart.name, () => {
     const { fixture, debugElement } = await setup({ cart$ });
 
     expect(debugElement.query(By.directive(CartEmptyBlock))).toBeFalsy();
+
     cart$.next(new Map());
     await fixture.whenStable();
+
     expect(debugElement.query(By.directive(CartEmptyBlock))).toBeTruthy();
   });
 
@@ -242,21 +246,22 @@ describe(Cart.name, () => {
 
     const productRowDebugElements = getProductRowDebugElements();
     expect(productRowDebugElements.length).toBe(2);
-    const productRow = productRowDebugElements[0].componentInstance as CartProductRowStub;
-    expect(productRow.product()).toEqual({ ...mockProducts[0], quantity: 1 });
+    const productRowComponent = productRowDebugElements[0].componentInstance as CartProductRowStub;
+    expect(productRowComponent.product()).toEqual({ ...mockProducts[0], quantity: 1 });
 
     const quantityDebugElements = getQuantityDebugElements();
     expect(quantityDebugElements.length).toBe(2);
-    const quantity = quantityDebugElements[0].componentInstance as CartQuantityStub;
-    expect(quantity.quantity()).toBe(1);
+    const quantityComponent = quantityDebugElements[0].componentInstance as CartQuantityStub;
+    expect(quantityComponent.quantity()).toBe(1);
   });
 
   it('should display order summary', async () => {
     const { debugElement } = await setup();
     const orderSummaryDebugElement = debugElement.query(By.directive(CartOrderSummaryStub));
     expect(orderSummaryDebugElement).toBeTruthy();
-    const orderSummary = orderSummaryDebugElement.componentInstance as CartOrderSummaryStub;
-    expect(orderSummary.summary()).toEqual({
+    const orderSummaryComponent =
+      orderSummaryDebugElement.componentInstance as CartOrderSummaryStub;
+    expect(orderSummaryComponent.summary()).toEqual({
       subtotal: 50,
       tax: 2.5,
       total: 52.5
@@ -266,10 +271,10 @@ describe(Cart.name, () => {
   it('should move all items from wishlist to cart', async () => {
     const { getWishlistPreviewDebugElement, wishlistApiClientSpy, cartApiClientSpy } =
       await setup();
-    const wishlistPreview = getWishlistPreviewDebugElement()
+    const wishlistPreviewComponent = getWishlistPreviewDebugElement()
       .componentInstance as CartWishlistPreviewStub;
 
-    wishlistPreview.allMoved.emit();
+    wishlistPreviewComponent.allMoved.emit();
 
     expect(wishlistApiClientSpy.deleteAll).toHaveBeenCalled();
     expect(cartApiClientSpy.createMany).toHaveBeenCalledWith(['3', '4']);
@@ -283,9 +288,10 @@ describe(Cart.name, () => {
       wishlistApiClientSpy,
       snackbarSpy
     } = await setup();
-    const productRow = getProductRowDebugElements()[0].componentInstance as CartProductRowStub;
+    const productRowComponent = getProductRowDebugElements()[0]
+      .componentInstance as CartProductRowStub;
 
-    productRow.movedToWishlist.emit();
+    productRowComponent.movedToWishlist.emit();
 
     expect(cartApiClientSpy.delete).toHaveBeenCalledWith(mockProducts[0].id);
     expect(wishlistApiClientSpy.create).toHaveBeenCalledWith(mockProducts[0].id);
@@ -295,9 +301,10 @@ describe(Cart.name, () => {
   it('should delete item and display snackbar on success', async () => {
     const { getProductRowDebugElements, mockProducts, cartApiClientSpy, snackbarSpy } =
       await setup();
-    const productRow = getProductRowDebugElements()[0].componentInstance as CartProductRowStub;
+    const productRowComponent = getProductRowDebugElements()[0]
+      .componentInstance as CartProductRowStub;
 
-    productRow.deleted.emit();
+    productRowComponent.deleted.emit();
 
     expect(cartApiClientSpy.delete).toHaveBeenCalledWith(mockProducts[0].id);
     expect(snackbarSpy.showSuccess).toHaveBeenCalledWith('Product removed from cart');
@@ -305,9 +312,9 @@ describe(Cart.name, () => {
 
   it('should update quantity', async () => {
     const { getQuantityDebugElements, mockProducts, cartApiClientSpy } = await setup();
-    const quantity = getQuantityDebugElements()[0].componentInstance as CartQuantityStub;
+    const quantityComponent = getQuantityDebugElements()[0].componentInstance as CartQuantityStub;
 
-    quantity.updated.emit(2);
+    quantityComponent.updated.emit(2);
 
     expect(cartApiClientSpy.create).toHaveBeenCalledWith(mockProducts[0].id, 2);
   });

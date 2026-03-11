@@ -115,7 +115,9 @@ describe(CartProductRow.name, () => {
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
 
     expect(await buttonIconHarness.getName()).toBe('favorite_border');
+
     await buttonHarness.click();
+
     expect(component.movedToWishlist()).toBe(true);
   });
 
@@ -125,7 +127,9 @@ describe(CartProductRow.name, () => {
     const buttonIconHarness = await buttonHarness.getHarness(MatIconHarness);
 
     expect(await buttonIconHarness.getName()).toBe('delete');
+
     await buttonHarness.click();
+
     expect(component.deleted()).toBe(true);
   });
 });

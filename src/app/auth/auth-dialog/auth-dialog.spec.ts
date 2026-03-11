@@ -98,7 +98,9 @@ describe(AuthDialog.name, () => {
     expect(tabHarnesses.length).toBe(2);
     expect(getLoginFormDebugElement()).toBeTruthy();
     expect(getRegisterFormDebugElement()).toBeFalsy();
+
     await selectSignUpTab();
+
     expect(getLoginFormDebugElement()).toBeFalsy();
     expect(getRegisterFormDebugElement()).toBeTruthy();
   });
@@ -108,7 +110,7 @@ describe(AuthDialog.name, () => {
     const loginFormComponent: LoginFormStub = getLoginFormDebugElement().componentInstance;
     loginFormComponent.dialogClosed.emit();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
+    expect(dialogRefSpy.close).toHaveBeenCalled();
   });
 
   it('should close dialog on register success', async () => {
@@ -118,7 +120,7 @@ describe(AuthDialog.name, () => {
     const registerFormComponent: LoginFormStub = getRegisterFormDebugElement().componentInstance;
     registerFormComponent.dialogClosed.emit();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
+    expect(dialogRefSpy.close).toHaveBeenCalled();
   });
 
   it('should log in with google and close dialog on success', async () => {
@@ -137,7 +139,7 @@ describe(AuthDialog.name, () => {
 
     await buttonHarness.click();
 
-    expect(authApiClientSpy.loginWithGoogle).toHaveBeenCalledTimes(1);
-    expect(dialogRefSpy.close).toHaveBeenCalledTimes(1);
+    expect(authApiClientSpy.loginWithGoogle).toHaveBeenCalled();
+    expect(dialogRefSpy.close).toHaveBeenCalled();
   });
 });

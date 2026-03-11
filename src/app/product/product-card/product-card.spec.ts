@@ -53,14 +53,18 @@ describe(ProductCard.name, () => {
     expect(imageElement.getAttribute('alt')).toBe(mockProduct().name);
   });
 
-  it('should display product name and description', async () => {
+  it('should display product name', async () => {
     const { debugElement, mockProduct } = await setup();
-
     const nameDebugElement = debugElement.query(By.css('[data-testid=product-name]'));
+
     expect(nameDebugElement).toBeTruthy();
     expect(nameDebugElement.nativeElement.textContent).toContain(mockProduct().name);
+  });
 
+  it('should display product description', async () => {
+    const { debugElement, mockProduct } = await setup();
     const descriptionDebugElement = debugElement.query(By.css('[data-testid=product-description]'));
+
     expect(descriptionDebugElement).toBeTruthy();
     expect(descriptionDebugElement.nativeElement.textContent).toContain(mockProduct().description);
   });

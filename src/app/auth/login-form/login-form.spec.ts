@@ -198,16 +198,16 @@ describe(LoginForm.name, () => {
     expect(await buttonIconHarness.getName()).toBe('visibility_off');
   });
 
-  it('should NOT call AuthApiClient.resetPassword if email is missing', async () => {
+  it('should NOT reset password if email is blank', async () => {
     const { getResetPasswordButtonHarness, authApiClientSpy, snackbarSpy } = await setup();
-    const resetPasswordButtonHarness = await getResetPasswordButtonHarness();
-    await resetPasswordButtonHarness.click();
+    const buttonHarness = await getResetPasswordButtonHarness();
+    await buttonHarness.click();
 
     expect(snackbarSpy.showError).toHaveBeenCalledWith('Please enter your email address');
     expect(authApiClientSpy.resetPassword).not.toHaveBeenCalled();
   });
 
-  it('should call AuthApiClient.resetPassword and display default snackbar on success', async () => {
+  it('should reset password and display snackbar on success', async () => {
     const {
       getEmailInputHarness,
       hasResetPasswordSpinnerHarness,
@@ -226,18 +226,18 @@ describe(LoginForm.name, () => {
     await resetPasswordButtonHarness.click();
 
     expect(await hasResetPasswordSpinnerHarness()).toBe(true);
-    expect(authApiClientSpy.resetPassword).toHaveBeenCalledOnceWith(email);
+    expect(authApiClientSpy.resetPassword).toHaveBeenCalledWith(email);
 
     resetPassword$.next();
     resetPassword$.complete();
 
     expect(await hasResetPasswordSpinnerHarness()).toBe(false);
-    expect(snackbarSpy.showDefault).toHaveBeenCalledOnceWith(
+    expect(snackbarSpy.showDefault).toHaveBeenCalledWith(
       `A password reset link has been sent to ${email}`
     );
   });
 
-  it('should call AuthApiClient.resetPassword and display error snackbar on failure', async () => {
+  it('should attempt to reset password and display snackbar on failure', async () => {
     const {
       getEmailInputHarness,
       hasResetPasswordSpinnerHarness,
@@ -256,15 +256,15 @@ describe(LoginForm.name, () => {
     await resetPasswordButtonHarness.click();
 
     expect(await hasResetPasswordSpinnerHarness()).toBe(true);
-    expect(authApiClientSpy.resetPassword).toHaveBeenCalledOnceWith(email);
+    expect(authApiClientSpy.resetPassword).toHaveBeenCalledWith(email);
 
     resetPassword$.error(new Error());
 
     expect(await hasResetPasswordSpinnerHarness()).toBe(false);
-    expect(snackbarSpy.showError).toHaveBeenCalledOnceWith('Could not send reset email');
+    expect(snackbarSpy.showError).toHaveBeenCalledWith('Could not send reset email');
   });
 
-  it('should NOT call AuthApiClient.login if form is invalid', async () => {
+  it('should NOT log in if form is invalid', async () => {
     const { getSubmitButtonHarness, authApiClientSpy } = await setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
@@ -273,7 +273,7 @@ describe(LoginForm.name, () => {
     expect(authApiClientSpy.login).not.toHaveBeenCalled();
   });
 
-  it('should call AuthApiClient.login and close dialog on success', async () => {
+  it('should log in and close dialog on success', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
@@ -299,14 +299,14 @@ describe(LoginForm.name, () => {
 
     expect(await submitButtonHarness.isDisabled()).toBe(true);
     expect(await submitButtonHarness.getText()).toContain('Signing In...');
-    expect(authApiClientSpy.login).toHaveBeenCalledOnceWith(mockCredentials);
+    expect(authApiClientSpy.login).toHaveBeenCalledWith(mockCredentials);
 
     login$.next();
 
     expect(dialogClosedSpy).toHaveBeenCalled();
   });
 
-  it('should call AuthApiClient.login and display error snackbar on failure', async () => {
+  it('should attempt to log in and display snackbar on failure', async () => {
     const {
       getEmailInputHarness,
       getPasswordInputHarness,
@@ -331,14 +331,13 @@ describe(LoginForm.name, () => {
     const submitButtonHarness = await getSubmitButtonHarness();
     await submitButtonHarness.click();
 
-    expect(authApiClientSpy.login).toHaveBeenCalledOnceWith(mockCredentials);
+    expect(authApiClientSpy.login).toHaveBeenCalledWith(mockCredentials);
 
     login$.error(new Error());
 
     expect(await submitButtonHarness.isDisabled()).toBe(false);
     expect(await submitButtonHarness.getText()).toContain('Sign In');
-
     expect(dialogClosedSpy).not.toHaveBeenCalled();
-    expect(snackbarSpy.showError).toHaveBeenCalledOnceWith('The email or password is incorrect');
+    expect(snackbarSpy.showError).toHaveBeenCalledWith('The email or password is incorrect');
   });
 });

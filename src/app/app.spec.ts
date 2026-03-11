@@ -58,28 +58,26 @@ describe(App.name, () => {
     return { debugElement, hasSpinnerHarness, currentUser };
   };
 
-  describe('User is undefined', () => {
-    it('should display spinner', async () => {
-      const { debugElement, hasSpinnerHarness, currentUser } = await setup();
-      currentUser.set(undefined);
+  it('should display spinner if user is undefined', async () => {
+    const { debugElement, hasSpinnerHarness, currentUser } = await setup();
+    currentUser.set(undefined);
 
-      expect(await hasSpinnerHarness()).toBe(true);
-      expect(debugElement.query(By.directive(NavbarStub))).toBeFalsy();
-      expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
-      currentUser.set(null);
-      expect(await hasSpinnerHarness()).toBe(false);
-    });
+    expect(await hasSpinnerHarness()).toBe(true);
+    expect(debugElement.query(By.directive(NavbarStub))).toBeFalsy();
+    expect(debugElement.query(By.directive(RouterOutlet))).toBeFalsy();
+
+    currentUser.set(null);
+
+    expect(await hasSpinnerHarness()).toBe(false);
   });
 
-  describe('User is defined', () => {
-    it('should display navbar', async () => {
-      const { debugElement } = await setup();
-      expect(debugElement.query(By.directive(NavbarStub))).toBeTruthy();
-    });
+  it('should display navbar', async () => {
+    const { debugElement } = await setup();
+    expect(debugElement.query(By.directive(NavbarStub))).toBeTruthy();
+  });
 
-    it('should have router outlet', async () => {
-      const { debugElement } = await setup();
-      expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
-    });
+  it('should have router outlet', async () => {
+    const { debugElement } = await setup();
+    expect(debugElement.query(By.directive(RouterOutlet))).toBeTruthy();
   });
 });

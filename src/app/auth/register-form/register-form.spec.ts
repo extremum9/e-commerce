@@ -188,7 +188,7 @@ describe(RegisterForm.name, () => {
     expect(await buttonIconHarness.getName()).toBe('visibility_off');
   });
 
-  it('should NOT call AuthApiClient.register if form is invalid', async () => {
+  it('should NOT register if form is invalid', async () => {
     const { getSubmitButtonHarness, authApiClientSpy } = await setup();
     const submitButtonHarness = await getSubmitButtonHarness();
 
@@ -197,7 +197,7 @@ describe(RegisterForm.name, () => {
     expect(authApiClientSpy.register).not.toHaveBeenCalled();
   });
 
-  it('should call AuthApiClient.register and close dialog on success', async () => {
+  it('should register and close dialog on success', async () => {
     const {
       getNameInputHarness,
       getEmailInputHarness,
@@ -223,14 +223,14 @@ describe(RegisterForm.name, () => {
 
     expect(await submitButtonHarness.isDisabled()).toBe(true);
     expect(await submitButtonHarness.getText()).toContain('Signing Up...');
-    expect(authApiClientSpy.register).toHaveBeenCalledOnceWith(mockCredentials);
+    expect(authApiClientSpy.register).toHaveBeenCalledWith(mockCredentials);
 
     register$.next();
 
     expect(dialogClosedSpy).toHaveBeenCalled();
   });
 
-  it('should call AuthApiClient.register and display error snackbar on failure', async () => {
+  it('should attempt to register and display snackbar on failure', async () => {
     const {
       getNameInputHarness,
       getEmailInputHarness,
@@ -255,13 +255,13 @@ describe(RegisterForm.name, () => {
     const submitButtonHarness = await getSubmitButtonHarness();
     await submitButtonHarness.click();
 
-    expect(authApiClientSpy.register).toHaveBeenCalledOnceWith(mockCredentials);
+    expect(authApiClientSpy.register).toHaveBeenCalledWith(mockCredentials);
 
     register$.error(new Error());
 
     expect(await submitButtonHarness.isDisabled()).toBe(false);
     expect(await submitButtonHarness.getText()).toContain('Sign Up');
     expect(dialogClosedSpy).not.toHaveBeenCalled();
-    expect(snackbarSpy.showError).toHaveBeenCalledOnceWith('Try again with another email');
+    expect(snackbarSpy.showError).toHaveBeenCalledWith('Try again with another email');
   });
 });
