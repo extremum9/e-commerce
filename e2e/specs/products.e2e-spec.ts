@@ -79,4 +79,18 @@ test.describe('Products page', () => {
     await expect(page.getByText('Product removed from wishlist')).toBeVisible();
     await expect(navbar.wishlistLink).toContainText('0');
   });
+
+  test('should add product to cart and update count', async ({ productsPage, page, navbar }) => {
+    await productsPage.goto();
+
+    const productCard = new ProductCard(productsPage.cards.first());
+    await productCard.addToCartButton.click();
+
+    await expect(page.getByText('Product added to cart')).toBeVisible();
+    await expect(navbar.cartLink.getByText('1')).toBeVisible();
+
+    await productCard.addToCartButton.click();
+
+    await expect(navbar.cartLink).toContainText('2');
+  });
 });
