@@ -2,13 +2,9 @@ import { Locator, Page } from '@playwright/test';
 
 import { getRandomString } from '../utils';
 
-export type LoginCredentials = {
-  email: string;
-  password: string;
-};
-
-export type RegisterCredentials = LoginCredentials & {
+export type RegisterCredentials = {
   name: string;
+  email: string;
 };
 
 export class AuthDialog {
@@ -60,23 +56,19 @@ export class AuthDialog {
     this.loginWithGoogleButton = page.getByTestId('login-with-google-button');
   }
 
-  public async login({
-    email = 'john.doe@mail.com',
-    password = '123456'
-  }: Partial<LoginCredentials> = {}): Promise<void> {
+  public async login(email = 'john.doe@mail.com'): Promise<void> {
     await this.loginEmailInput.fill(email);
-    await this.loginPasswordInput.fill(password);
+    await this.loginPasswordInput.fill('123456');
     await this.loginSubmitButton.click();
   }
 
   public async register({
     name = getRandomString(),
-    email = `${getRandomString()}@mail.com`,
-    password = '123456'
+    email = `${getRandomString()}@mail.com`
   }: Partial<RegisterCredentials> = {}): Promise<void> {
     await this.registerNameInput.fill(name);
     await this.registerEmailInput.fill(email);
-    await this.registerPasswordInput.fill(password);
+    await this.registerPasswordInput.fill('123456');
     await this.registerSubmitButton.click();
   }
 }

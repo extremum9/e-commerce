@@ -4,15 +4,15 @@ export class ProductsPage {
   public readonly page: Page;
   public readonly categoryLinks: Locator;
   public readonly loadingProductListSpinner: Locator;
-  public readonly productCount: Locator;
-  public readonly productCards: Locator;
+  public readonly count: Locator;
+  public readonly cards: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.categoryLinks = page.getByTestId('category-link');
     this.loadingProductListSpinner = page.getByTestId('loading-product-list-spinner');
-    this.productCount = page.getByTestId('product-count');
-    this.productCards = page.getByTestId('product-card');
+    this.count = page.getByTestId('product-count');
+    this.cards = page.getByTestId('product-card');
   }
 
   public async goto(category = 'all'): Promise<void> {
@@ -23,7 +23,7 @@ export class ProductsPage {
     await this.categoryLinks.filter({ hasText: category }).click();
   }
 
-  public getProductCard(name: string | RegExp): Locator {
-    return this.productCards.filter({ hasText: name });
+  public getCard(name: string | RegExp): Locator {
+    return this.cards.filter({ hasText: name });
   }
 }
