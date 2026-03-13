@@ -1,13 +1,7 @@
 import { test as base } from '@playwright/test';
 
 import { ProductsPage, WishlistPage } from './page-objects';
-import {
-  AuthDialog,
-  ConfirmDialog,
-  LoginCredentials,
-  Navbar,
-  RegisterCredentials
-} from './components';
+import { AuthDialog, ConfirmDialog, Navbar, RegisterCredentials } from './components';
 
 type Fixtures = {
   navbar: Navbar;
@@ -15,7 +9,7 @@ type Fixtures = {
   confirmDialog: ConfirmDialog;
   productsPage: ProductsPage;
   wishlistPage: WishlistPage;
-  login: (credentials?: Partial<LoginCredentials>) => Promise<void>;
+  login: (email?: string) => Promise<void>;
   register: (credentials?: Partial<RegisterCredentials>) => Promise<void>;
 };
 
@@ -36,10 +30,10 @@ export const test = base.extend<Fixtures>({
     await use(new WishlistPage(page));
   },
   login: async ({ page, navbar, authDialog }, use) => {
-    await use(async (credentials: Partial<LoginCredentials> = {}) => {
+    await use(async (email?: string) => {
       await page.goto('/');
       await navbar.loginButton.click();
-      await authDialog.login(credentials);
+      await authDialog.login(email);
     });
   },
   register: async ({ page, navbar, authDialog }, use) => {

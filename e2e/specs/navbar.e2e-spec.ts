@@ -10,9 +10,11 @@ test.describe('Navbar', () => {
 
     await expect(navbar.wishlistLink).toBeVisible();
     await expect(navbar.wishlistLink).toHaveAttribute('href', '/wishlist');
+    await expect(navbar.wishlistLink.getByText('0')).toBeHidden();
 
     await expect(navbar.cartLink).toBeVisible();
     await expect(navbar.cartLink).toHaveAttribute('href', '/cart');
+    await expect(navbar.cartLink.getByText('0')).toBeHidden();
 
     await expect(navbar.loginButton).toBeVisible();
     await expect(navbar.loginButton).toContainText('Sign In');

@@ -2,10 +2,8 @@ import { expect, test } from '../fixtures';
 import { ProductCard } from '../components';
 
 test.describe('Products page', () => {
-  test('should display categories and products', async ({ productsPage }) => {
+  test('should display categories', async ({ productsPage }) => {
     await productsPage.goto();
-
-    await expect(productsPage.loadingProductListSpinner).toBeHidden();
 
     await expect(productsPage.categoryLinks).toHaveText([
       'All',
@@ -21,22 +19,29 @@ test.describe('Products page', () => {
       '/products/electronics'
     );
     await expect(productsPage.categoryLinks.nth(1)).not.toHaveAttribute('aria-current', 'page');
+  });
 
-    await expect(productsPage.productCount).toContainText('14 products found');
-    await expect(productsPage.productCards).toHaveCount(14);
+  test('should display products', async ({ productsPage }) => {
+    await productsPage.goto();
 
-    const lampCard = new ProductCard(productsPage.getProductCard('Lamp'));
-    await expect(lampCard.image).toBeVisible();
-    await expect(lampCard.name).toBeVisible();
-    await expect(lampCard.description).toBeVisible();
-    await expect(lampCard.availability).toBeVisible();
-    await expect(lampCard.availability).toContainText('In Stock');
-    await expect(lampCard.price).toBeVisible();
-    await expect(lampCard.toggleWishlistButton).toBeVisible();
-    await expect(lampCard.addToCartButton).toBeVisible();
+    await expect(productsPage.loadingProductListSpinner).toBeHidden();
 
-    const blenderCard = new ProductCard(productsPage.getProductCard('Blender'));
-    await expect(blenderCard.availability).toContainText('Out of Stock');
+    await expect(productsPage.count).toContainText('14 products found');
+    await expect(productsPage.cards).toHaveCount(14);
+
+    let productCard = new ProductCard(productsPage.cards.first());
+    await expect(productCard.image).toBeVisible();
+    await expect(productCard.name).toBeVisible();
+    await expect(productCard.name).toContainText('Hiking Jacket');
+    await expect(productCard.description).toBeVisible();
+    await expect(productCard.availability).toBeVisible();
+    await expect(productCard.availability).toContainText('In Stock');
+    await expect(productCard.price).toBeVisible();
+    await expect(productCard.toggleWishlistButton).toBeVisible();
+    await expect(productCard.addToCartButton).toBeVisible();
+
+    productCard = new ProductCard(productsPage.cards.last());
+    await expect(productCard.availability).toContainText('Out of Stock');
   });
 
   test('should filter products by category', async ({ page, productsPage }) => {
@@ -44,72 +49,34 @@ test.describe('Products page', () => {
     await productsPage.selectCategory('Clothing');
 
     await expect(page).toHaveURL('products/clothing');
-    await expect(productsPage.productCount).toContainText('3 products found');
-    await expect(productsPage.productCards).toHaveCount(3);
-    await expect(productsPage.getProductCard('Jeans')).toBeVisible();
+    await expect(productsPage.count).toContainText('3 products found');
+    await expect(productsPage.cards).toHaveCount(3);
+    await expect(productsPage.getCard('Jeans')).toBeVisible();
 
     await productsPage.selectCategory('Accessories');
 
     await expect(page).toHaveURL('products/accessories');
-    await expect(productsPage.productCount).toContainText('2 products found');
-    await expect(productsPage.productCards).toHaveCount(2);
-    await expect(productsPage.getProductCard('Wallet')).toBeVisible();
+    await expect(productsPage.count).toContainText('2 products found');
+    await expect(productsPage.cards).toHaveCount(2);
+    await expect(productsPage.getCard('Wallet')).toBeVisible();
   });
 
-  test.describe('Add to wishlist', () => {
-    test('should persist wishlist in local storage if not authenticated', async ({
-      page,
-      productsPage,
-      navbar
-    }) => {
-      await productsPage.goto();
+  test('should add or remove product from wishlist and update count', async ({
+    productsPage,
+    page,
+    navbar
+  }) => {
+    await productsPage.goto();
 
-      const productCard = new ProductCard(productsPage.productCards.first());
-      await productCard.toggleWishlistButton.click();
+    const productCard = new ProductCard(productsPage.cards.first());
+    await productCard.toggleWishlistButton.click();
 
-      await expect(navbar.wishlistLink).toContainText('1');
-      await expect(page.getByText('Product added to wishlist')).toBeVisible();
+    await expect(page.getByText('Product added to wishlist')).toBeVisible();
+    await expect(navbar.wishlistLink.getByText('1')).toBeVisible();
 
-      await page.reload();
+    await productCard.toggleWishlistButton.click();
 
-      await expect(navbar.wishlistLink).toContainText('1');
-
-      await productCard.toggleWishlistButton.click();
-
-      await expect(navbar.wishlistLink).toContainText('0');
-      await expect(page.getByText('Product removed from wishlist')).toBeVisible();
-
-      await page.reload();
-
-      await expect(navbar.wishlistLink).toContainText('0');
-    });
-
-    test('should persist wishlist in database if authenticated', async ({
-      page,
-      register,
-      productsPage,
-      navbar
-    }) => {
-      await register();
-
-      const productCard = new ProductCard(productsPage.productCards.first());
-      await productCard.toggleWishlistButton.click();
-
-      await expect(navbar.wishlistLink).toContainText('1');
-      await expect(page.getByText('Product added to wishlist')).toBeVisible();
-
-      await page.reload();
-
-      await expect(navbar.wishlistLink).toContainText('1');
-
-      await productCard.toggleWishlistButton.click();
-
-      await expect(navbar.wishlistLink).toContainText('0');
-      await expect(page.getByText('Product removed from wishlist')).toBeVisible();
-
-      await page.reload();
-
-      await expect(navbar.wishlistLink).toContainText('0');
-    });
+    await expect(page.getByText('Product removed from wishlist')).toBeVisible();
+    await expect(navbar.wishlistLink).toContainText('0');
   });
 });

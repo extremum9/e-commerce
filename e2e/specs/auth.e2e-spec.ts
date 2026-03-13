@@ -1,8 +1,13 @@
+import { Page } from '@playwright/test';
+
 import { expect, test } from '../fixtures';
 import { getRandomString } from '../utils';
 import { ProductCard } from '../components';
 
 test.describe('Authentication', () => {
+  const getWishlist = async (page: Page) =>
+    await page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist'));
+
   test('should display login tab', async ({ page, navbar, authDialog }) => {
     await page.goto('/');
     await navbar.loginButton.click();
@@ -55,7 +60,7 @@ test.describe('Authentication', () => {
   });
 
   test('should display snackbar on login failure', async ({ page, login, authDialog }) => {
-    await login({ email: `${getRandomString()}@mail.com` });
+    await login(`${getRandomString()}@mail.com`);
 
     await expect(page.getByText('The email or password is incorrect')).toBeVisible();
     await expect(authDialog.loginSubmitButton).toBeEnabled();
@@ -75,8 +80,7 @@ test.describe('Authentication', () => {
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Name is required');
 
-    const mockName = getRandomString();
-    await authDialog.registerNameInput.fill(mockName);
+    await authDialog.registerNameInput.fill(getRandomString());
     await expect(authDialog.errorMessage).toBeHidden();
 
     await authDialog.registerEmailInput.fill('');
@@ -84,12 +88,11 @@ test.describe('Authentication', () => {
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Email is required');
 
-    await authDialog.registerEmailInput.fill('test');
+    await authDialog.registerEmailInput.fill(getRandomString());
     await expect(authDialog.errorMessage).toBeVisible();
     await expect(authDialog.errorMessage).toContainText('Email is invalid');
 
-    const mockEmail = `${getRandomString()}@mail.com`;
-    await authDialog.registerEmailInput.fill(mockEmail);
+    await authDialog.registerEmailInput.fill(`${getRandomString()}@mail.com`);
     await expect(authDialog.errorMessage).toBeHidden();
 
     await authDialog.registerPasswordInput.fill('');
@@ -142,7 +145,7 @@ test.describe('Authentication', () => {
     await expect(authDialog.resetPasswordButton).toBeVisible();
   });
 
-  test('should login with google', async ({ page, navbar, authDialog }) => {
+  test('should log in with google', async ({ page, navbar, authDialog }) => {
     await page.goto('/');
     await navbar.loginButton.click();
 
@@ -158,7 +161,7 @@ test.describe('Authentication', () => {
     await expect(authDialog.loginWithGoogleButton).toBeHidden();
   });
 
-  test('should sync and merge wishlist on login', async ({
+  test('should synchronize and merge wishlist on login', async ({
     page,
     productsPage,
     register,
@@ -169,41 +172,40 @@ test.describe('Authentication', () => {
 
     await register({ email: mockEmail });
 
-    let productCard = new ProductCard(productsPage.productCards.first());
-    await productCard.toggleWishlistButton.click();
+    await expect(navbar.userMenuButton).toBeVisible();
+
+    await new ProductCard(productsPage.cards.first()).toggleWishlistButton.click();
 
     await navbar.logout();
-    await productsPage.goto();
 
-    productCard = new ProductCard(productsPage.productCards.nth(1));
-    await productCard.toggleWishlistButton.click();
+    await expect(navbar.userMenuButton).toBeHidden();
 
-    await login({ email: mockEmail });
+    await new ProductCard(productsPage.cards.nth(1)).toggleWishlistButton.click();
+
+    await login(mockEmail);
 
     await expect(navbar.userMenuButton).toBeVisible();
     await expect(navbar.wishlistLink).toContainText('2');
-    await expect
-      .poll(async () => page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist')))
-      .toBeNull();
+    await expect.poll(() => getWishlist(page)).toBeNull();
 
     await page.reload();
 
     await expect(navbar.wishlistLink).toContainText('2');
   });
 
-  test('should sync wishlist on register', async ({ page, productsPage, register, navbar }) => {
+  test('should synchronize wishlist on register', async ({
+    page,
+    productsPage,
+    register,
+    navbar
+  }) => {
     await productsPage.goto();
-
-    const productCard = new ProductCard(productsPage.productCards.first());
-    await productCard.toggleWishlistButton.click();
-
+    await new ProductCard(productsPage.cards.first()).toggleWishlistButton.click();
     await register();
 
     await expect(navbar.userMenuButton).toBeVisible();
     await expect(navbar.wishlistLink).toContainText('1');
-    await expect
-      .poll(async () => page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist')))
-      .toBeNull();
+    await expect.poll(() => getWishlist(page)).toBeNull();
 
     await page.reload();
 
