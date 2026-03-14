@@ -7,6 +7,8 @@ import { ProductCard } from '../components';
 test.describe('Authentication', () => {
   const getWishlist = async (page: Page) =>
     await page.evaluate(() => window.localStorage.getItem('e-commerce-wishlist'));
+  const getCart = async (page: Page) =>
+    await page.evaluate(() => window.localStorage.getItem('e-commerce-cart'));
 
   test('should display login tab', async ({ page, navbar, authDialog }) => {
     await page.goto('/');
@@ -161,7 +163,7 @@ test.describe('Authentication', () => {
     await expect(authDialog.loginWithGoogleButton).toBeHidden();
   });
 
-  test('should synchronize and merge wishlist on login', async ({
+  test('should sync and merge wishlist on login', async ({
     page,
     productsPage,
     register,
@@ -175,13 +177,11 @@ test.describe('Authentication', () => {
     await expect(navbar.userMenuButton).toBeVisible();
 
     await new ProductCard(productsPage.cards.first()).toggleWishlistButton.click();
-
     await navbar.logout();
 
     await expect(navbar.userMenuButton).toBeHidden();
 
     await new ProductCard(productsPage.cards.nth(1)).toggleWishlistButton.click();
-
     await login(mockEmail);
 
     await expect(navbar.userMenuButton).toBeVisible();
@@ -193,12 +193,7 @@ test.describe('Authentication', () => {
     await expect(navbar.wishlistLink).toContainText('2');
   });
 
-  test('should synchronize wishlist on register', async ({
-    page,
-    productsPage,
-    register,
-    navbar
-  }) => {
+  test('should sync wishlist on register', async ({ page, productsPage, register, navbar }) => {
     await productsPage.goto();
     await new ProductCard(productsPage.cards.first()).toggleWishlistButton.click();
     await register();
@@ -210,5 +205,37 @@ test.describe('Authentication', () => {
     await page.reload();
 
     await expect(navbar.wishlistLink).toContainText('1');
+  });
+
+  test('should sync and merge cart on login', async ({
+    page,
+    productsPage,
+    register,
+    login,
+    navbar
+  }) => {
+    const mockEmail = `${getRandomString()}@mail.com`;
+
+    await register({ email: mockEmail });
+
+    await expect(navbar.userMenuButton).toBeVisible();
+
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await navbar.logout();
+
+    await expect(navbar.userMenuButton).toBeHidden();
+
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await new ProductCard(productsPage.cards.nth(1)).addToCartButton.click();
+
+    await login(mockEmail);
+
+    await expect(navbar.userMenuButton).toBeVisible();
+    await expect(navbar.cartLink).toContainText('3');
+    await expect.poll(() => getCart(page)).toBeNull();
+
+    await page.reload();
+
+    await expect(navbar.cartLink).toContainText('3');
   });
 });
