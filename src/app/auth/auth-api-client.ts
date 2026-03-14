@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { filter, forkJoin, from, map, Observable, switchMap } from 'rxjs';
+import { distinctUntilKeyChanged, filter, forkJoin, from, map, Observable, switchMap } from 'rxjs';
 import {
   Auth,
   browserLocalPersistence,
@@ -49,6 +49,7 @@ export class AuthApiClient {
     this.currentUser$
       .pipe(
         filter(Boolean),
+        distinctUntilKeyChanged('uid'),
         switchMap(({ uid }) =>
           forkJoin([
             wishlistLocalStorage.syncToFirestore(uid),
