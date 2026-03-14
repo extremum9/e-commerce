@@ -238,4 +238,18 @@ test.describe('Authentication', () => {
 
     await expect(navbar.cartLink).toContainText('3');
   });
+
+  test('should sync cart on register', async ({ page, productsPage, register, navbar }) => {
+    await productsPage.goto();
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await register();
+
+    await expect(navbar.userMenuButton).toBeVisible();
+    await expect(navbar.cartLink).toContainText('1');
+    await expect.poll(() => getCart(page)).toBeNull();
+
+    await page.reload();
+
+    await expect(navbar.cartLink).toContainText('1');
+  });
 });
