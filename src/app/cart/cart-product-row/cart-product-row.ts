@@ -8,7 +8,10 @@ import { CartProduct } from '../../models/cart-product';
 @Component({
   selector: 'app-cart-product-row',
   template: `
-    <div class="grid grid-cols-[3fr_1fr_1fr] items-center gap-x-4 min-w-[40rem]">
+    <div
+      data-testid="cart-product"
+      class="grid grid-cols-[3fr_1fr_1fr] items-center gap-x-4 min-w-[40rem]"
+    >
       <div class="flex items-center gap-4">
         <img
           data-testid="cart-product-image"
