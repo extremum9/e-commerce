@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures';
 import { ProductCard } from '../components';
+import { CartProductRow } from '../components/cart-product-row';
 
 test.describe('Cart page', () => {
   test('should display title and back button', async ({ cartPage }) => {
@@ -59,5 +60,48 @@ test.describe('Cart page', () => {
 
     await expect(cartPage.emptyTitle).toBeVisible();
     await expect(cartPage.emptyTitle).toContainText('Your cart is empty');
+  });
+
+  test('should display items', async ({ productsPage, cartPage, navbar }) => {
+    await productsPage.goto();
+
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await new ProductCard(productsPage.cards.nth(1)).addToCartButton.click();
+
+    await cartPage.goto();
+
+    await expect(cartPage.count).toBeVisible();
+    await expect(cartPage.count).toContainText('Cart Items (2)');
+
+    const productRow = new CartProductRow(cartPage.products.first());
+    await expect(productRow.image).toBeVisible();
+    await expect(productRow.name).toBeVisible();
+    await expect(productRow.name).toContainText('Gaming Laptop');
+    await expect(productRow.price).toBeVisible();
+    await expect(productRow.price).toContainText('$1,299');
+    await expect(productRow.decrementButton).toBeVisible();
+    await expect(productRow.decrementButton).toBeDisabled();
+    await expect(productRow.quantity).toBeVisible();
+    await expect(productRow.quantity).toContainText('1');
+    await expect(productRow.incrementButton).toBeVisible();
+    await expect(productRow.total).toBeVisible();
+    await expect(productRow.total).toContainText('$1,299');
+    await expect(productRow.moveToWishlistButton).toBeVisible();
+    await expect(productRow.deleteButton).toBeVisible();
+
+    await productRow.incrementButton.click();
+
+    await expect(productRow.decrementButton).toBeEnabled();
+    await expect(productRow.quantity).toContainText('2');
+    await expect(productRow.total).toContainText('$2,598');
+
+    await productRow.moveToWishlistButton.click();
+
+    await expect(cartPage.products).toHaveCount(1);
+    await expect(navbar.wishlistLink).toContainText('1');
+
+    await productRow.deleteButton.click();
+
+    await expect(cartPage.products).toHaveCount(0);
   });
 });
