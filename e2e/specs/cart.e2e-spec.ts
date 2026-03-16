@@ -141,4 +141,25 @@ test.describe('Cart page', () => {
 
     await expect(cartPage.products).toHaveCount(2);
   });
+
+  test('should persist items in database if authenticated', async ({
+    register,
+    navbar,
+    productsPage,
+    page,
+    cartPage
+  }) => {
+    await register();
+
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await new ProductCard(productsPage.cards.nth(1)).addToCartButton.click();
+
+    await expect(navbar.cartLink).toContainText('2');
+
+    await page.reload();
+    await cartPage.goto();
+
+    await expect(cartPage.loadingSpinner).toBeHidden();
+    await expect(cartPage.products).toHaveCount(2);
+  });
 });
