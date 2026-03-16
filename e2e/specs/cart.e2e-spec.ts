@@ -125,4 +125,20 @@ test.describe('Cart page', () => {
     await expect(cartPage.orderTotal).toBeVisible();
     await expect(cartPage.orderTotal).toContainText('$1,458.44');
   });
+
+  test('should persist items in local storage if not authenticated', async ({
+    productsPage,
+    cartPage,
+    page
+  }) => {
+    await productsPage.goto();
+
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await new ProductCard(productsPage.cards.nth(1)).addToCartButton.click();
+
+    await page.reload();
+    await cartPage.goto();
+
+    await expect(cartPage.products).toHaveCount(2);
+  });
 });
