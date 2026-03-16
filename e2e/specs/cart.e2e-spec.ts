@@ -104,4 +104,25 @@ test.describe('Cart page', () => {
 
     await expect(cartPage.products).toHaveCount(0);
   });
+
+  test('should display order summary', async ({ productsPage, cartPage }) => {
+    await productsPage.goto();
+
+    await new ProductCard(productsPage.cards.first()).addToCartButton.click();
+    await new ProductCard(productsPage.cards.nth(1)).addToCartButton.click();
+
+    await cartPage.goto();
+
+    await expect(cartPage.orderTitle).toBeVisible();
+    await expect(cartPage.orderTitle).toContainText('Order Summary');
+
+    await expect(cartPage.orderSubtotal).toBeVisible();
+    await expect(cartPage.orderSubtotal).toContainText('$1,388.99');
+
+    await expect(cartPage.orderTax).toBeVisible();
+    await expect(cartPage.orderTax).toContainText('$69.45');
+
+    await expect(cartPage.orderTotal).toBeVisible();
+    await expect(cartPage.orderTotal).toContainText('$1,458.44');
+  });
 });
