@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test';
 
-import { ProductsPage, WishlistPage } from './page-objects';
+import { CartPage, ProductsPage, WishlistPage } from './page-objects';
 import { AuthDialog, ConfirmDialog, Navbar, RegisterCredentials } from './components';
 
 type Fixtures = {
@@ -9,6 +9,7 @@ type Fixtures = {
   confirmDialog: ConfirmDialog;
   productsPage: ProductsPage;
   wishlistPage: WishlistPage;
+  cartPage: CartPage;
   login: (email?: string) => Promise<void>;
   register: (credentials?: Partial<RegisterCredentials>) => Promise<void>;
 };
@@ -28,6 +29,9 @@ export const test = base.extend<Fixtures>({
   },
   wishlistPage: async ({ page }, use) => {
     await use(new WishlistPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
   },
   login: async ({ page, navbar, authDialog }, use) => {
     await use(async (email?: string) => {

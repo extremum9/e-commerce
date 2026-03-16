@@ -6,7 +6,7 @@ export class WishlistPage {
   public readonly backButton: Locator;
   public readonly title: Locator;
   public readonly count: Locator;
-  public readonly items: Locator;
+  public readonly products: Locator;
   public readonly clearButton: Locator;
   public readonly emptyTitle: Locator;
   public readonly emptyLink: Locator;
@@ -17,7 +17,7 @@ export class WishlistPage {
     this.backButton = page.getByTestId('back-button');
     this.title = page.getByTestId('wishlist-title');
     this.count = page.getByTestId('wishlist-count');
-    this.items = page.getByTestId('product-card');
+    this.products = page.getByTestId('product-card');
     this.clearButton = page.getByTestId('clear-wishlist-button');
     this.emptyTitle = page.getByTestId('wishlist-empty-title');
     this.emptyLink = page.getByTestId('wishlist-empty-link');

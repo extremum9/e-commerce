@@ -35,15 +35,15 @@ test.describe('Wishlist page', () => {
     await expect(wishlistPage.count).toBeVisible();
     await expect(wishlistPage.count).toContainText('2 items');
 
-    await expect(wishlistPage.items).toHaveCount(2);
+    await expect(wishlistPage.products).toHaveCount(2);
 
-    const item = new ProductCard(wishlistPage.items.first());
-    await expect(item.name).toContainText('Gaming Laptop');
+    const productCard = new ProductCard(wishlistPage.products.first());
+    await expect(productCard.name).toContainText('Gaming Laptop');
 
-    await item.deleteFromWishlistButton.click();
+    await productCard.deleteFromWishlistButton.click();
 
     await expect(wishlistPage.count).toContainText('1 items');
-    await expect(wishlistPage.items).toHaveCount(1);
+    await expect(wishlistPage.products).toHaveCount(1);
     await expect(navbar.wishlistLink).toContainText('1');
   });
 
@@ -68,14 +68,14 @@ test.describe('Wishlist page', () => {
     await confirmDialog.cancelButton.click();
 
     await expect(confirmDialog.title).toBeHidden();
-    await expect(wishlistPage.items).toHaveCount(2);
+    await expect(wishlistPage.products).toHaveCount(2);
 
     await wishlistPage.clearButton.click();
     await confirmDialog.confirmButton.click();
 
     await expect(confirmDialog.title).toBeHidden();
     await expect(wishlistPage.title).toBeHidden();
-    await expect(wishlistPage.items).toHaveCount(0);
+    await expect(wishlistPage.products).toHaveCount(0);
     await expect(wishlistPage.emptyTitle).toBeVisible();
   });
 
@@ -92,32 +92,29 @@ test.describe('Wishlist page', () => {
     await page.reload();
     await wishlistPage.goto();
 
-    await expect(wishlistPage.items).toHaveCount(2);
+    await expect(wishlistPage.products).toHaveCount(2);
 
-    await new ProductCard(wishlistPage.items.first()).deleteFromWishlistButton.click();
+    await new ProductCard(wishlistPage.products.first()).deleteFromWishlistButton.click();
     await page.reload();
 
-    await expect(wishlistPage.items).toHaveCount(1);
+    await expect(wishlistPage.products).toHaveCount(1);
   });
 
   test('should persist items in database if authenticated', async ({
-    productsPage,
     register,
-    wishlistPage,
-    page
+    productsPage,
+    page,
+    wishlistPage
   }) => {
     await register();
 
     await new ProductCard(productsPage.cards.first()).toggleWishlistButton.click();
     await new ProductCard(productsPage.cards.nth(1)).toggleWishlistButton.click();
 
+    await page.reload();
     await wishlistPage.goto();
 
     await expect(wishlistPage.loadingSpinner).toBeHidden();
-    await expect(wishlistPage.items).toHaveCount(2);
-
-    await page.reload();
-
-    await expect(wishlistPage.items).toHaveCount(2);
+    await expect(wishlistPage.products).toHaveCount(2);
   });
 });
