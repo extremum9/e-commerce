@@ -53,4 +53,11 @@ test.describe('Cart page', () => {
 
     await expect(cartPage.products).toHaveCount(2);
   });
+
+  test('should display empty block if cart is empty', async ({ cartPage }) => {
+    await cartPage.goto();
+
+    await expect(cartPage.emptyTitle).toBeVisible();
+    await expect(cartPage.emptyTitle).toContainText('Your cart is empty');
+  });
 });
