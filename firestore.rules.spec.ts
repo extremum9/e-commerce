@@ -31,10 +31,12 @@ describe('Firestore security rules', () => {
       const db = context.firestore();
       const existingProductDocRef = doc(db, 'products', 'existingDoc');
       const existingWishlistDocRef = doc(db, 'users', mockUser.uid, 'wishlist', 'existingDoc');
+      const existingCartDocRef = doc(db, 'users', mockUser.uid, 'cart', 'existingDoc');
 
       await Promise.all([
         setDoc(existingProductDocRef, { name: 'test' }),
-        setDoc(existingWishlistDocRef, { productId: 'test' })
+        setDoc(existingWishlistDocRef, { productId: 'test' }),
+        setDoc(existingCartDocRef, { quantity: 1 })
       ]);
     });
   });
@@ -94,6 +96,47 @@ describe('Firestore security rules', () => {
         assertSucceeds(getDoc(existingDocRef)),
         assertSucceeds(setDoc(newDocRef, { productId: 'test' })),
         assertSucceeds(setDoc(existingDocRef, { productId: 'test' })),
+        assertSucceeds(deleteDoc(existingDocRef))
+      ]);
+    });
+
+    it('should NOT allow read and write if userId DOES NOT match authenticated userId', async () => {
+      const db = getFirestore({ uid: 'user456' });
+      const existingDocRef = doc(db, 'users', mockUser.uid, 'wishlist', 'existingDoc');
+      const newDocRef = doc(db, 'users', mockUser.uid, 'wishlist', 'newDoc');
+
+      await Promise.all([
+        assertFails(getDoc(existingDocRef)),
+        assertFails(setDoc(newDocRef, { productId: 'test' })),
+        assertFails(setDoc(existingDocRef, { productId: 'test' })),
+        assertFails(deleteDoc(existingDocRef))
+      ]);
+    });
+  });
+
+  describe('Cart collection', () => {
+    it('should NOT allow read and write for non-authenticated users', async () => {
+      const db = getFirestore();
+      const existingDocRef = doc(db, 'users', mockUser.uid, 'cart', 'existingDoc');
+      const newDocRef = doc(db, 'users', mockUser.uid, 'cart', 'newDoc');
+
+      await Promise.all([
+        assertFails(getDoc(existingDocRef)),
+        assertFails(setDoc(newDocRef, { quantity: 10 })),
+        assertFails(setDoc(existingDocRef, { quantity: 10 })),
+        assertFails(deleteDoc(existingDocRef))
+      ]);
+    });
+
+    it('should allow read and write if userId matches authenticated userId', async () => {
+      const db = getFirestore(mockUser);
+      const existingDocRef = doc(db, 'users', mockUser.uid, 'cart', 'existingDoc');
+      const newDocRef = doc(db, 'users', mockUser.uid, 'cart', 'newDoc');
+
+      await Promise.all([
+        assertSucceeds(getDoc(existingDocRef)),
+        assertSucceeds(setDoc(newDocRef, { quantity: 10 })),
+        assertSucceeds(setDoc(existingDocRef, { quantity: 10 })),
         assertSucceeds(deleteDoc(existingDocRef))
       ]);
     });
