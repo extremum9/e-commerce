@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { Component, input, output, provideZonelessChangeDetection, signal } from '@angular/core';
+import { Component, input, output, provideZonelessChangeDetection } from '@angular/core';
 import { MatIconHarness, MatIconTestingModule } from '@angular/material/icon/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
-import { of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { MatButtonHarness } from '@angular/material/button/testing';
 
@@ -22,7 +22,7 @@ import { WishlistApiClient } from './wishlist-api-client';
 import { WishlistEmptyBlock } from './wishlist-empty-block/wishlist-empty-block';
 
 type SetupConfig = {
-  initialWishlistSet: Set<string>;
+  wishlist$: Observable<Set<string>>;
 };
 
 @Component({
@@ -50,17 +50,16 @@ class WishlistEmptyBlockStub {}
 
 describe(Wishlist.name, () => {
   const setup = async (config: Partial<SetupConfig> = {}) => {
-    const { initialWishlistSet }: SetupConfig = {
-      initialWishlistSet: new Set(['1', '2']),
+    const { wishlist$ }: SetupConfig = {
+      wishlist$: of(new Set(['1', '2'])),
       ...config
     };
 
-    const wishlistSet = signal<Set<string> | undefined>(initialWishlistSet);
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
       'WishlistApiClient',
       ['delete', 'deleteAll'],
       {
-        wishlistSet
+        wishlist$
       }
     );
     wishlistApiClientSpy.delete.and.returnValue(of(undefined));
@@ -143,7 +142,6 @@ describe(Wishlist.name, () => {
       getProductCardDebugElements,
       getDeleteFromWishlistButtonHarnesses,
       getClearWishlistButtonHarness,
-      wishlistSet,
       mockProducts,
       wishlistApiClientSpy,
       cartApiClientSpy,
@@ -155,7 +153,8 @@ describe(Wishlist.name, () => {
   };
 
   it('should display loading spinner if wishlist is loading', async () => {
-    const { loader, wishlistSet } = await setup({ initialWishlistSet: undefined });
+    const wishlist$ = new Subject<Set<string>>();
+    const { loader } = await setup({ wishlist$ });
     const hasSpinnerHarness = () =>
       loader.hasHarness(
         MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-wishlist-spinner]' })
@@ -163,22 +162,23 @@ describe(Wishlist.name, () => {
 
     expect(await hasSpinnerHarness()).toBe(true);
 
-    wishlistSet.set(new Set([]));
+    wishlist$.next(new Set());
 
     expect(await hasSpinnerHarness()).toBe(false);
   });
 
   it('should display empty block if wishlist is empty', async () => {
-    const { fixture, debugElement, wishlistSet } = await setup({
-      initialWishlistSet: new Set([])
+    const wishlist$ = new Subject<Set<string>>();
+    const { fixture, debugElement } = await setup({
+      wishlist$
     });
 
-    expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeTruthy();
+    expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeFalsy();
 
-    wishlistSet.set(new Set(['1']));
+    wishlist$.next(new Set());
     await fixture.whenStable();
 
-    expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeFalsy();
+    expect(debugElement.query(By.directive(WishlistEmptyBlockStub))).toBeTruthy();
   });
 
   it('should display back button', async () => {

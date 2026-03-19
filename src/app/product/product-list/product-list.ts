@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, filter, map, switchMap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ProductCard } from '../product-card/product-card';
@@ -88,12 +88,12 @@ export default class ProductList {
         cat === 'all' ? productApiClient.list() : productApiClient.listByCategory(cat)
       )
     );
-    const wishlistSet$ = toObservable(this.wishlistApiClient.wishlistSet).pipe(filter(Boolean));
+    const wishlist$ = this.wishlistApiClient.wishlist$;
 
     this.products = toSignal(
-      combineLatest([products$, wishlistSet$]).pipe(
-        map(([products, wishlistSet]) =>
-          products.map((product) => ({ ...product, favorite: wishlistSet.has(product.id) }))
+      combineLatest([products$, wishlist$]).pipe(
+        map(([products, wishlist]) =>
+          products.map((product) => ({ ...product, favorite: wishlist.has(product.id) }))
         )
       )
     );

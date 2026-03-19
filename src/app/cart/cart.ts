@@ -132,7 +132,7 @@ export default class Cart {
   }
 
   protected moveAllFromWishlist(): void {
-    const wishlist = this.wishlistApiClient.wishlistSet();
+    const wishlist = this.wishlistApiClient.wishlist();
     const cart = this.cartApiClient.cart();
     if (wishlist && cart) {
       const newProductIds = [...wishlist].filter((productId) => !cart.has(productId));

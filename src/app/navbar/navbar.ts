@@ -107,7 +107,6 @@ export class Navbar {
   private readonly dialog = inject(MatDialog);
 
   protected readonly user = this.authApiClient.currentUser;
-
   protected readonly wishlistCount = this.wishlistApiClient.count;
   protected readonly cartCount = this.cartApiClient.count;
 

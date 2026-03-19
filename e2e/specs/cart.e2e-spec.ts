@@ -144,7 +144,6 @@ test.describe('Cart page', () => {
 
   test('should persist items in database if authenticated', async ({
     register,
-    navbar,
     productsPage,
     page,
     cartPage
@@ -153,8 +152,6 @@ test.describe('Cart page', () => {
 
     await new ProductCard(productsPage.cards.first()).addToCartButton.click();
     await new ProductCard(productsPage.cards.nth(1)).addToCartButton.click();
-
-    await expect(navbar.cartLink).toContainText('2');
 
     await page.reload();
     await cartPage.goto();

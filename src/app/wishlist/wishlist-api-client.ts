@@ -9,7 +9,7 @@ import {
   setDoc,
   writeBatch
 } from '@angular/fire/firestore';
-import { defer, from, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { defer, from, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthApiClient } from '../auth/auth-api-client';
@@ -27,39 +27,31 @@ export class WishlistApiClient {
 
   private readonly user = this.authApiClient.currentUser;
 
-  public readonly wishlistSet = toSignal(
-    this.wishlistLocalStorage.change$.pipe(
-      startWith(undefined),
-      switchMap(() =>
-        this.list().pipe(
-          map((items) => new Set(items.map((item) => item.productId)) as ReadonlySet<string>)
-        )
-      )
-    )
+  public readonly wishlist$: Observable<ReadonlySet<string>> = this.authApiClient.currentUser$.pipe(
+    switchMap((user) => {
+      if (!user) {
+        return this.wishlistLocalStorage.refresh$.pipe(
+          startWith(undefined),
+          map(() => this.wishlistLocalStorage.get())
+        );
+      }
+
+      const wishlistCollection = collection(this.firestore, `users/${user.uid}/wishlist`);
+
+      return (
+        collectionData(wishlistCollection, { idField: 'productId' }) as Observable<WishlistItem[]>
+      ).pipe(map((items) => items.map((item) => item.productId)));
+    }),
+    map((productIds) => new Set(productIds)),
+    shareReplay(1)
   );
+  public readonly wishlist = toSignal(this.wishlist$);
 
-  public readonly count = computed(() => this.wishlistSet()?.size);
-
-  public list(): Observable<WishlistItem[]> {
-    return this.authApiClient.currentUser$.pipe(
-      switchMap((user) => {
-        if (!user) {
-          return of(this.wishlistLocalStorage.get());
-        }
-
-        const wishlistCollection = collection(this.firestore, `users/${user.uid}/wishlist`);
-
-        return from(collectionData(wishlistCollection, { idField: 'id' })) as Observable<
-          WishlistItem[]
-        >;
-      })
-    );
-  }
+  public readonly count = computed(() => this.wishlist()?.size);
 
   public create(productId: string): Observable<void> {
-    const user = this.user();
-
     return defer(() => {
+      const user = this.user();
       if (!user) {
         this.wishlistLocalStorage.add(productId);
 
@@ -73,9 +65,8 @@ export class WishlistApiClient {
   }
 
   public delete(productId: string): Observable<void> {
-    const user = this.user();
-
     return defer(() => {
+      const user = this.user();
       if (!user) {
         this.wishlistLocalStorage.remove(productId);
 
@@ -89,9 +80,8 @@ export class WishlistApiClient {
   }
 
   public deleteAll(): Observable<void> {
-    const user = this.user();
-
     return defer(() => {
+      const user = this.user();
       if (!user) {
         this.wishlistLocalStorage.clear();
 
@@ -107,11 +97,9 @@ export class WishlistApiClient {
           }
 
           const batch = writeBatch(this.firestore);
-          snapshot.forEach((doc) => {
-            batch.delete(doc.ref);
-          });
+          snapshot.forEach((doc) => batch.delete(doc.ref));
 
-          return from(batch.commit());
+          return batch.commit();
         })
       );
     });
