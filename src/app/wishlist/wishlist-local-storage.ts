@@ -1,10 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { from, Observable, of, Subject, tap } from 'rxjs';
+import { defer, from, Observable, of, Subject, tap } from 'rxjs';
 import { doc, Firestore, writeBatch } from '@angular/fire/firestore';
 
-import { WishlistItem } from '../models/wishlist-item';
-
-const WISHLIST_KEY = 'e-commerce-wishlist';
+const WISHLIST_STORAGE_KEY = 'e-commerce-wishlist';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +10,11 @@ const WISHLIST_KEY = 'e-commerce-wishlist';
 export class WishlistLocalStorage {
   private readonly firestore = inject(Firestore);
 
-  public readonly change$ = new Subject<void>();
+  public readonly refresh$ = new Subject<void>();
 
-  public get(): WishlistItem[] {
+  public get(): string[] {
     try {
-      return JSON.parse(window.localStorage.getItem(WISHLIST_KEY) || '[]');
+      return JSON.parse(window.localStorage.getItem(WISHLIST_STORAGE_KEY) || '[]');
     } catch {
       return [];
     }
@@ -24,49 +22,49 @@ export class WishlistLocalStorage {
 
   public add(productId: string): void {
     const wishlist = this.get();
-    if (wishlist.some((item) => item.productId === productId)) {
+    if (wishlist.some((id) => id === productId)) {
       return;
     }
 
-    const updated = [...wishlist, { id: crypto.randomUUID(), productId }];
-
-    this.save(updated);
+    this.save([...wishlist, productId]);
   }
 
   public remove(productId: string): void {
     const wishlist = this.get();
-    const filtered = wishlist.filter((item) => item.productId !== productId);
+    const filtered = wishlist.filter((id) => id !== productId);
 
     this.save(filtered);
   }
 
   public clear(): void {
-    window.localStorage.removeItem(WISHLIST_KEY);
-    this.change$.next();
+    window.localStorage.removeItem(WISHLIST_STORAGE_KEY);
+    this.refresh$.next();
   }
 
   public syncToFirestore(userId: string): Observable<void> {
-    const wishlist = this.get();
-    if (!wishlist.length) {
-      return of(undefined);
-    }
+    return defer(() => {
+      const wishlist = this.get();
+      if (!wishlist.length) {
+        return of(undefined);
+      }
 
-    const batch = writeBatch(this.firestore);
-    wishlist.forEach(({ productId }) => {
-      const docRef = doc(this.firestore, `users/${userId}/wishlist/${productId}`);
-      batch.set(docRef, { productId }, { merge: true });
+      const batch = writeBatch(this.firestore);
+      wishlist.forEach((productId) => {
+        const docRef = doc(this.firestore, `users/${userId}/wishlist/${productId}`);
+        batch.set(docRef, { productId }, { merge: true });
+      });
+
+      return from(batch.commit()).pipe(tap(() => this.clear()));
     });
-
-    return from(batch.commit()).pipe(tap(() => this.clear()));
   }
 
-  private save(wishlist: WishlistItem[]): void {
+  private save(wishlist: string[]): void {
     try {
-      window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
-      this.change$.next();
+      window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
+      this.refresh$.next();
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Error saving wishlist data to local storage:', error);
+      console.error('Error saving wishlist items to local storage:', error);
     }
   }
 }

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { Component, input, output, provideZonelessChangeDetection, signal } from '@angular/core';
+import { Component, input, output, provideZonelessChangeDetection } from '@angular/core';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { By } from '@angular/platform-browser';
 import { Observable, of, Subject } from 'rxjs';
@@ -55,12 +55,11 @@ describe(ProductList.name, () => {
     productApiClientSpy.list.and.returnValue(listReturn$);
     productApiClientSpy.listByCategory.and.returnValue(listByCategoryReturn$);
 
-    const wishlistSet = signal(new Set(['2']));
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
       'WishlistApiClient',
       ['create', 'delete'],
       {
-        wishlistSet
+        wishlist$: of(new Set(['2']))
       }
     );
     wishlistApiClientSpy.create.and.returnValue(of(undefined));

@@ -4,7 +4,7 @@ import { doc, Firestore, increment, writeBatch } from '@angular/fire/firestore';
 
 import { CartItem } from '../models/cart-item';
 
-const CART_KEY_STORAGE = 'e-commerce-cart';
+const CART_STORAGE_KEY = 'e-commerce-cart';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class CartLocalStorage {
 
   public get(): CartItem[] {
     try {
-      return JSON.parse(window.localStorage.getItem(CART_KEY_STORAGE) || '[]');
+      return JSON.parse(window.localStorage.getItem(CART_STORAGE_KEY) || '[]');
     } catch {
       return [];
     }
@@ -54,8 +54,6 @@ export class CartLocalStorage {
     return defer(() => {
       const cart = this.get();
       if (!cart.length) {
-        this.clear();
-
         return of(undefined);
       }
 
@@ -71,7 +69,7 @@ export class CartLocalStorage {
 
   private save(cart: CartItem[]): void {
     try {
-      window.localStorage.setItem(CART_KEY_STORAGE, JSON.stringify(cart));
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
       this.refresh$.next();
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -80,6 +78,6 @@ export class CartLocalStorage {
   }
 
   private clear(): void {
-    window.localStorage.removeItem(CART_KEY_STORAGE);
+    window.localStorage.removeItem(CART_STORAGE_KEY);
   }
 }

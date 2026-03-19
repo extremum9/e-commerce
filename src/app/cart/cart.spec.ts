@@ -93,13 +93,13 @@ describe(Cart.name, () => {
     cartApiClientSpy.createMany.and.returnValue(of(undefined));
     cartApiClientSpy.delete.and.returnValue(of(undefined));
 
-    const wishlistSet = signal(new Set(['1', '2', '3', '4']));
+    const wishlist = signal(new Set(['1', '2', '3', '4']));
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
       'WishlistApiClient',
       ['create', 'deleteAll'],
       {
-        wishlistSet,
-        count: signal(wishlistSet().size)
+        wishlist,
+        count: signal(wishlist().size)
       }
     );
     wishlistApiClientSpy.create.and.returnValue(of(undefined));

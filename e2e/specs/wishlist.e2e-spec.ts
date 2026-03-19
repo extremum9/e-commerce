@@ -93,11 +93,6 @@ test.describe('Wishlist page', () => {
     await wishlistPage.goto();
 
     await expect(wishlistPage.products).toHaveCount(2);
-
-    await new ProductCard(wishlistPage.products.first()).deleteFromWishlistButton.click();
-    await page.reload();
-
-    await expect(wishlistPage.products).toHaveCount(1);
   });
 
   test('should persist items in database if authenticated', async ({

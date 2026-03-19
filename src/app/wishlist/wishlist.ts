@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, of, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
@@ -95,15 +95,14 @@ export default class Wishlist {
     const productApiClient = inject(ProductApiClient);
 
     this.products = toSignal(
-      toObservable(this.wishlistApiClient.wishlistSet).pipe(
-        filter(Boolean),
-        switchMap((ids) => {
-          if (!ids.size) {
+      this.wishlistApiClient.wishlist$.pipe(
+        switchMap((productIds) => {
+          if (!productIds.size) {
             return of([]);
           }
 
           return productApiClient
-            .listByIds([...ids])
+            .listByIds([...productIds])
             .pipe(map((products) => products.map((product) => ({ ...product, favorite: true }))));
         })
       )
