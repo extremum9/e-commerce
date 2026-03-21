@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import {
   collection,
   collectionData,
+  doc,
+  docData,
   documentId,
   Firestore,
   orderBy,
@@ -35,5 +37,9 @@ export class ProductApiClient {
     return collectionData(query(this.productsCollection, where(documentId(), 'in', ids)), {
       idField: 'id'
     }) as Observable<Product[]>;
+  }
+
+  public get(id: string): Observable<Product> {
+    return docData(doc(this.productsCollection, id)) as Observable<Product>;
   }
 }
