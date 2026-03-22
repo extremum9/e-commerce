@@ -15,13 +15,12 @@ import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-
     <h1 class="mb-3 text-2xl font-medium">{{ product().name }}</h1>
     <div class="mb-3">STAR RATING</div>
     <data class="block mb-4 text-3xl font-medium" [value]="product().price"
-      >{{ product().price | currency }}
+      >{{ product().price | currency: 'USD' : 'symbol' : '1.0-2' }}
     </data>
-    <div class="mb-4">STOCK STATUS</div>
     <h2 class="mb-2 font-medium">Description</h2>
-    <p class="pb-4 border-b border-gray-200 text-gray-600">{{ product().description }}</p>
+    <p class="mb-4 text-gray-600">{{ product().description }}</p>
 
-    <div class="flex gap-4 py-4 border-b border-gray-200">
+    <div class="flex gap-4 pb-4 border-b border-gray-200">
       <button class="w-2/3" matButton="filled" type="button" [disabled]="!product().inStock">
         <mat-icon>shopping_cart</mat-icon>
         {{ product().inStock ? 'Add to Cart' : 'Out of Stock' }}
