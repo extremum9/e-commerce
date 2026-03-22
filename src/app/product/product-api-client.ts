@@ -40,6 +40,6 @@ export class ProductApiClient {
   }
 
   public get(id: string): Observable<Product> {
-    return docData(doc(this.productsCollection, id)) as Observable<Product>;
+    return docData(doc(this.productsCollection, id), { idField: 'id' }) as Observable<Product>;
   }
 }
