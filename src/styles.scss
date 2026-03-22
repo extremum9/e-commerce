@@ -83,6 +83,10 @@ mat-icon.small {
   font-size: 1.25rem;
 }
 
+.danger {
+  color: var(--mat-sys-error);
+}
+
 .fluid-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));

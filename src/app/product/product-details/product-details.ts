@@ -10,16 +10,16 @@ import { ProductMainInfo } from '../product-main-info/product-main-info';
 @Component({
   template: `
     <div class="container">
-      <app-back-button class="mb-6" navigateTo="/products">Back to Products</app-back-button>
-
       @if (product(); as product) {
+        <app-back-button class="mb-6" navigateTo="/products">Back to Products</app-back-button>
+
         <div class="flex items-start gap-8 mb-8">
           <div>
             <img
-              class="aspect-[500/500] object-cover rounded-lg"
+              class="aspect-[500/450] object-cover rounded-lg"
               [src]="product.imageUrl"
               width="500"
-              height="500"
+              height="450"
               [alt]="product.name"
             />
           </div>
