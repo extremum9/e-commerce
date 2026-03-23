@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
 
 import { Product } from '../../models/product';
 
@@ -24,7 +25,9 @@ import { Product } from '../../models/product';
 
       <div class="flex flex-col flex-1 p-5">
         <h3 data-testid="product-name" class="mb-2 leading-tight text-lg font-medium text-gray-900">
-          {{ product().name }}
+          <a class="stretched-link" [routerLink]="['/product', product().id]">{{
+            product().name
+          }}</a>
         </h3>
         <p
           data-testid="product-description"
@@ -57,7 +60,7 @@ import { Product } from '../../models/product';
       </div>
     </article>
   `,
-  imports: [MatButton, MatIcon],
+  imports: [MatButton, MatIcon, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCard {
