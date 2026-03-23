@@ -6,6 +6,9 @@ import { BackButton } from '../../back-button/back-button';
 import { ProductApiClient } from '../product-api-client';
 import { WishlistApiClient } from '../../wishlist/wishlist-api-client';
 import { ProductMainInfo } from '../product-main-info/product-main-info';
+import { Product } from '../../models/product';
+import { Snackbar } from '../../snackbar/snackbar';
+import { CartApiClient } from '../../cart/cart-api-client';
 
 @Component({
   template: `
@@ -25,7 +28,11 @@ import { ProductMainInfo } from '../product-main-info/product-main-info';
           </div>
 
           <div class="flex-1">
-            <app-product-main-info [product]="product" />
+            <app-product-main-info
+              [product]="product"
+              (addedToCart)="addToCart(product.id)"
+              (toggledWishlist)="toggleWishlist(product)"
+            />
           </div>
         </div>
       }
@@ -37,6 +44,8 @@ import { ProductMainInfo } from '../product-main-info/product-main-info';
 export default class ProductDetails {
   private readonly productApiClient = inject(ProductApiClient);
   private readonly wishlistApiClient = inject(WishlistApiClient);
+  private readonly cartApiClient = inject(CartApiClient);
+  private readonly snackbar = inject(Snackbar);
 
   protected readonly id = input.required<string>();
 
@@ -45,7 +54,28 @@ export default class ProductDetails {
       switchMap(() =>
         combineLatest([this.productApiClient.get(this.id()), this.wishlistApiClient.wishlist$])
       ),
-      map(([product, wishlist]) => ({ ...product, favorite: wishlist.has(product.id) }))
+      map(([product, wishlist]) => ({
+        ...product,
+        favorite: wishlist.has(product.id)
+      }))
     )
   );
+
+  protected addToCart(productId: string): void {
+    this.cartApiClient
+      .create(productId)
+      .subscribe(() => this.snackbar.showSuccess('Product added to cart'));
+  }
+
+  protected toggleWishlist(product: Product): void {
+    if (product.favorite) {
+      this.wishlistApiClient
+        .delete(product.id)
+        .subscribe(() => this.snackbar.showSuccess('Product removed from wishlist'));
+    } else {
+      this.wishlistApiClient
+        .create(product.id)
+        .subscribe(() => this.snackbar.showSuccess('Product added to wishlist'));
+    }
+  }
 }
