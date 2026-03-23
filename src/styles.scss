@@ -93,6 +93,14 @@ mat-icon.small {
   gap: 1rem;
 }
 
+.stretched-link {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+}
+
 .surface-box {
   @apply p-6 border border-gray-200 rounded-xl bg-white;
 }
