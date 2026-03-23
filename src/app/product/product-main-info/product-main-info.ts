@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -21,11 +21,20 @@ import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-
     <p class="mb-4 text-gray-600">{{ product().description }}</p>
 
     <div class="flex gap-4 pb-4 border-b border-gray-200">
-      <button class="w-2/3" matButton="filled" type="button" [disabled]="!product().inStock">
+      <button
+        class="w-2/3"
+        matButton="filled"
+        type="button"
+        [disabled]="!product().inStock"
+        (click)="addedToCart.emit()"
+      >
         <mat-icon>shopping_cart</mat-icon>
         {{ product().inStock ? 'Add to Cart' : 'Out of Stock' }}
       </button>
-      <app-toggle-wishlist-button [favorite]="product().favorite" />
+      <app-toggle-wishlist-button
+        [favorite]="product().favorite"
+        (toggled)="toggledWishlist.emit()"
+      />
     </div>
 
     <div class="flex flex-col gap-2 pt-6 text-xs text-gray-700">
@@ -48,4 +57,7 @@ import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-
 })
 export class ProductMainInfo {
   public readonly product = input.required<Product>();
+
+  public readonly addedToCart = output();
+  public readonly toggledWishlist = output();
 }
