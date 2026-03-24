@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, input, Signal, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  Signal,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
@@ -72,7 +81,7 @@ export default class ProductList {
   private readonly cartApiClient = inject(CartApiClient);
   private readonly snackbar = inject(Snackbar);
 
-  protected readonly categories = signal(inject(CategoryApiClient).list());
+  protected readonly categories: WritableSignal<readonly string[]>;
 
   protected readonly category = input.required({
     transform: (value?: string) => value?.toLowerCase().trim() || 'all'
@@ -81,7 +90,10 @@ export default class ProductList {
   protected readonly products: Signal<Product[] | undefined>;
 
   constructor() {
+    const categoryApiClient = inject(CategoryApiClient);
     const productApiClient = inject(ProductApiClient);
+
+    this.categories = signal(categoryApiClient.list());
 
     const products$ = toObservable(this.category).pipe(
       switchMap((cat) =>
@@ -97,6 +109,8 @@ export default class ProductList {
         )
       )
     );
+
+    effect(() => categoryApiClient.currentCategory.set(this.category()));
   }
 
   protected toggleWishlist(product: Product): void {

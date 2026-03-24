@@ -9,12 +9,17 @@ import { ProductMainInfo } from '../product-main-info/product-main-info';
 import { Product } from '../../models/product';
 import { Snackbar } from '../../snackbar/snackbar';
 import { CartApiClient } from '../../cart/cart-api-client';
+import { CategoryApiClient } from '../category-api-client';
 
 @Component({
   template: `
     <div class="container">
       @if (product(); as product) {
-        <app-back-button class="mb-6" navigateTo="/products">Back to Products</app-back-button>
+        <app-back-button
+          class="mb-6"
+          [navigateTo]="category() === 'all' ? '/products' : '/products/' + category()"
+          >Back to Products</app-back-button
+        >
 
         <div class="flex items-start gap-8 mb-8">
           <div>
@@ -46,6 +51,8 @@ export default class ProductDetails {
   private readonly wishlistApiClient = inject(WishlistApiClient);
   private readonly cartApiClient = inject(CartApiClient);
   private readonly snackbar = inject(Snackbar);
+
+  protected readonly category = inject(CategoryApiClient).currentCategory;
 
   protected readonly id = input.required<string>();
 
