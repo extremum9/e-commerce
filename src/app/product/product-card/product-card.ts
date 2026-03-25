@@ -4,6 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 
 import { Product } from '../../models/product';
+import { StarRating } from '../../star-rating/star-rating';
 
 @Component({
   selector: 'app-product-card',
@@ -35,6 +36,9 @@ import { Product } from '../../models/product';
         >
           {{ product().description }}
         </p>
+        <app-star-rating class="mb-3" [rating]="product().rating">
+          ({{ product().reviewCount }})
+        </app-star-rating>
         <span
           data-testid="product-availability"
           class="mb-4 text-sm font-medium"
@@ -60,7 +64,7 @@ import { Product } from '../../models/product';
       </div>
     </article>
   `,
-  imports: [MatButton, MatIcon, RouterLink],
+  imports: [MatButton, MatIcon, RouterLink, StarRating],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCard {
