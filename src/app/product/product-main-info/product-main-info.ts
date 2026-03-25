@@ -5,6 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 
 import { Product } from '../../models/product';
 import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-button';
+import { StarRating } from '../../star-rating/star-rating';
 
 @Component({
   selector: 'app-product-main-info',
@@ -13,7 +14,9 @@ import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-
       product().category | titlecase
     }}</span>
     <h1 class="mb-3 text-2xl font-medium">{{ product().name }}</h1>
-    <div class="mb-3">STAR RATING</div>
+    <app-star-rating class="mb-3" [rating]="4.5">
+      {{ product().rating }} ({{ product().reviewCount }} reviews)
+    </app-star-rating>
     <data class="block mb-4 text-3xl font-medium" [value]="product().price"
       >{{ product().price | currency: 'USD' : 'symbol' : '1.0-2' }}
     </data>
@@ -52,7 +55,7 @@ import { ToggleWishlistButton } from '../toggle-wishlist-button/toggle-wishlist-
       </div>
     </div>
   `,
-  imports: [CurrencyPipe, MatButton, MatIcon, TitleCasePipe, ToggleWishlistButton],
+  imports: [CurrencyPipe, MatButton, MatIcon, TitleCasePipe, ToggleWishlistButton, StarRating],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductMainInfo {
