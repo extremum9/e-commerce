@@ -3,16 +3,13 @@
   "users": [
     {
       "localId": "ae04ysutPy3cu2WLpzf2Eb778QKb",
+      "createdAt": "1768300186203",
       "lastLoginAt": "1768300186203",
       "displayName": "John Doe",
       "photoUrl": "",
-      "emailVerified": false,
-      "email": "john.doe@mail.com",
-      "salt": "fakeSaltpEuggFlqpVKdTtPcjDP4",
       "passwordHash": "fakeHash:salt=fakeSaltpEuggFlqpVKdTtPcjDP4:password=123456",
-      "passwordUpdatedAt": 1768300316542,
-      "validSince": "1768300316",
-      "createdAt": "1768300186203",
+      "salt": "fakeSaltpEuggFlqpVKdTtPcjDP4",
+      "passwordUpdatedAt": 1774636464053,
       "providerUserInfo": [
         {
           "providerId": "password",
@@ -23,9 +20,10 @@
           "photoUrl": ""
         }
       ],
-      "initialEmail": "test@gmail.com",
-      "customAttributes": "",
-      "lastRefreshAt": "2026-01-13T10:31:56.543Z"
+      "validSince": "1774636464",
+      "email": "john.doe@mail.com",
+      "emailVerified": false,
+      "disabled": false
     }
   ]
 }
