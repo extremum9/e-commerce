@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, Signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, switchMap } from 'rxjs';
 
@@ -10,11 +10,19 @@ import { Product } from '../../models/product';
 import { Snackbar } from '../../snackbar/snackbar';
 import { CartApiClient } from '../../cart/cart-api-client';
 import { CategoryApiClient } from '../category-api-client';
+import { ProductReviews } from '../product-reviews/product-reviews';
+import { ReviewApiClient } from '../review-api-client';
+import { Review } from '../../models/review';
+
+type ViewModel = {
+  product: Product;
+  reviews: Review[];
+};
 
 @Component({
   template: `
     <div class="container">
-      @if (product(); as product) {
+      @if (viewModel(); as vm) {
         <app-back-button
           class="mb-6"
           [navigateTo]="category() === 'all' ? '/products' : '/products/' + category()"
@@ -25,29 +33,31 @@ import { CategoryApiClient } from '../category-api-client';
           <div>
             <img
               class="aspect-[500/450] object-cover rounded-lg"
-              [src]="product.imageUrl"
+              [src]="vm.product.imageUrl"
               width="500"
               height="450"
-              [alt]="product.name"
+              [alt]="vm.product.name"
             />
           </div>
 
           <div class="flex-1">
             <app-product-main-info
-              [product]="product"
-              (addedToCart)="addToCart(product.id)"
-              (toggledWishlist)="toggleWishlist(product)"
+              [product]="vm.product"
+              (addedToCart)="addToCart(vm.product.id)"
+              (toggledWishlist)="toggleWishlist(vm.product)"
             />
           </div>
         </div>
+
+        <app-product-reviews class="surface-box" [reviews]="vm.reviews" />
       }
     </div>
   `,
-  imports: [BackButton, ProductMainInfo],
+  imports: [BackButton, ProductMainInfo, ProductReviews],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductDetails {
-  private readonly productApiClient = inject(ProductApiClient);
+  private readonly reviewApiClient = inject(ReviewApiClient);
   private readonly wishlistApiClient = inject(WishlistApiClient);
   private readonly cartApiClient = inject(CartApiClient);
   private readonly snackbar = inject(Snackbar);
@@ -56,17 +66,27 @@ export default class ProductDetails {
 
   protected readonly id = input.required<string>();
 
-  protected readonly product = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(() =>
-        combineLatest([this.productApiClient.get(this.id()), this.wishlistApiClient.wishlist$])
-      ),
-      map(([product, wishlist]) => ({
-        ...product,
-        favorite: wishlist.has(product.id)
-      }))
-    )
-  );
+  protected readonly viewModel: Signal<ViewModel | undefined>;
+
+  constructor() {
+    const productApiClient = inject(ProductApiClient);
+
+    this.viewModel = toSignal(
+      toObservable(this.id).pipe(
+        switchMap((id) =>
+          combineLatest([
+            productApiClient.get(id),
+            this.wishlistApiClient.wishlist$,
+            this.reviewApiClient.list(id)
+          ])
+        ),
+        map(([product, wishlist, reviews]) => ({
+          product: { ...product, favorite: wishlist.has(product.id) },
+          reviews
+        }))
+      )
+    );
+  }
 
   protected addToCart(productId: string): void {
     this.cartApiClient

@@ -102,7 +102,7 @@ mat-icon.small {
 }
 
 .surface-box {
-  @apply p-6 border border-gray-200 rounded-xl bg-white;
+  @apply block p-6 border border-gray-200 rounded-xl bg-white;
 }
 
 .snackbar-success {
