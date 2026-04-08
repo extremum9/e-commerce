@@ -49,7 +49,11 @@ type ViewModel = {
           </div>
         </div>
 
-        <app-product-reviews class="surface-box" [reviews]="vm.reviews" />
+        <app-product-reviews
+          class="surface-box"
+          [reviews]="vm.reviews"
+          [rating]="vm.product.rating"
+        />
       }
     </div>
   `,
