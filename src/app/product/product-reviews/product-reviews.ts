@@ -3,6 +3,7 @@ import { MatButton } from '@angular/material/button';
 
 import { Review } from '../../models/review';
 import { ProductReview } from '../product-review/product-review';
+import { ProductReviewSummary } from '../product-review-summary/product-review-summary';
 
 @Component({
   selector: 'app-product-reviews',
@@ -12,7 +13,7 @@ import { ProductReview } from '../product-review/product-review';
       <button matButton="filled" type="button">Write a Review</button>
     </div>
 
-    <div class="mb-6">RATING SUMMARY</div>
+    <app-product-review-summary class="block mb-6" [reviews]="reviews()" [rating]="rating()" />
 
     <div class="flex flex-col gap-y-6">
       @for (review of reviews(); track review.id) {
@@ -20,9 +21,10 @@ import { ProductReview } from '../product-review/product-review';
       }
     </div>
   `,
-  imports: [MatButton, ProductReview],
+  imports: [MatButton, ProductReview, ProductReviewSummary],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductReviews {
   public readonly reviews = input.required<Review[]>();
+  public readonly rating = input.required<number>();
 }
