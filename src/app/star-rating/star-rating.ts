@@ -8,10 +8,13 @@ import { MatIcon } from '@angular/material/icon';
       <div class="flex items-center">
         @for (starWidth of starWidths(); track $index) {
           <div class="relative">
-            <mat-icon class="text-gray-300! align-middle">star</mat-icon>
-            <div class="absolute top-0 left-0 h-full overflow-hidden" [style.width.%]="starWidth">
-              <mat-icon class="text-yellow-400!">star</mat-icon>
-            </div>
+            <mat-icon class="text-lg! text-gray-300! align-middle" [inline]="true">star</mat-icon>
+            <mat-icon
+              class="absolute top-0 left-0 text-lg! text-yellow-400!"
+              [style.width.%]="starWidth"
+              [inline]="true"
+              >star</mat-icon
+            >
           </div>
         }
       </div>
@@ -38,7 +41,7 @@ export class StarRating {
       } else if (difference <= 0) {
         return 0;
       }
-      return difference * 100;
+      return 50;
     })
   );
 }

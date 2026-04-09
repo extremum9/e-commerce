@@ -81,7 +81,8 @@ module.exports = {
     'wishlist',
     'cart',
     'back-button',
-    'confirm-dialog'
+    'confirm-dialog',
+    'star-rating'
   ],
   types
 };
