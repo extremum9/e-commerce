@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { collection, collectionData, Firestore } from '@angular/fire/firestore';
+import { collection, collectionData, Firestore, orderBy, query } from '@angular/fire/firestore';
 
 import { Review } from '../models/review';
 
@@ -13,6 +13,8 @@ export class ReviewApiClient {
   public list(productId: string): Observable<Review[]> {
     const colRef = collection(this.firestore, `products/${productId}/reviews`);
 
-    return collectionData(colRef, { idField: 'id' }) as Observable<Review[]>;
+    return collectionData(query(colRef, orderBy('createdAt', 'desc')), {
+      idField: 'id'
+    }) as Observable<Review[]>;
   }
 }

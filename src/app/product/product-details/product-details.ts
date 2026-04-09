@@ -50,7 +50,7 @@ type ViewModel = {
         </div>
 
         <app-product-reviews
-          class="surface-box"
+          class="block surface-box"
           [reviews]="vm.reviews"
           [rating]="vm.product.rating"
         />
