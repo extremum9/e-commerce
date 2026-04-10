@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, Signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, switchMap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 import { BackButton } from '../../back-button/back-button';
 import { ProductApiClient } from '../product-api-client';
@@ -13,6 +14,7 @@ import { CategoryApiClient } from '../category-api-client';
 import { ProductReviews } from '../product-reviews/product-reviews';
 import { ReviewApiClient } from '../review-api-client';
 import { Review } from '../../models/review';
+import { ProductWriteReviewDialog } from '../product-write-review-dialog/product-write-review-dialog';
 
 type ViewModel = {
   product: Product;
@@ -53,6 +55,7 @@ type ViewModel = {
           class="block surface-box"
           [reviews]="vm.reviews"
           [rating]="vm.product.rating"
+          (writeDialogOpened)="openWriteReviewDialog()"
         />
       }
     </div>
@@ -65,6 +68,7 @@ export default class ProductDetails {
   private readonly wishlistApiClient = inject(WishlistApiClient);
   private readonly cartApiClient = inject(CartApiClient);
   private readonly snackbar = inject(Snackbar);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly category = inject(CategoryApiClient).currentCategory;
 
@@ -108,5 +112,9 @@ export default class ProductDetails {
         .create(product.id)
         .subscribe(() => this.snackbar.showSuccess('Product added to wishlist'));
     }
+  }
+
+  protected openWriteReviewDialog(): void {
+    this.dialog.open(ProductWriteReviewDialog, {});
   }
 }
