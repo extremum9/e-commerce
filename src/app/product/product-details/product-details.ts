@@ -115,6 +115,6 @@ export default class ProductDetails {
   }
 
   protected openWriteReviewDialog(): void {
-    this.dialog.open(ProductWriteReviewDialog, {});
+    this.dialog.open(ProductWriteReviewDialog, { data: { productId: this.id() } });
   }
 }
