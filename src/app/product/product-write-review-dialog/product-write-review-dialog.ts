@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
@@ -11,6 +12,13 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { MatError, MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
+
+import { ReviewApiClient } from '../review-api-client';
+import { Snackbar } from '../../snackbar/snackbar';
+
+type WriteReviewDialogData = {
+  productId: string;
+};
 
 type RatingOption = {
   label: string;
@@ -67,7 +75,9 @@ type RatingOption = {
 
     <mat-dialog-actions>
       <button matButton mat-dialog-close>Cancel</button>
-      <button form="reviewForm" matButton type="submit" cdkFocusInitial>Submit</button>
+      <button form="reviewForm" matButton type="submit" [disabled]="submitted()" cdkFocusInitial>
+        {{ submitted() ? 'Submitting...' : 'Submit' }}
+      </button>
     </mat-dialog-actions>
   `,
   imports: [
@@ -86,7 +96,10 @@ type RatingOption = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductWriteReviewDialog {
+  private readonly data = inject<WriteReviewDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef);
+  private readonly reviewApiClient = inject(ReviewApiClient);
+  private readonly snackbar = inject(Snackbar);
 
   protected readonly ratingOptions = signal<RatingOption[]>([
     { label: '5 Stars - Excellent', value: 5 },
@@ -102,12 +115,29 @@ export class ProductWriteReviewDialog {
     rating: signal(5)
   };
 
+  protected readonly submitted = signal(false);
+
   protected readonly ngForm = viewChild.required(NgForm);
 
   protected submit(): void {
     if (this.ngForm().invalid) {
       return;
     }
-    this.dialogRef.close(this.form);
+    this.submitted.set(true);
+    this.snackbar.dismiss();
+    this.reviewApiClient
+      .create({
+        productId: this.data.productId,
+        title: this.form.title(),
+        body: this.form.body(),
+        rating: this.form.rating()
+      })
+      .subscribe({
+        next: () => this.dialogRef.close(),
+        error: () => {
+          this.submitted.set(false);
+          this.snackbar.showError('Could not create a review');
+        }
+      });
   }
 }
