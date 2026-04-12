@@ -7,6 +7,6 @@ export type Review = {
   title: string;
   body: string;
   rating: number;
-  createdAt: Timestamp;
+  createdAt: Timestamp | null;
   author: Omit<CurrentUser, 'email'>;
 };
