@@ -9,13 +9,17 @@ import { ProductReviewSummary } from '../product-review-summary/product-review-s
   selector: 'app-product-reviews',
   template: `
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-medium">Reviews</h2>
+      <h2 class="text-xl font-medium">Ratings and reviews</h2>
       <button matButton="filled" type="button" (click)="writeDialogOpened.emit()">
         Write a Review
       </button>
     </div>
 
-    <app-product-review-summary class="block mb-6" [reviews]="reviews()" [rating]="rating()" />
+    <app-product-review-summary
+      class="block [&:not(:last-child)]:mb-6"
+      [reviews]="reviews()"
+      [rating]="rating()"
+    />
 
     <div class="flex flex-col gap-y-6">
       @for (review of reviews(); track review.id) {
