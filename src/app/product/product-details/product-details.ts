@@ -15,6 +15,8 @@ import { ProductReviews } from '../product-reviews/product-reviews';
 import { ReviewApiClient } from '../review-api-client';
 import { Review } from '../../models/review';
 import { ProductWriteReviewDialog } from '../product-write-review-dialog/product-write-review-dialog';
+import { AuthApiClient } from '../../auth/auth-api-client';
+import { AuthDialog } from '../../auth/auth-dialog/auth-dialog';
 
 type ViewModel = {
   product: Product;
@@ -70,6 +72,8 @@ export default class ProductDetails {
   private readonly snackbar = inject(Snackbar);
   private readonly dialog = inject(MatDialog);
 
+  private readonly user = inject(AuthApiClient).currentUser;
+
   protected readonly category = inject(CategoryApiClient).currentCategory;
 
   protected readonly id = input.required<string>();
@@ -115,6 +119,10 @@ export default class ProductDetails {
   }
 
   protected openWriteReviewDialog(): void {
-    this.dialog.open(ProductWriteReviewDialog, { data: { productId: this.id() } });
+    if (this.user()) {
+      this.dialog.open(ProductWriteReviewDialog, { data: { productId: this.id() } });
+    } else {
+      this.dialog.open(AuthDialog, { width: '400px' });
+    }
   }
 }
