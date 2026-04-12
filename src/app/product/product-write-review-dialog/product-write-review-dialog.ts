@@ -112,7 +112,7 @@ export class ProductWriteReviewDialog {
   protected readonly form = {
     title: signal(''),
     body: signal(''),
-    rating: signal(5)
+    rating: signal(this.ratingOptions()[0].value)
   };
 
   protected readonly submitted = signal(false);

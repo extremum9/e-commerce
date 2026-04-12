@@ -20,7 +20,7 @@ import { Review } from '../../models/review';
         <div class="flex items-center mb-1">
           <app-star-rating [rating]="review().rating" />
           <div class="text-sm text-gray-500">
-            {{ review().createdAt.toDate() | date: 'MMM d, yyyy' }}
+            {{ review().createdAt?.toDate() | date: 'MMM d, yyyy' }}
           </div>
         </div>
 
