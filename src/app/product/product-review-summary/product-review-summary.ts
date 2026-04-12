@@ -12,7 +12,7 @@ type RatingStats = {
 @Component({
   selector: 'app-product-review-summary',
   template: `
-    <div class="flex items-center gap-8 mb-6 px-4 py-6 rounded-lg bg-gray-50">
+    <div class="flex items-center gap-8 px-4 py-6 rounded-lg bg-gray-50">
       <div class="flex flex-col items-center w-1/2">
         <div class="mb-1 text-4xl font-medium text-gray-900">
           {{ rating() }}
