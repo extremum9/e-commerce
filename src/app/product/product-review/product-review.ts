@@ -9,23 +9,30 @@ import { Review } from '../../models/review';
   template: `
     <div class="flex items-start gap-4">
       <img
+        data-testid="review-author-image"
         class="w-10 h-10 rounded-full"
         [src]="review().author.imageUrl || 'person.jpg'"
+        width="40"
+        height="40"
         [alt]="review().author.name"
       />
 
       <div>
-        <div class="text-lg font-medium">{{ review().author.name }}</div>
+        <div data-testid="review-author-name" class="text-lg font-medium">
+          {{ review().author.name }}
+        </div>
 
         <div class="flex items-center mb-1">
           <app-star-rating [rating]="review().rating" />
-          <div class="text-sm text-gray-500">
+          <div data-testid="review-creation-date" class="text-sm text-gray-500">
             {{ review().createdAt?.toDate() | date: 'MMM d, yyyy' }}
           </div>
         </div>
 
-        <div class="text-base mb-1 font-medium">{{ review().title }}</div>
-        <div class="text-sm text-gray-500">{{ review().body }}</div>
+        <div data-testid="review-title" class="text-base mb-1 font-medium">
+          {{ review().title }}
+        </div>
+        <div data-testid="review-body" class="text-sm text-gray-500">{{ review().body }}</div>
       </div>
     </div>
   `,
