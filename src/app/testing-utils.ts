@@ -1,9 +1,11 @@
 import { Provider } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { Timestamp } from '@angular/fire/firestore';
 
 import { Product } from './models/product';
 import { CurrentUser } from './models/current-user';
 import { OrderSummary } from './models/order-summary';
+import { Review } from './models/review';
 
 export const provideDisabledAnimations = (): Provider => ({
   provide: MATERIAL_ANIMATIONS,
@@ -37,4 +39,19 @@ export const createMockOrderSummary = (summary: Partial<OrderSummary> = {}): Ord
   tax: 100.5,
   total: 1100.5,
   ...summary
+});
+
+export const createMockReview = (
+  { review, author }: { review?: Partial<Review>; author?: Partial<CurrentUser> } = {
+    review: {},
+    author: {}
+  }
+): Review => ({
+  id: '1',
+  title: 'test title',
+  body: 'test body',
+  rating: 5,
+  createdAt: Timestamp.now(),
+  author: createMockUser(author),
+  ...review
 });
