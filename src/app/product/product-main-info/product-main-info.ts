@@ -10,21 +10,27 @@ import { StarRating } from '../../star-rating/star-rating';
 @Component({
   selector: 'app-product-main-info',
   template: `
-    <span class="inline-block mb-2 px-2 py-1 text-xs rounded-xl bg-gray-100">{{
-      product().category | titlecase
-    }}</span>
-    <h1 class="mb-3 text-2xl font-medium">{{ product().name }}</h1>
-    <app-star-rating class="mb-3" [rating]="4.5">
+    <span
+      data-testid="product-category"
+      class="inline-block mb-2 px-2 py-1 text-xs rounded-xl bg-gray-100"
+      >{{ product().category | titlecase }}</span
+    >
+    <h1 data-testid="product-name" class="mb-3 text-2xl font-medium">{{ product().name }}</h1>
+    <app-star-rating class="mb-3" [rating]="product().rating">
       {{ product().rating }} ({{ product().reviewCount }} reviews)
     </app-star-rating>
-    <data class="block mb-4 text-3xl font-medium" [value]="product().price"
+    <data
+      data-testid="product-price"
+      class="block mb-4 text-3xl font-medium"
+      [value]="product().price"
       >{{ product().price | currency: 'USD' : 'symbol' : '1.0-2' }}
     </data>
-    <h2 class="mb-2 font-medium">Description</h2>
-    <p class="mb-4 text-gray-600">{{ product().description }}</p>
+    <h2 data-testid="product-description-title" class="mb-2 font-medium">Description</h2>
+    <p data-testid="product-description" class="mb-4 text-gray-600">{{ product().description }}</p>
 
     <div class="flex gap-4 pb-4 border-b border-gray-200">
       <button
+        data-testid="product-add-to-cart-button"
         class="w-2/3"
         matButton="filled"
         type="button"
