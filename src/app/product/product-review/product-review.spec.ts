@@ -1,6 +1,5 @@
 import { Component, input, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { By } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
 
@@ -39,14 +38,12 @@ describe(ProductReview.name, () => {
       providers: [provideZonelessChangeDetection(), provideDisabledAnimations()]
     });
     const fixture = TestBed.createComponent(ProductReviewTestHost);
-    const component = fixture.componentInstance;
     const debugElement = fixture.debugElement;
-    const loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
 
-    const mockReview = component.mockReview;
+    const mockReview = fixture.componentInstance.mockReview;
 
-    return { fixture, debugElement, loader, mockReview };
+    return { fixture, debugElement, mockReview };
   };
 
   it('should display review author image', async () => {

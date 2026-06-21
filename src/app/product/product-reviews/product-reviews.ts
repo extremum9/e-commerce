@@ -9,8 +9,13 @@ import { ProductReviewSummary } from '../product-review-summary/product-review-s
   selector: 'app-product-reviews',
   template: `
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-medium">Ratings and reviews</h2>
-      <button matButton="filled" type="button" (click)="writeDialogOpened.emit()">
+      <h2 data-testid="product-reviews-title" class="text-xl font-medium">Ratings and reviews</h2>
+      <button
+        data-testid="write-review-button"
+        matButton="filled"
+        type="button"
+        (click)="writeDialogOpened.emit()"
+      >
         Write a Review
       </button>
     </div>
