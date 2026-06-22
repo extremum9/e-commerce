@@ -11,7 +11,7 @@ import { Review } from '../../models/review';
       <img
         data-testid="review-author-image"
         class="w-10 h-10 rounded-full"
-        [src]="review().author.imageUrl || 'person.jpg'"
+        [src]="review().author.imageUrl || 'user-placeholder-image.png'"
         width="40"
         height="40"
         [alt]="review().author.name"
