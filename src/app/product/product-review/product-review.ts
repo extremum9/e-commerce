@@ -7,7 +7,7 @@ import { Review } from '../../models/review';
 @Component({
   selector: 'app-product-review',
   template: `
-    <div class="flex items-start gap-4">
+    <div class="flex flex-col items-start gap-4 sm:flex-row">
       <img
         data-testid="review-author-image"
         class="w-10 h-10 rounded-full"
