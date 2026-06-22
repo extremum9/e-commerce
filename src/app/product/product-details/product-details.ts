@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, input, Signal } from '@angu
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, switchMap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { BackButton } from '../../back-button/back-button';
 import { ProductApiClient } from '../product-api-client';
@@ -59,10 +60,14 @@ type ViewModel = {
           [rating]="vm.product.rating"
           (writeDialogOpened)="openWriteReviewDialog()"
         />
+      } @else {
+        <div class="flex justify-center">
+          <mat-spinner data-testid="loading-product-list-spinner" [diameter]="50" />
+        </div>
       }
     </div>
   `,
-  imports: [BackButton, ProductMainInfo, ProductReviews],
+  imports: [BackButton, ProductMainInfo, ProductReviews, MatProgressSpinner],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class ProductDetails {
