@@ -11,6 +11,7 @@ import { MatBadge } from '@angular/material/badge';
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistApiClient } from '../wishlist/wishlist-api-client';
 import { CartApiClient } from '../cart/cart-api-client';
+import { SearchBar } from '../search-bar/search-bar';
 
 @Component({
   selector: 'app-navbar',
@@ -20,6 +21,7 @@ import { CartApiClient } from '../cart/cart-api-client';
         <a data-testid="navbar-brand" class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/"
           >MiniStore</a
         >
+        <app-search-bar class="flex-grow-1" />
         <div class="flex items-center gap-2">
           <a
             data-testid="navbar-wishlist-link"
@@ -95,7 +97,8 @@ import { CartApiClient } from '../cart/cart-api-client';
     MatMenuItem,
     MatMenuTrigger,
     MatDivider,
-    MatBadge
+    MatBadge,
+    SearchBar
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

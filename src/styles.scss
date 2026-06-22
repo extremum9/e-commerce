@@ -68,6 +68,16 @@ button[matIconButton].danger {
   );
 }
 
+button[matIconButton].small {
+  @include mat.icon-button-overrides(
+    (
+      icon-size: 24px,
+      touch-target-size: 28px,
+      state-layer-size: 28px
+    )
+  );
+}
+
 mat-form-field {
   @include mat.theme(
     (
