@@ -34,7 +34,7 @@ type ViewModel = {
           >Back to Products</app-back-button
         >
 
-        <div class="flex items-start gap-8 mb-8">
+        <div class="flex flex-col items-start gap-x-8 gap-y-4 mb-8 lg:flex-row">
           <div>
             <img
               class="aspect-[500/450] object-cover rounded-lg"

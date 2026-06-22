@@ -8,7 +8,7 @@ import { ProductReviewSummary } from '../product-review-summary/product-review-s
 @Component({
   selector: 'app-product-reviews',
   template: `
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
       <h2 data-testid="product-reviews-title" class="text-xl font-medium">Ratings and reviews</h2>
       <button
         data-testid="write-review-button"
