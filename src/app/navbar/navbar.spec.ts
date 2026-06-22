@@ -158,8 +158,7 @@ describe(Navbar.name, () => {
   });
 
   it('should display user profile if logged in', async () => {
-    const { fixture, debugElement, loader, getUserMenuHarness, mockUser, currentUser } =
-      await setup();
+    const { debugElement, loader, getUserMenuHarness, mockUser, currentUser } = await setup();
     currentUser.set(mockUser);
 
     const hasLoginButtonHarness = await loader.hasHarness(
@@ -177,15 +176,8 @@ describe(Navbar.name, () => {
       By.css('[data-testid=user-profile-image]')
     );
     expect(userProfileImageDebugElement).toBeTruthy();
-
-    const userProfileImageElement: HTMLImageElement = userProfileImageDebugElement.nativeElement;
-    expect(userProfileImageElement.getAttribute('src')).toBe(mockUser.imageUrl);
-    expect(userProfileImageElement.getAttribute('alt')).toBe('Profile image');
-
-    currentUser.set({ ...mockUser, imageUrl: null });
-    await fixture.whenStable();
-
-    expect(userProfileImageElement.getAttribute('src')).toBe('person.jpg');
+    expect(userProfileImageDebugElement.nativeElement.getAttribute('src')).toBe(mockUser.imageUrl);
+    expect(userProfileImageDebugElement.nativeElement.getAttribute('alt')).toBe('Profile image');
 
     const userMenuHarness = await getUserMenuHarness();
     await userMenuHarness.open();

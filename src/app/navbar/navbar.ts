@@ -51,7 +51,7 @@ import { CartApiClient } from '../cart/cart-api-client';
               <img
                 data-testid="user-profile-image"
                 class="rounded-full"
-                [src]="user.imageUrl || 'person.jpg'"
+                [src]="user.imageUrl || 'user-placeholder-image.png'"
                 alt="Profile image"
               />
             </button>
