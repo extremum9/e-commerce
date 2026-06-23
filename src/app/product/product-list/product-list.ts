@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -33,6 +34,7 @@ import { CartApiClient } from '../../cart/cart-api-client';
             <a
               data-testid="category-link"
               [routerLink]="cat === 'all' ? ['/products'] : ['/products', cat]"
+              queryParamsHandling="preserve"
               [matButton]="cat === category() ? 'filled' : 'outlined'"
               [attr.aria-current]="cat === category() ? 'page' : null"
             >
@@ -45,6 +47,9 @@ import { CartApiClient } from '../../cart/cart-api-client';
       @if (products(); as products) {
         <p data-testid="product-count" class="mb-6 text-base text-gray-600">
           {{ products.length }} products found
+          @if (search()) {
+            for "{{ search() }}"
+          }
         </p>
         <ul class="fluid-grid">
           @for (product of products; track product.id) {
@@ -86,6 +91,12 @@ export default class ProductList {
   protected readonly category = input.required({
     transform: (value?: string) => value?.toLowerCase().trim() || 'all'
   });
+  protected readonly search = input.required({ transform: (value?: string) => value ?? '' });
+
+  protected readonly queryParams = computed(() => ({
+    category: this.category(),
+    search: this.search()
+  }));
 
   protected readonly products: Signal<Product[] | undefined>;
 
@@ -95,9 +106,15 @@ export default class ProductList {
 
     this.categories = signal(categoryApiClient.list());
 
-    const products$ = toObservable(this.category).pipe(
-      switchMap((cat) =>
-        cat === 'all' ? productApiClient.list() : productApiClient.listByCategory(cat)
+    const products$ = toObservable(this.queryParams).pipe(
+      switchMap(({ category, search }) =>
+        productApiClient
+          .list(category)
+          .pipe(
+            map((products) =>
+              products.filter((product) => product.name.toLowerCase().includes(search))
+            )
+          )
       )
     );
     const wishlist$ = this.wishlistApiClient.wishlist$;
