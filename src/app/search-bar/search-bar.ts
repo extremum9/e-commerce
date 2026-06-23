@@ -1,6 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
+import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { Router } from '@angular/router';
+
+import { CategoryApiClient } from '../product/category-api-client';
 
 @Component({
   selector: 'app-search-bar',
@@ -13,13 +18,30 @@ import { MatIconButton } from '@angular/material/button';
         class="flex-1 outline-none text-gray-700 text-sm bg-transparent placeholder-gray-400"
         type="search"
         placeholder="Search products..."
+        [formControl]="input"
       />
       <button class="small" matIconButton type="button">
         <mat-icon>close</mat-icon>
       </button>
     </search>
   `,
-  imports: [MatIcon, MatIconButton],
+  imports: [MatIcon, MatIconButton, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchBar {}
+export class SearchBar {
+  private readonly router = inject(Router);
+  private readonly categoryApiClient = inject(CategoryApiClient);
+
+  protected readonly input = inject(NonNullableFormBuilder).control('');
+
+  constructor() {
+    this.input.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
+      const trimmed = term.toLowerCase().trim();
+      const category = this.categoryApiClient.currentCategory();
+
+      this.router.navigate([`/products/${category === 'all' ? '' : category}`], {
+        queryParams: trimmed ? { search: trimmed } : {}
+      });
+    });
+  }
+}

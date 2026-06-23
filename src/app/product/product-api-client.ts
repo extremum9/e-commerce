@@ -8,6 +8,7 @@ import {
   Firestore,
   orderBy,
   query,
+  QueryConstraint,
   where
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
@@ -18,19 +19,15 @@ import { Product } from '../models/product';
 export class ProductApiClient {
   private readonly productsCollection = collection(inject(Firestore), 'products');
 
-  public list(): Observable<Product[]> {
-    return collectionData(query(this.productsCollection, orderBy('inStock', 'desc')), {
+  public list(category = 'all'): Observable<Product[]> {
+    const constraints: QueryConstraint[] = [orderBy('inStock', 'desc')];
+    if (category !== 'all') {
+      constraints.push(where('category', '==', category));
+    }
+
+    return collectionData(query(this.productsCollection, ...constraints), {
       idField: 'id'
     }) as Observable<Product[]>;
-  }
-
-  public listByCategory(category: string): Observable<Product[]> {
-    return collectionData(
-      query(this.productsCollection, where('category', '==', category), orderBy('inStock', 'desc')),
-      {
-        idField: 'id'
-      }
-    ) as Observable<Product[]>;
   }
 
   public listByIds(ids: string[]): Observable<Product[]> {
