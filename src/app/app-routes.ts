@@ -9,6 +9,11 @@ export const APP_ROUTES: Routes = [
     redirectTo: 'products'
   },
   {
+    path: 'products/all',
+    pathMatch: 'full',
+    redirectTo: 'products'
+  },
+  {
     matcher: productCategoryMatcher,
     loadComponent: () => import('./product/product-list/product-list')
   },
