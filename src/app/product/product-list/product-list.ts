@@ -33,7 +33,7 @@ import { CartApiClient } from '../../cart/cart-api-client';
           <li>
             <a
               data-testid="category-link"
-              [routerLink]="cat === 'all' ? ['/products'] : ['/products', cat]"
+              [routerLink]="['/products', cat]"
               queryParamsHandling="preserve"
               [matButton]="cat === category() ? 'filled' : 'outlined'"
               [attr.aria-current]="cat === category() ? 'page' : null"

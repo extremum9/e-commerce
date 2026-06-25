@@ -39,7 +39,7 @@ export class SearchBar {
       const trimmed = term.toLowerCase().trim();
       const category = this.categoryApiClient.currentCategory();
 
-      this.router.navigate([`/products/${category === 'all' ? '' : category}`], {
+      this.router.navigate([`/products/${category}`], {
         queryParams: trimmed ? { search: trimmed } : {}
       });
     });
