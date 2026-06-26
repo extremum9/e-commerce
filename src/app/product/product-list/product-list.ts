@@ -112,7 +112,9 @@ export default class ProductList {
           .list(category)
           .pipe(
             map((products) =>
-              products.filter((product) => product.name.toLowerCase().includes(search))
+              products.filter((product) =>
+                product.name.toLowerCase().includes(search.toLowerCase())
+              )
             )
           )
       )
