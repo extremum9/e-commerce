@@ -82,7 +82,8 @@ module.exports = {
     'cart',
     'back-button',
     'confirm-dialog',
-    'star-rating'
+    'star-rating',
+    'search-bar'
   ],
   types
 };

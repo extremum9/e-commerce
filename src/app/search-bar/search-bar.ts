@@ -17,12 +17,23 @@ import { CategoryApiClient } from '../product/category-api-client';
       <input
         class="flex-1 outline-none text-gray-700 text-sm bg-transparent placeholder-gray-400"
         type="search"
+        autocomplete="off"
         placeholder="Search products..."
-        [formControl]="input"
+        aria-label="Search products"
+        [formControl]="queryControl"
+        #inputElement
       />
-      <button class="small" matIconButton type="button">
-        <mat-icon>close</mat-icon>
-      </button>
+      @if (queryControl.value.trim().length > 0) {
+        <button
+          class="small"
+          matIconButton
+          type="button"
+          aria-label="Clear search"
+          (click)="queryControl.setValue(''); inputElement.focus()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
     </search>
   `,
   imports: [MatIcon, MatIconButton, ReactiveFormsModule],
@@ -32,16 +43,18 @@ export class SearchBar {
   private readonly router = inject(Router);
   private readonly categoryApiClient = inject(CategoryApiClient);
 
-  protected readonly input = inject(NonNullableFormBuilder).control('');
+  protected readonly queryControl = inject(NonNullableFormBuilder).control('');
 
   constructor() {
-    this.input.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
-      const trimmed = term.toLowerCase().trim();
-      const category = this.categoryApiClient.currentCategory();
+    this.queryControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((query) => {
+        const trimmedQuery = query.trim();
+        const category = this.categoryApiClient.currentCategory();
 
-      this.router.navigate([`/products/${category}`], {
-        queryParams: trimmed ? { search: trimmed } : {}
+        this.router.navigate([`/products/${category}`], {
+          queryParams: trimmedQuery ? { search: trimmedQuery } : {}
+        });
       });
-    });
   }
 }
