@@ -5,7 +5,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Router } from '@angular/router';
 
-import { CategoryApiClient } from '../product/category-api-client';
+import { CategoryApiClient } from '../../product/category-api-client';
 
 @Component({
   selector: 'app-search-bar',
