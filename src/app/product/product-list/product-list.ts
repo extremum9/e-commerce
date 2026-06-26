@@ -5,9 +5,7 @@ import {
   effect,
   inject,
   input,
-  Signal,
-  signal,
-  WritableSignal
+  Signal
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
@@ -29,7 +27,7 @@ import { CartApiClient } from '../../cart/cart-api-client';
   template: `
     <div class="px-5 md:px-8">
       <ul class="flex flex-wrap justify-center gap-3 mb-6">
-        @for (cat of categories(); track cat) {
+        @for (cat of categories; track cat) {
           <li>
             <a
               data-testid="category-link"
@@ -86,7 +84,7 @@ export default class ProductList {
   private readonly cartApiClient = inject(CartApiClient);
   private readonly snackbar = inject(Snackbar);
 
-  protected readonly categories: WritableSignal<readonly string[]>;
+  protected readonly categories: readonly string[];
 
   protected readonly category = input.required({
     transform: (value?: string) => value?.toLowerCase().trim() || 'all'
@@ -104,7 +102,7 @@ export default class ProductList {
     const categoryApiClient = inject(CategoryApiClient);
     const productApiClient = inject(ProductApiClient);
 
-    this.categories = signal(categoryApiClient.list());
+    this.categories = categoryApiClient.list();
 
     const products$ = toObservable(this.queryParams).pipe(
       switchMap(({ category, search }) =>
