@@ -3,7 +3,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { CategoryApiClient } from '../../product/category-api-client';
 
@@ -41,11 +41,19 @@ import { CategoryApiClient } from '../../product/category-api-client';
 })
 export class SearchBar {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly categoryApiClient = inject(CategoryApiClient);
 
   protected readonly queryControl = inject(NonNullableFormBuilder).control('');
 
   constructor() {
+    this.route.queryParamMap.subscribe((paramMap) => {
+      const searchParam = paramMap.get('search') ?? '';
+      if (this.queryControl.value !== searchParam) {
+        this.queryControl.setValue(searchParam, { emitEvent: false });
+      }
+    });
+
     this.queryControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((query) => {
