@@ -11,7 +11,8 @@ import { MatBadge } from '@angular/material/badge';
 import { AuthApiClient } from '../auth/auth-api-client';
 import { WishlistApiClient } from '../wishlist/wishlist-api-client';
 import { CartApiClient } from '../cart/cart-api-client';
-import { SearchBar } from '../search-bar/search-bar';
+
+import { SearchBar } from './search-bar/search-bar';
 
 @Component({
   selector: 'app-navbar',
@@ -21,7 +22,9 @@ import { SearchBar } from '../search-bar/search-bar';
         <a data-testid="navbar-brand" class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/"
           >MiniStore</a
         >
+
         <app-search-bar class="flex-grow-1" />
+
         <div class="flex items-center gap-2">
           <a
             data-testid="navbar-wishlist-link"
