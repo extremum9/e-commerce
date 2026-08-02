@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, PendingTasks } from '@angular/core';
-import { MatToolbar } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -17,8 +16,10 @@ import { SearchBar } from './search-bar/search-bar';
 @Component({
   selector: 'app-navbar',
   template: `
-    <mat-toolbar class="shadow-md">
-      <div class="container flex items-center justify-between gap-2 px-0">
+    <header class="shadow-md">
+      <div
+        class="container flex flex-wrap items-center justify-center gap-4 min-h-14 py-1.5 md:min-h-16"
+      >
         <a data-testid="navbar-brand" class="shrink-0 text-lg font-medium sm:text-xl" routerLink="/"
           >MiniStore</a
         >
@@ -88,11 +89,10 @@ import { SearchBar } from './search-bar/search-bar';
           }
         </div>
       </div>
-    </mat-toolbar>
+    </header>
   `,
   imports: [
     RouterLink,
-    MatToolbar,
     MatIconButton,
     MatIcon,
     MatButton,
