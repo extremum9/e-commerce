@@ -23,7 +23,6 @@ import ProductList from './product-list';
 
 type SetupConfig = {
   listReturn$: Observable<Product[]>;
-  listByCategoryReturn$: Observable<Product[]>;
 };
 
 @Component({
@@ -42,18 +41,15 @@ describe(ProductList.name, () => {
       createMockProduct({ id: '2', name: 'Product 2' })
     ];
 
-    const { listReturn$, listByCategoryReturn$ }: SetupConfig = {
+    const { listReturn$ }: SetupConfig = {
       listReturn$: of(mockProducts),
-      listByCategoryReturn$: of(mockProducts),
       ...config
     };
 
     const productApiClientSpy = jasmine.createSpyObj<ProductApiClient>('ProductApiClient', [
-      'list',
-      'listByCategory'
+      'list'
     ]);
     productApiClientSpy.list.and.returnValue(listReturn$);
-    productApiClientSpy.listByCategory.and.returnValue(listByCategoryReturn$);
 
     const wishlistApiClientSpy = jasmine.createSpyObj<WishlistApiClient>(
       'WishlistApiClient',
@@ -96,19 +92,24 @@ describe(ProductList.name, () => {
     const harness = await RouterTestingHarness.create('/products');
     const debugElement = harness.routeDebugElement!;
     const loader = TestbedHarnessEnvironment.loader(harness.fixture);
+    const router = TestBed.inject(Router);
 
     const hasSpinnerHarness = () =>
       loader.hasHarness(
         MatProgressSpinnerHarness.with({ selector: '[data-testid=loading-product-list-spinner]' })
       );
+    const getProductCountDebugElement = () =>
+      debugElement.query(By.css('[data-testid=product-count]'));
     const getProductCardDebugElements = () => debugElement.queryAll(By.directive(ProductCardStub));
     const getToggleWishlistButtonDebugElements = () =>
       debugElement.queryAll(By.directive(ToggleWishlistButton));
 
     return {
-      debugElement,
+      harness,
       loader,
+      router,
       hasSpinnerHarness,
+      getProductCountDebugElement,
       getProductCardDebugElements,
       getToggleWishlistButtonDebugElements,
       productApiClientSpy,
@@ -132,7 +133,7 @@ describe(ProductList.name, () => {
     expect(await allLinkHarness.getText()).toBe('All');
 
     const allLinkHost = await allLinkHarness.host();
-    expect(await allLinkHost.getAttribute('href')).toBe('/products');
+    expect(await allLinkHost.getAttribute('href')).toBe('/products/all');
     expect(await allLinkHost.getAttribute('aria-current')).toBe('page');
 
     const electronicsLinkHarness = await loader.getHarness(
@@ -149,7 +150,7 @@ describe(ProductList.name, () => {
     expect(await allLinkHost.getAttribute('aria-current')).toBeNull();
   });
 
-  it('should display spinner if products are loding', async () => {
+  it('should display spinner if products are loading', async () => {
     const products$ = new Subject<Product[]>();
     const { hasSpinnerHarness, mockProducts } = await setup({ listReturn$: products$ });
 
@@ -162,13 +163,13 @@ describe(ProductList.name, () => {
 
   it('should display all products by default with its toggle-wishlist buttons', async () => {
     const {
-      debugElement,
+      getProductCountDebugElement,
       getProductCardDebugElements,
       getToggleWishlistButtonDebugElements,
       mockProducts
     } = await setup();
 
-    const productCountDebugElement = debugElement.query(By.css('[data-testid=product-count]'));
+    const productCountDebugElement = getProductCountDebugElement();
     expect(productCountDebugElement).toBeTruthy();
     expect(productCountDebugElement.nativeElement.textContent).toContain('2 products found');
 
@@ -198,8 +199,8 @@ describe(ProductList.name, () => {
       createMockProduct({ name: 'Filtered product 1' }),
       createMockProduct({ id: '2', name: 'Filtered product 2' })
     ];
-    const { loader, getProductCardDebugElements, productApiClientSpy } = await setup({
-      listByCategoryReturn$: of(mockProducts)
+    const { loader, router, getProductCardDebugElements, productApiClientSpy } = await setup({
+      listReturn$: of(mockProducts)
     });
 
     const clothingLinkHarness = await loader.getHarness(
@@ -207,15 +208,35 @@ describe(ProductList.name, () => {
     );
     await clothingLinkHarness.click();
 
-    expect(productApiClientSpy.listByCategory).toHaveBeenCalledOnceWith('clothing');
-
-    const router = TestBed.inject(Router);
+    expect(productApiClientSpy.list).toHaveBeenCalledWith('clothing');
     expect(router.url).toBe('/products/clothing');
 
     const productCardDebugElements = getProductCardDebugElements();
     expect(productCardDebugElements.length).toBe(2);
     expect((productCardDebugElements[0].componentInstance as ProductCardStub).product().name).toBe(
       mockProducts[0].name
+    );
+  });
+
+  it('should filter products when search query changes', async () => {
+    const {
+      harness,
+      router,
+      getProductCountDebugElement,
+      getProductCardDebugElements,
+      mockProducts
+    } = await setup();
+    await router.navigateByUrl('/products?search=2');
+    harness.detectChanges();
+
+    const productCountDebugElement = getProductCountDebugElement();
+    expect(productCountDebugElement.nativeElement.textContent).toContain('1 products found');
+    expect(productCountDebugElement.nativeElement.textContent).toContain('for "2"');
+
+    const productCardDebugElements = getProductCardDebugElements();
+    expect(productCardDebugElements.length).toBe(1);
+    expect((productCardDebugElements[0].componentInstance as ProductCardStub).product().name).toBe(
+      mockProducts[1].name
     );
   });
 
