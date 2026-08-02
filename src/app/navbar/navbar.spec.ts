@@ -17,6 +17,7 @@ import { AuthDialog } from '../auth/auth-dialog/auth-dialog';
 import { CartApiClient } from '../cart/cart-api-client';
 
 import { Navbar } from './navbar';
+import { SearchBar } from './search-bar/search-bar';
 
 describe(Navbar.name, () => {
   const setup = async () => {
@@ -100,6 +101,12 @@ describe(Navbar.name, () => {
     expect(brandLinkDebugElement).toBeTruthy();
     expect(brandLinkDebugElement.nativeElement.getAttribute('href')).toBe('/');
     expect(brandLinkDebugElement.nativeElement.textContent).toContain('MiniStore');
+  });
+
+  it('should display search bar', async () => {
+    const { debugElement } = await setup();
+
+    expect(debugElement.query(By.directive(SearchBar))).toBeTruthy();
   });
 
   it('should display user links', async () => {
