@@ -12,7 +12,7 @@ test.describe('Products page', () => {
       'Accessories',
       'Home'
     ]);
-    await expect(productsPage.categoryLinks.first()).toHaveAttribute('href', '/products');
+    await expect(productsPage.categoryLinks.first()).toHaveAttribute('href', '/products/all');
     await expect(productsPage.categoryLinks.first()).toHaveAttribute('aria-current', 'page');
     await expect(productsPage.categoryLinks.nth(1)).toHaveAttribute(
       'href',
